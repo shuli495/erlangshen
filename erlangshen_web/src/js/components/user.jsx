@@ -1,0 +1,406 @@
+import BaseComponents from 'components/common/baseComponents.jsx';
+import CommonPageApp from 'components/common/page.jsx';
+import CommonClientApp from 'components/common/client.jsx';
+import CommonAddressApp from 'components/common/address.jsx';
+import CommonReSendCodeApp from 'components/common/reSendCode.jsx';
+import UserStore from 'stores/user.jsx';
+
+class UserApp extends BaseComponents {
+    constructor(props) {
+            super(props, UserStore);
+
+            this.handleQuery = this.handleQuery.bind(this);
+            this.handleInfo = this.handleInfo.bind(this);
+            this.handleUpdate = this.handleUpdate.bind(this);
+            this.handleDel = this.handleDel.bind(this);
+    }
+
+    componentDidMount() {
+        this.handleQuery(1);
+        super.reloading();
+    }
+
+    handleQuery(pageNum) {
+        UserStore.page(pageNum,this.refs.schSource.value,this.refs.schUsername.value,this.refs.schNickname.value,this.refs.schMail.value,this.refs.schPhone.value,this.refs.schTel.value,
+            this.refs.schQQ.value,this.refs.schWeixin.value,this.refs.schWeibo.value,this.refs.schName.value,this.refs.schIdcard.value,this.refs.schSex.value,this.refs.schStatus.value,
+            this.refs.schAddressApp.refs.province.value,this.refs.schAddressApp.refs.city.value,this.refs.schAddressApp.refs.area.value,this.refs.schAddressApp.refs.address.value,
+            this.refs.schClientApp.refs.clientId.value);
+    }
+
+    handleInfo(id,status,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,clientId,province,city,area,address) {
+        if(typeof(id) == "undefined" || id == "undefined" || typeof(id) == "object" || id == "") {
+            this.refs.id.value= "";
+            this.refs.pwd.value= "";
+            this.refs.status.value = "";
+            this.refs.source.value = "";
+            this.refs.username.value = "";
+            this.refs.nickname.value = "";
+            this.refs.mail.value = "";
+            this.refs.phone.value = "";
+            this.refs.tel.value = "";
+            this.refs.qq.value = "";
+            this.refs.weixin.value = "";
+            this.refs.weibo.value = "";
+            this.refs.name.value = "";
+            this.refs.idcard.value = "";
+            this.refs.address.refs.province.value = "";
+            this.refs.address.refs.city.value = "";
+            this.refs.address.refs.area.value = "";
+            this.refs.address.refs.address.value = "";
+            this.refs.client.refs.clientId.value = "";
+
+            this.refs.addBut.style.display = "";
+            this.refs.sendMailBut.hidden();
+            this.refs.updateBut.style.display = "none";
+            this.refs.delBut.style.display = "none";
+
+            this.refs.pwdContainer.style.display = "";
+            this.refs.pwd.setAttribute("data-disabled","false");
+
+            $("#pwdContainer").show();
+        } else {
+            this.refs.id.value= id;
+            this.refs.status.value = status;
+            this.refs.source.value = source;
+            this.refs.username.value = username;
+            this.refs.nickname.value = nickname;
+            this.refs.mail.value = mail;
+            this.refs.phone.value = phone;
+            this.refs.tel.value = tel;
+            this.refs.qq.value = qq;
+            this.refs.weixin.value = weixin;
+            this.refs.weibo.value = weibo;
+            this.refs.name.value = name;
+            this.refs.idcard.value = idcard;
+            this.refs.address.refs.province.value = province;
+            this.refs.address.handleSelectProvince(city, area);
+            this.refs.address.handleSelectCity(area);
+            this.refs.address.refs.address.value = address;
+            this.refs.client.selected(clientId);
+
+            this.refs.addBut.style.display = "none";
+            this.refs.sendMailBut.show();
+            this.refs.updateBut.style.display = "";
+            this.refs.delBut.style.display = "";
+
+            this.refs.pwdContainer.style.display = "none";
+            this.refs.pwd.setAttribute("data-disabled","true");
+
+            $("#pwdContainer").hide();
+        }
+    }
+
+    handleUpdate() {
+        var source = this.refs.source.value;
+        var username = this.refs.username.value;
+        var nickname = this.refs.nickname.value;
+        var mail = this.refs.mail.value;
+        var phone = this.refs.phone.value;
+        var tel = this.refs.tel.value;
+        var qq = this.refs.qq.value;
+        var weixin = this.refs.weixin.value;
+        var weibo = this.refs.weibo.value;
+        var name = this.refs.name.value;
+        var idcard = this.refs.idcard.value;
+        var sex = this.refs.sex.value;
+        var province = this.refs.address.refs.province.value;
+        var city = this.refs.address.refs.city.value;
+        var area = this.refs.address.refs.area.value;
+        var address = this.refs.address.refs.address.value;
+        var clientId = this.refs.client.refs.clientId.value;
+
+        if(!$util_validateValue("user_info")) {
+            return;
+        }
+        if(clientId == "") {
+            $("#clientError").html("所属应用必选");
+            return;
+        } else {
+            $("#clientError").html("");
+        }
+
+        var id = this.refs.id.value;
+        if(typeof(id) == "undefined" || id == "undefined" || id == "") {
+            var pwd = this.refs.pwd.value;
+            if(pwd == "") {
+                $("#pwdError").html("密码不能为空");
+                return;
+            } else {
+                $("#pwdError").html("");
+            }
+            UserStore.add(source,username,pwd,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,clientId,province,city,area,address);
+        } else {
+            UserStore.update(id,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,clientId,province,city,area,address);
+        }
+    }
+
+    handleDel(id) {
+        if(!window.confirm('是否确认删除？')) {
+            return;
+        }
+
+        UserStore.del(id);
+    }
+
+    render(){
+        {
+            // 关闭详情框
+            if(document.getElementById("info_close")) {
+                document.getElementById("info_close").click();
+            }
+
+            var usersDOM = [];
+            for (var i = 0; i < this.state.users.length; i++) {
+                var sex = "女";
+                if(this.state.users[i].sex == 1) {
+                    sex = "男";
+                }
+
+                var statusStr = "正常";
+                var status = this.state.users[i].status;
+                if(status == 1) {
+                    statusStr = "邮箱手机未验证";
+                } else if(status == 2) {
+                    statusStr = "邮箱未验证";
+                } else if(status == 3) {
+                    statusStr = "手机未验证";
+                }
+
+                var id = typeof(this.state.users[i].id) == "undefined" ? "" : this.state.users[i].id;
+                var source = typeof(this.state.users[i].source) == "undefined" ? "" : this.state.users[i].source;
+                var username = typeof(this.state.users[i].username) == "undefined" ? "" : this.state.users[i].username;
+                var nickname = typeof(this.state.users[i].nickname) == "undefined" ? "" : this.state.users[i].nickname;
+                var mail = typeof(this.state.users[i].mail) == "undefined" ? "" : this.state.users[i].mail;
+                var phone = typeof(this.state.users[i].phone) == "undefined" ? "" : this.state.users[i].phone;
+                var tel = typeof(this.state.users[i].tel) == "undefined" ? "" : this.state.users[i].tel;
+                var qq = typeof(this.state.users[i].qq) == "undefined" ? "" : this.state.users[i].qq;
+                var weixin = typeof(this.state.users[i].weixin) == "undefined" ? "" : this.state.users[i].weixin;
+                var weibo = typeof(this.state.users[i].weibo) == "undefined" ? "" : this.state.users[i].weibo;
+                var name = typeof(this.state.users[i].name) == "undefined" ? "" : this.state.users[i].name;
+                var idcard = typeof(this.state.users[i].idcard) == "undefined" ? "" : this.state.users[i].idcard;
+                var province = typeof(this.state.users[i].province) == "undefined" ? "" : this.state.users[i].province;
+                var city = typeof(this.state.users[i].city) == "undefined" ? "" : this.state.users[i].city;
+                var area = typeof(this.state.users[i].area) == "undefined" ? "" : this.state.users[i].area;
+                var clientId = typeof(this.state.users[i].clientId) == "undefined" ? "" : this.state.users[i].clientId;
+                var clientName = typeof(this.state.users[i].clientName) == "undefined" ? "" : this.state.users[i].clientName;
+
+                var address = this.state.users[i].address;
+                var addresses = [];
+                if(typeof(address) != "undefined") {
+                    addresses = address.split('_');
+                }
+                var newAddres = "";
+                for(var j=0; j<addresses.length; j++) {
+                    if(newAddres != "") {
+                        newAddres += " ";
+                    }
+                    newAddres += addresses[j];
+                }
+
+                usersDOM.push(
+                                        <tr>
+                                            <td>
+                                                <a href="javascript:void(0);" className="fa fa-pencil-square-o" data-toggle="modal" data-target="#user_info" title="修改"
+                                                onClick={this.handleInfo.bind(this,id,status,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,clientId,province,city,area,addresses[addresses.length-1])}></a>&nbsp;
+                                                <a href="javascript:void(0);" className="fa fa-times errorBut" title="删除" onClick={this.handleDel.bind(this,id)}></a>
+                                            </td>
+                                            <td>{id}</td>
+                                            <td>{username}</td>
+                                            <td>{nickname}</td>
+                                            <td>{mail}</td>
+                                            <td>{phone}</td>
+                                            <td>{tel}</td>
+                                            <td>{qq}</td>
+                                            <td>{weixin}</td>
+                                            <td>{weibo}</td>
+                                            <td>{name}</td>
+                                            <td>{sex}</td>
+                                            <td>{idcard}</td>
+                                            <td>{source}</td>
+                                            <td>{clientName}</td>
+                                            <td>{newAddres}</td>
+                                            <td>{statusStr}</td>
+                                        </tr>
+                                      );
+            }
+        }
+
+        return (
+            <div className="content table-responsive">
+                <div className="search_content">
+                    <input type="text" placeholder="用户名" ref="schUsername" />
+                    <input type="text" placeholder="昵称" ref="schNickname" />
+                    <input type="text" placeholder="邮箱" ref="schMail" />
+                    <input type="text" placeholder="手机号" ref="schPhone" />
+                    <input type="text" placeholder="电话" ref="schTel" />
+                    <input type="text" placeholder="QQ" ref="schQQ" />
+                    <input type="text" placeholder="微信" ref="schWeixin" />
+                    <input type="text" placeholder="微博" ref="schWeibo" />
+                    <input type="text" placeholder="姓名" ref="schName" />
+                    <input type="text" placeholder="身份证" ref="schIdcard" />
+                    <select ref="schSex"><option value ="">性别</option><option value ="1">男</option><option value ="0">女</option></select>
+                    <select ref="schStatus"><option value ="">状态</option><option value ="0">正常</option><option value ="1">手机邮箱未验证</option><option value ="2">邮箱未验证</option><option value ="3">手机未验证</option></select>
+                    <input type="text" placeholder="来源" ref="schSource" />
+                    <CommonClientApp ref="schClientApp"/>
+                    <CommonAddressApp ref="schAddressApp"/>
+                    <button className="button button-primary button-circle button-small" onClick={this.handleQuery.bind(this,1)}><i className="fa fa-search"></i></button>
+                </div>
+                <table className="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th className="width55"><a href="javascript:void(0);" className="fa fa-plus" data-toggle="modal" data-target="#user_info" onClick={this.handleInfo} title="添加"></a></th>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>昵称</th>
+                            <th>邮箱</th>
+                            <th>手机号</th>
+                            <th>电话</th>
+                            <th>QQ</th>
+                            <th>微信</th>
+                            <th>微博</th>
+                            <th>姓名</th>
+                            <th>性别</th>
+                            <th>身份证</th>
+                            <th>来源</th>
+                            <th>所属应用</th>
+                            <th>地址</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {usersDOM}
+                    </tbody>
+                </table>
+
+                <CommonPageApp total={this.state.total} pageSize={this.state.pageSize} pageNum={this.state.pageNum} handleQuery={this.handleQuery} />
+
+                <div className="modal fade" id="user_info" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" id="info_close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            </div>
+                            <div className="modal-body search_content add_content show_body">
+                                <input type="hidden" ref="id" />
+                                <input type="hidden" ref="status" />
+                                <form className="form-horizontal">
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">用户名</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" placeholder="1-32个字符" ref="username" data-errMsgId="usernameError" data-max="32" data-maxText="1-32个字符"/>
+                                           <div id="usernameError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group" id="pwdContainer" ref="pwdContainer">
+                                        <label class="col-sm-2 control-label"><span className="errorMsg">*&nbsp;</span>密码</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" placeholder="6-16个字符" ref="pwd" data-errMsgId="pwdError" data-min="6" data-max="16" data-maxText="6-16个字符"/>
+                                           <div id="pwdError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">昵称</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" placeholder="1-8个汉字或字母" ref="nickname" data-errMsgId="nicknameError" data-max="8" data-maxText="1-32个字符"/>
+                                           <div id="nicknameError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label"><span className="errorMsg">*&nbsp;</span>邮箱</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" placeholder="1-32个字符" ref="mail" data-errMsgId="mailError"  data-mail="true" data-empty="true" data-emptyText="不能为空" data-max="32" data-maxText="1-32个字符"/>
+                                           <div id="mailError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">手机号</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" placeholder="11位手机号码" ref="phone" data-errMsgId="phoneError"  data-phone="true" data-max="11" data-maxText="11位手机号码"/>
+                                           <div id="phoneError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">电话</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" placeholder="电话号码" ref="tel" data-errMsgId="telError" data-max="16" data-maxText="16个字符以内"/>
+                                           <div id="telError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">QQ</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" placeholder="QQ" ref="qq" data-errMsgId="qqError" data-maxText="1-32个字符"/>
+                                           <div id="qqError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">微信</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" placeholder="微信" ref="weixin" data-errMsgId="weixinError" data-max="32" data-maxText="1-32个字符"/>
+                                           <div id="weixinError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">微博</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" placeholder="微博" ref="weibo" data-errMsgId="weiboError" data-max="32" data-maxText="1-32个字符"/>
+                                           <div id="weiboError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">姓名</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" placeholder="1-32个汉字" ref="name" data-errMsgId="nameError" data-max="32" data-maxText="1-32个字符"/>
+                                           <div id="nameError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">性别</label>
+                                        <div className="col-sm-9">
+                                          <select ref="sex"><option value ="1">男</option><option value ="0">女</option></select>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">身份证</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" placeholder="18位身份证号码" ref="idcard" data-errMsgId="idcardError"  data-idcard="true" data-length="18" data-lengthText="18位身份证号码"/>
+                                           <div id="idcardError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">地址</label>
+                                        <div className="col-sm-9">
+                                           <CommonAddressApp ref="address"/>
+                                           <div id="addressError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">来源</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" placeholder="1-255个汉字或字母" ref="source" data-errMsgId="sourceError" data-max="255" data-maxText="1-255个汉字或字母"/>
+                                           <div id="sourceError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label"><span className="errorMsg">*&nbsp;</span>所属应用</label>
+                                        <div className="col-sm-9">
+                                          <CommonClientApp ref="client"/>
+                                           <div id="clientError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="button button-primary button-rounded button-small" ref="addBut" onClick={this.handleUpdate}>添加</button>&nbsp;
+                                <CommonReSendCodeApp ref="sendMailBut" clsName="button button-primary button-rounded button-small resend_but" userId={id} text="重发验证邮件" />&nbsp;
+                                <button type="button" className="button button-primary button-rounded button-small" ref="updateBut" onClick={this.handleUpdate}>修改</button>&nbsp;
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}
+
+module.exports = UserApp;

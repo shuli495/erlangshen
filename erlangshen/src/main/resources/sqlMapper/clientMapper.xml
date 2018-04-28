@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.website.dao.ClientDaoMapper">
+	<resultMap type="com.website.model.bo.ClientBO" id="clientBO">
+		<id column="ID" property="id" />
+		<result column="NAME" property="name" />
+		<result column="CREATED_BY" property="createdBy" />
+		<result column="DELETED" property="deleted" />
+		<result column="DELETED_TIME" property="deletedTime" />
+	</resultMap>
+	<resultMap type="com.website.model.vo.ClientVO" id="clientVO" extends="clientBO">
+	</resultMap>
+
+	<insert id="insert" parameterType="com.website.model.bo.ClientBO" useGeneratedKeys="true" keyProperty="id">
+		INSERT client
+		(ID,`NAME`,CREATED_BY,DELETED,DELETED_TIME)
+		VALUES
+		(#{id},#{name},#{createdBy},#{deleted},#{deletedTime})
+	</insert>
+
+	<insert id="insertBatch" parameterType="java.util.List">
+		INSERT client
+		(ID,`NAME`,CREATED_BY,DELETED,DELETED_TIME)
+		VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.id},#{item.name},#{item.createdBy},#{item.deleted},#{item.deletedTime})
+		</foreach>
+	</insert>
+
+	<update id="update" parameterType="com.website.model.bo.ClientBO">
+		UPDATE client
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="name != null">
+				`NAME`=#{name},
+			</if>
+		</trim>
+		WHERE id=#{id}
+	</update>
+
+	<update id="updateBatch" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
+			UPDATE client
+			<trim prefix="SET" suffixOverrides=",">
+				<if test="name != null">
+					`NAME`=#{item.name},
+				</if>
+			</trim>
+			WHERE id=#{id}
+		</foreach>
+	</update>
+
+	<update id="deleteLogic" parameterType="string">
+		UPDATE client SET deleted_time=now(),deleted=#{deleted} WHERE id=#{id}
+	</update>
+
+	<update id="deleteLogicBatch" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
+			UPDATE client SET deleted_time=now(),deleted=#{item.deleted} WHERE id=#{item.id}
+		</foreach>
+	</update>
+
+	<delete id="delete" parameterType="String">
+		DELETE FROM client WHERE id=#{id}
+	</delete>
+
+	<delete id="deleteBatch" parameterType="java.util.List">
+		DELETE FROM client WHERE id IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<select id="findById" parameterType="string" resultMap="clientVO">
+		SELECT
+		ID,`NAME`,CREATED_BY,DELETED,DELETED_TIME
+		FROM client
+		WHERE id=#{id}
+	</select>
+
+	<select id="queryByAnd" parameterType="com.website.model.bo.ClientBO" resultMap="clientVO">
+		SELECT
+		t1.ID,t1.`NAME`,t1.CREATED_BY,t1.DELETED,t1.DELETED_TIME, COUNT(t2.ID) as setMailNum, COUNT(t3.ID) as setPhoneNum
+		FROM client t1
+		LEFT JOIN client_mail t2 ON t1.ID=t2.client_id
+		LEFT JOIN client_phone t3 ON t1.ID=t3.client_id
+		<where>
+			<if test="name != null">
+				and t1.`NAME` like CONCAT('%',#{name},'%')
+			</if>
+			<if test="createdBy != null">
+				and t1.CREATED_BY=#{createdBy}
+			</if>
+			<if test="deleted != null">
+				and t1.DELETED=#{deleted}
+			</if>
+			<if test="deletedTime != null">
+				and t1.DELETED_TIME=#{deletedTime}
+			</if>
+		</where>
+		GROUP BY t1.ID,t1.`NAME`,t1.CREATED_BY,t1.DELETED,t1.DELETED_TIME
+	</select>
+
+</mapper>

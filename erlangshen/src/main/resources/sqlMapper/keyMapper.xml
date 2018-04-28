@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.website.dao.KeyDaoMapper">
+	<resultMap type="com.website.model.bo.KeyBO" id="keyBO">
+		<id column="ACCESS" property="access" />
+		<result column="SECRET" property="secret" />
+		<result column="CLIENT_ID" property="clientId" />
+		<result column="STATUS" property="status" />
+		<result column="CREATED_TIME" property="createdTime" />
+	</resultMap>
+	<resultMap type="com.website.model.vo.KeyVO" id="keyVO" extends="keyBO">
+	</resultMap>
+
+	<insert id="insert" parameterType="com.website.model.vo.KeyVO" useGeneratedKeys="true" keyProperty="access">
+		INSERT `key`
+		(ACCESS,SECRET,CLIENT_ID,STATUS,CREATED_TIME)
+		VALUES
+		(#{access},#{secret},#{clientId},#{status},#{createdTime})
+	</insert>
+
+	<insert id="insertBatch" parameterType="java.util.List">
+		INSERT `key`
+		(ACCESS,SECRET,CLIENT_ID,STATUS,CREATED_TIME)
+		VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.access},#{item.secret},#{item.clientId},#{item.status},#{item.createdTime})
+		</foreach>
+	</insert>
+
+	<update id="update" parameterType="com.website.model.vo.KeyVO">
+		UPDATE `key`
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="secret != null">
+				SECRET=#{secret},
+			</if>
+			<if test="clientId != null">
+				CLIENT_ID=#{clientId},
+			</if>
+			<if test="status != null">
+				STATUS=#{status},
+			</if>
+			<if test="createdTime != null">
+				CREATED_TIME=#{createdTime},
+			</if>
+		</trim>
+		WHERE access=#{access}
+	</update>
+
+	<update id="updateBatch" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
+			UPDATE `key`
+			<trim prefix="SET" suffixOverrides=",">
+				<if test="secret != null">
+					SECRET=#{item.secret},
+				</if>
+				<if test="clientId != null">
+					CLIENT_ID=#{item.clientId},
+				</if>
+				<if test="status != null">
+					STATUS=#{item.status},
+				</if>
+				<if test="createdTime != null">
+					CREATED_TIME=#{item.createdTime},
+				</if>
+			</trim>
+			WHERE access=#{access}
+		</foreach>
+	</update>
+
+	<delete id="delete" parameterType="String">
+		DELETE FROM `key` WHERE access=#{access}
+	</delete>
+
+	<delete id="deleteBatch" parameterType="java.util.List">
+		DELETE FROM `key` WHERE access IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<select id="findById" parameterType="string" resultMap="keyVO">
+		SELECT
+		ACCESS,SECRET,CLIENT_ID,STATUS,CREATED_TIME
+		FROM `key`
+		WHERE access=#{access}
+	</select>
+
+	<select id="queryByOr" parameterType="com.website.model.vo.KeyVO" resultMap="keyVO">
+		SELECT
+		t1.ACCESS,t1.SECRET,t1.CLIENT_ID,t1.STATUS,t1.CREATED_TIME,t2.NAME as clientName
+		FROM `key` t1,client t2
+		<where>
+			t1.CLIENT_ID=t2.ID
+			<if test="secret != null">
+				OR t1.SECRET=#{secret}
+			</if>
+			<if test="clientId != null">
+				OR t1.CLIENT_ID=#{clientId}
+			</if>
+			<if test="status != null">
+				OR t1.STATUS=#{status}
+			</if>
+			<if test="createdTime != null">
+				OR t1.CREATED_TIME=#{createdTime}
+			</if>
+			<if test="createdBy != null">
+				OR t2.CREATED_BY=#{createdBy}
+			</if>
+		</where>
+	</select>
+
+	<select id="queryByAnd" parameterType="com.website.model.vo.KeyVO" resultMap="keyVO">
+		SELECT
+		t1.ACCESS,t1.SECRET,t1.CLIENT_ID,t1.STATUS,t1.CREATED_TIME,t2.NAME as clientName
+		FROM `key` t1,client t2
+		<where>
+			t1.CLIENT_ID=t2.ID
+			<if test="secret != null">
+				AND t1.SECRET=#{secret}
+			</if>
+			<if test="clientId != null">
+				AND t1.CLIENT_ID=#{clientId}
+			</if>
+			<if test="status != null">
+				AND t1.STATUS=#{status}
+			</if>
+			<if test="createdTime != null">
+				AND t1.CREATED_TIME=#{createdTime}
+			</if>
+			<if test="createdBy != null">
+				AND t2.CREATED_BY=#{createdBy}
+			</if>
+		</where>
+	</select>
+
+</mapper>

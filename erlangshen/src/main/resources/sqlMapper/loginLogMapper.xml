@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.website.dao.LoginLogDaoMapper">
+	<resultMap type="com.website.model.bo.LoginLogBO" id="loginLogBO">
+		<id column="ID" property="id" />
+		<result column="USER_ID" property="userId" />
+		<result column="IP" property="ip" />
+		<result column="LOGIN_TIME" property="loginTime" />
+	</resultMap>
+	<resultMap type="com.website.model.vo.LoginLogVO" id="loginLogVO" extends="loginLogBO">
+	</resultMap>
+
+	<insert id="insert" parameterType="com.website.model.vo.LoginLogVO" useGeneratedKeys="true" keyProperty="id">
+		INSERT login_log
+		(USER_ID,IP,LOGIN_TIME)
+		VALUES
+		(#{userId},#{ip},#{loginTime})
+	</insert>
+
+	<delete id="delete" parameterType="Integer">
+		DELETE FROM login_log WHERE id=#{id}
+	</delete>
+
+	<select id="findById" parameterType="integer" resultMap="loginLogVO">
+		SELECT
+		USER_ID,IP,LOGIN_TIME
+		FROM login_log
+		WHERE id=#{id}
+	</select>
+
+	<select id="queryByOr" parameterType="com.website.model.vo.LoginLogVO" resultMap="loginLogVO">
+		SELECT
+		t1.USER_ID,t1.IP,t1.LOGIN_TIME,t2.USERNAME,t2.NICKNAME,t2.MAIL,t2.PHONE,t3.NAME AS clientName
+		FROM login_log t1,`user` t2,client t3
+		<where>
+			t1.USER_ID=t2.ID and t2.CLIENT_ID=t3.ID and t3.CREATED_BY=#{createdBy}
+			<if test="userId != null">
+				OR USER_ID=#{userId}
+			</if>
+			<if test="ip != null">
+				OR IP=#{ip}
+			</if>
+			<if test="loginTime != null">
+				OR LOGIN_TIME=#{loginTime}
+			</if>
+			<if test="username != null">
+				OR t2.USERNAME=#{userName}
+			</if>
+			<if test="nickname != null">
+				OR t2.nickname=#{nickname}
+			</if>
+			<if test="mail != null">
+				OR t2.MAIL=#{mail}
+			</if>
+			<if test="phone != null">
+				OR t2.PHONE=#{phone}
+			</if>
+			<if test="clientId != null">
+				OR t3.ID=#{clientId}
+			</if>
+		</where>
+	</select>
+
+	<select id="queryByAnd" parameterType="com.website.model.vo.LoginLogVO" resultMap="loginLogVO">
+		SELECT
+		t1.USER_ID,t1.IP,t1.LOGIN_TIME,t2.USERNAME,t2.NICKNAME,t2.MAIL,t2.PHONE,t3.NAME AS clientName
+		FROM login_log t1,`user` t2,client t3
+		<where>
+			t1.USER_ID=t2.ID and t2.CLIENT_ID=t3.ID and t3.CREATED_BY=#{createdBy}
+			<if test="userId != null">
+				AND t1.USER_ID=#{userId}
+			</if>
+			<if test="ip != null">
+				AND t1.IP=#{ip}
+			</if>
+			<if test="loginTime != null">
+				AND t1.LOGIN_TIME=#{loginTime}
+			</if>
+			<if test="username != null">
+				AND t2.USERNAME=#{username}
+			</if>
+			<if test="nickname != null">
+				AND t2.nickname=#{nickname}
+			</if>
+			<if test="mail != null">
+				AND t2.MAIL=#{mail}
+			</if>
+			<if test="phone != null">
+				AND t2.PHONE=#{phone}
+			</if>
+			<if test="clientId != null">
+				AND t3.ID=#{clientId}
+			</if>
+		</where>
+	</select>
+
+</mapper>

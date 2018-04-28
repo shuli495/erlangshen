@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.website.dao.PermissionUserRoleDaoMapper">
+	<resultMap type="com.website.model.bo.PermissionUserRoleBO" id="permissionUserRoleBO">
+		<id column="ID" property="id" />
+		<result column="USER_ID" property="userId" />
+		<result column="ROLE_ID" property="roleId" />
+	</resultMap>
+	<resultMap type="com.website.model.vo.PermissionUserRoleVO" id="permissionUserRoleVO" extends="permissionUserRoleBO">
+	</resultMap>
+
+	<insert id="insert" parameterType="com.website.model.vo.PermissionUserRoleVO" useGeneratedKeys="true" keyProperty="id">
+		INSERT permission_user_role
+		(USER_ID,ROLE_ID)
+		VALUES
+		(#{userId},#{roleId})
+	</insert>
+
+	<insert id="insertBatch" parameterType="java.util.List">
+		INSERT permission_user_role
+		(USER_ID,ROLE_ID)
+		VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.userId},#{item.roleId})
+		</foreach>
+	</insert>
+
+	<update id="update" parameterType="com.website.model.vo.PermissionUserRoleVO">
+		UPDATE permission_user_role
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="userId != null">
+				USER_ID=#{userId},
+			</if>
+			<if test="roleId != null">
+				ROLE_ID=#{roleId},
+			</if>
+		</trim>
+		WHERE id=#{id}
+	</update>
+
+	<update id="updateBatch" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
+			UPDATE permission_user_role
+			<trim prefix="SET" suffixOverrides=",">
+				<if test="userId != null">
+					USER_ID=#{item.userId},
+				</if>
+				<if test="roleId != null">
+					ROLE_ID=#{item.roleId},
+				</if>
+			</trim>
+			WHERE id=#{id}
+		</foreach>
+	</update>
+
+	<delete id="delete" parameterType="Integer">
+		DELETE FROM permission_user_role WHERE ROLE_ID=#{id}
+	</delete>
+
+	<delete id="deleteBatch" parameterType="java.util.List">
+		<foreach item="item" index="index" collection="list" separator=";">
+		DELETE FROM permission_user_role
+			WHERE ROLE_ID=#{item.roleId} AND USER_ID=#{item.userId}
+		</foreach>
+	</delete>
+
+	<select id="findById" parameterType="integer" resultMap="permissionUserRoleVO">
+		SELECT
+		ID,USER_ID,ROLE_ID
+		FROM permission_user_role
+		WHERE id=#{id}
+	</select>
+
+	<select id="queryByOr" parameterType="com.website.model.vo.PermissionUserRoleVO" resultMap="permissionUserRoleVO">
+		SELECT
+		ID,USER_ID,ROLE_ID
+		FROM permission_user_role
+		<where>
+			<if test="userId != null">
+				OR USER_ID=#{userId}
+			</if>
+			<if test="roleId != null">
+				OR ROLE_ID=#{roleId}
+			</if>
+		</where>
+	</select>
+
+	<select id="queryByAnd" parameterType="com.website.model.vo.PermissionUserRoleVO" resultMap="permissionUserRoleVO">
+		SELECT
+		ID,USER_ID,ROLE_ID
+		FROM permission_user_role
+		<where>
+			<if test="userId != null">
+				AND USER_ID=#{userId}
+			</if>
+			<if test="roleId != null">
+				AND ROLE_ID=#{roleId}
+			</if>
+		</where>
+	</select>
+
+</mapper>

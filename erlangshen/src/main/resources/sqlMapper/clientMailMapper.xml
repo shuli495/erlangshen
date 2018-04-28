@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.website.dao.ClientMailDaoMapper">
+	<resultMap type="com.website.model.bo.ClientMailBO" id="clientMailBO">
+		<id column="ID" property="id" />
+		<result column="CLIENT_ID" property="clientId" />
+		<result column="MAIL" property="mail" />
+		<result column="USERNAME" property="username" />
+		<result column="PWD" property="pwd" />
+		<result column="SMTP" property="smtp" />
+		<result column="TYPE" property="type" />
+		<result column="SUBJECT" property="subject" />
+		<result column="TEXT" property="text" />
+	</resultMap>
+	<resultMap type="com.website.model.vo.ClientMailVO" id="clientMailVO" extends="clientMailBO">
+	</resultMap>
+
+	<insert id="insert" parameterType="com.website.model.vo.ClientMailVO" useGeneratedKeys="true" keyProperty="id">
+		INSERT client_mail
+		(CLIENT_ID,MAIL,USERNAME,PWD,SMTP,TYPE,SUBJECT,TEXT)
+		VALUES
+		(#{clientId},#{mail},#{username},#{pwd},#{smtp},#{type},#{subject},#{text})
+	</insert>
+
+	<delete id="delete" parameterType="Integer">
+		DELETE FROM client_mail WHERE ID=#{id}
+	</delete>
+
+	<delete id="deleteByClientId" parameterType="String">
+		DELETE FROM client_mail WHERE CLIENT_ID=#{clientId}
+	</delete>
+
+	<select id="find" parameterType="com.website.model.vo.ClientMailVO" resultMap="clientMailVO">
+		SELECT
+		ID,CLIENT_ID,MAIL,USERNAME,PWD,SMTP,TYPE,SUBJECT,TEXT
+		FROM client_mail
+		WHERE CLIENT_ID=#{clientId} AND `TYPE`=#{type}
+	</select>
+
+	<select id="findById" parameterType="integer" resultMap="clientMailVO">
+		SELECT
+		ID,CLIENT_ID,MAIL,USERNAME,PWD,SMTP,TYPE,SUBJECT,TEXT
+		FROM client_mail
+		WHERE ID=#{id}
+	</select>
+
+	<select id="queryByAnd" parameterType="com.website.model.vo.ClientMailVO" resultMap="clientMailVO">
+		SELECT
+		ID,CLIENT_ID,MAIL,USERNAME,SMTP,TYPE,SUBJECT,TEXT
+		FROM client_mail
+		<where>
+			<if test="clientId != null">
+				AND CLIENT_ID=#{clientId}
+			</if>
+			<if test="mail != null">
+				AND MAIL=#{mail}
+			</if>
+			<if test="username != null">
+				AND USERNAME=#{username}
+			</if>
+			<if test="smtp != null">
+				AND SMTP=#{smtp}
+			</if>
+			<if test="type != null">
+				AND TYPE=#{type}
+			</if>
+			<if test="text != null">
+				AND TEXT=#{text}
+			</if>
+		</where>
+	</select>
+
+</mapper>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.website.dao.ClientSecurityDaoMapper">
+	<resultMap type="com.website.model.bo.ClientSecurityBO" id="clientSecurityBO">
+		<id column="CLIENT_ID" property="clientId" />
+		<result column="IS_CHECK_PLACE" property="isCheckPlace" />
+		<result column="CHECK_PLACE_PRIORITY" property="checkPlacePriority" />
+		<result column="CHECK_PLACE_PHONE_TYPE_ID" property="checkPlacePhoneTypeId" />
+		<result column="CHECK_PLACE_MAIL_TYPE_ID" property="checkPlaceMailTypeId" />
+		<result column="IS_CHECK_PLATFORM" property="isCheckPlatform" />
+		<result column="CHECK_PLATFORM_TYPE" property="checkPlatformType" />
+		<result column="LOGIN_API" property="loginApi" />
+	</resultMap>
+	<resultMap type="com.website.model.vo.ClientSecurityVO" id="clientSecurityVO" extends="clientSecurityBO">
+	</resultMap>
+
+	<insert id="insert" parameterType="com.website.model.vo.ClientSecurityVO" useGeneratedKeys="true" keyProperty="id">
+		INSERT client_security
+		(CLIENT_ID,IS_CHECK_PLACE,CHECK_PLACE_PRIORITY,CHECK_PLACE_PHONE_TYPE_ID,CHECK_PLACE_MAIL_TYPE_ID,IS_CHECK_PLATFORM,CHECK_PLATFORM_TYPE,LOGIN_API)
+		VALUES
+		(#{clientId},#{isCheckPlace},#{checkPlacePriority},#{checkPlacePhoneTypeId},#{checkPlaceMailTypeId},#{isCheckPlatform},#{checkPlatformType},#{loginApi})
+	</insert>
+
+	<insert id="insertBatch" parameterType="java.util.List">
+		INSERT client_security
+		(CLIENT_ID,IS_CHECK_PLACE,CHECK_PLACE_PRIORITY,CHECK_PLACE_PHONE_TYPE_ID,CHECK_PLACE_MAIL_TYPE_ID,IS_CHECK_PLATFORM,CHECK_PLATFORM_TYPE,LOGIN_API)
+		VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.clientId},#{item.isCheckPlace},#{item.checkPlacePriority},#{item.checkPlacePhoneTypeId},#{item.checkPlaceMailTypeId},#{item.isCheckPlatform},#{item.checkPlatformType},#{item.loginApi})
+		</foreach>
+	</insert>
+
+	<update id="update" parameterType="com.website.model.vo.ClientSecurityVO">
+		UPDATE client_security
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="isCheckPlace != null">
+				IS_CHECK_PLACE=#{isCheckPlace},
+			</if>
+			<if test="checkPlacePriority != null">
+				CHECK_PLACE_PRIORITY=#{checkPlacePriority},
+			</if>
+			<if test="checkPlacePhoneTypeId != null">
+				CHECK_PLACE_PHONE_TYPE_ID=#{checkPlacePhoneTypeId},
+			</if>
+			<if test="checkPlaceMailTypeId != null">
+				CHECK_PLACE_MAIL_TYPE_ID=#{checkPlaceMailTypeId},
+			</if>
+			<if test="isCheckPlatform != null">
+				IS_CHECK_PLATFORM=#{isCheckPlatform},
+			</if>
+			<if test="checkPlatformType != null">
+				CHECK_PLATFORM_TYPE=#{checkPlatformType},
+			</if>
+			<if test="loginApi != null">
+				LOGIN_API=#{loginApi},
+			</if>
+		</trim>
+		WHERE CLIENT_ID=#{clientId}
+	</update>
+
+	<delete id="delete" parameterType="String">
+		DELETE FROM client_security WHERE CLIENT_ID=#{clientId}
+	</delete>
+
+	<delete id="deleteBatch" parameterType="java.util.List">
+		DELETE FROM client_security WHERE id IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<select id="findById" parameterType="String" resultMap="clientSecurityVO">
+		SELECT
+		CLIENT_ID,IS_CHECK_PLACE,CHECK_PLACE_PRIORITY,CHECK_PLACE_PHONE_TYPE_ID,CHECK_PLACE_MAIL_TYPE_ID,IS_CHECK_PLATFORM,CHECK_PLATFORM_TYPE,LOGIN_API
+		FROM client_security
+		WHERE CLIENT_ID=#{clientId}
+	</select>
+
+	<select id="queryByOr" parameterType="com.website.model.vo.ClientSecurityVO" resultMap="clientSecurityVO">
+		SELECT
+		CLIENT_ID,IS_CHECK_PLACE,CHECK_PLACE_PRIORITY,CHECK_PLACE_PHONE_TYPE_ID,CHECK_PLACE_MAIL_TYPE_ID,IS_CHECK_PLATFORM,CHECK_PLATFORM_TYPE,LOGIN_API
+		FROM client_security
+		<where>
+			<if test="clientId != null">
+				OR CLIENT_ID=#{clientId}
+			</if>
+			<if test="isCheckPlace != null">
+				OR IS_CHECK_PLACE=#{isCheckPlace}
+			</if>
+			<if test="checkPlacePriority != null">
+				OR CHECK_PLACE_PRIORITY=#{checkPlacePriority}
+			</if>
+			<if test="checkPlacePhoneTypeId != null">
+				OR CHECK_PLACE_PHONE_TYPE_ID=#{checkPlacePhoneTypeId}
+			</if>
+			<if test="checkPlaceMailTypeId != null">
+				OR CHECK_PLACE_MAIL_TYPE_ID=#{checkPlaceMailTypeId}
+			</if>
+			<if test="isCheckPlatform != null">
+				OR IS_CHECK_PLATFORM=#{isCheckPlatform}
+			</if>
+			<if test="checkPlatformType != null">
+				OR CHECK_PLATFORM_TYPE=#{checkPlatformType}
+			</if>
+			<if test="loginApi != null">
+				OR LOGIN_API=#{loginApi}
+			</if>
+		</where>
+	</select>
+
+	<select id="queryByAnd" parameterType="com.website.model.vo.ClientSecurityVO" resultMap="clientSecurityVO">
+		SELECT
+		CLIENT_ID,IS_CHECK_PLACE,CHECK_PLACE_PRIORITY,CHECK_PLACE_PHONE_TYPE_ID,CHECK_PLACE_MAIL_TYPE_ID,IS_CHECK_PLATFORM,CHECK_PLATFORM_TYPE,LOGIN_API
+		FROM client_security
+		<where>
+			<if test="clientId != null">
+				AND CLIENT_ID=#{clientId}
+			</if>
+			<if test="isCheckPlace != null">
+				AND IS_CHECK_PLACE=#{isCheckPlace}
+			</if>
+			<if test="checkPlacePriority != null">
+				AND CHECK_PLACE_PRIORITY=#{checkPlacePriority}
+			</if>
+			<if test="checkPlacePhoneTypeId != null">
+				AND CHECK_PLACE_PHONE_TYPE_ID=#{checkPlacePhoneTypeId}
+			</if>
+			<if test="checkPlaceMailTypeId != null">
+				AND CHECK_PLACE_MAIL_TYPE_ID=#{checkPlaceMailTypeId}
+			</if>
+			<if test="isCheckPlatform != null">
+				AND IS_CHECK_PLATFORM=#{isCheckPlatform}
+			</if>
+			<if test="checkPlatformType != null">
+				AND CHECK_PLATFORM_TYPE=#{checkPlatformType}
+			</if>
+			<if test="loginApi != null">
+				AND LOGIN_API=#{loginApi}
+			</if>
+		</where>
+	</select>
+
+</mapper>
