@@ -6,7 +6,8 @@ import java.util.Date;
 
 import com.fastjavaframework.base.BaseBean;
 
-public class UserBO extends BaseBean {
+public class
+UserBO extends BaseBean {
 	private static final long serialVersionUID = 1L;
 
 	private String id;	
@@ -60,8 +61,10 @@ public class UserBO extends BaseBean {
 	@Size(max=18, min=0, message="{user.idcard.size}")
 	private String idcard;	//身份证号
 
-	@Size(max=255, min=0, message="{user.idcardImg.size}")
-	private String idcardImg;	//身份证图片
+	private Integer certification;	// 实名认证 0未实名 1认证中 2认证失败 3认证成功
+
+	@Size(max=255)
+	private String certificationFailMsg;	// 实名认证失败原因
 
 	@Size(max=64, min=0, message="{user.province.size}")
 	private String province;	//省
@@ -217,12 +220,20 @@ public class UserBO extends BaseBean {
 		this.idcard = idcard;
 	}
 
-	public String getIdcardImg() {
-		return idcardImg;
+	public Integer getCertification() {
+		return certification;
 	}
 
-	public void setIdcardImg(String idcardImg) {
-		this.idcardImg = idcardImg;
+	public void setCertification(Integer certification) {
+		this.certification = certification;
+	}
+
+	public String getCertificationFailMsg() {
+		return certificationFailMsg;
+	}
+
+	public void setCertificationFailMsg(String certificationFailMsg) {
+		this.certificationFailMsg = certificationFailMsg;
 	}
 
 	public String getProvince() {

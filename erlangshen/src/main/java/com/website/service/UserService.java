@@ -6,6 +6,7 @@ import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.page.PageResult;
 import com.fastjavaframework.util.*;
+import com.website.Executor.Certification;
 import com.website.common.Constants;
 import com.website.common.MailSender;
 import com.website.common.PhoneSender;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.fastjavaframework.base.BaseService;
 import com.website.dao.UserDao;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.*;
 
 @Service
@@ -36,6 +38,20 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	@Autowired
 	public UserRecycleService userRecycleService;
 
+	/**
+	 * 该用户是否为登陆用户的子用户
+	 * @param tokenUserId
+	 * @param userId
+     * @return
+     */
+	public boolean isMyUser(String tokenUserId, String userId) {
+		UserVO user = this.dao.baseFind(userId);
+		if(null == user) {
+			throw new ThrowPrompt("用户不存在！");
+		}
+
+		return clientService.isMyClient(tokenUserId, user.getClientId());
+	}
 
 	/**
 	 * 校验用户是否存在
@@ -44,7 +60,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	 * @param pwd
 	 * @return
 	 */
-	public List<UserVO> check(String clientId, String userName, String pwd) {
+	public List<UserVO> checkExist(String clientId, String userName, String pwd) {
 		if(VerifyUtils.isNotEmpty(pwd)) {
 			pwd = SecretUtil.md5(pwd);
 		}
@@ -127,6 +143,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			vo.setStatus(1);
 		}
 
+		vo.setCertification(0);
 		this.dao.baseInsert(vo);
 
 		// 删除验证码
@@ -139,25 +156,24 @@ public class UserService extends BaseService<UserDao,UserVO> {
 
 	/**
 	 * 发送邮件
-	 * @param token
+	 * @param token		为null则不校验权限，但userId必传
 	 * @param type 		类型 mail注册链接 mailCode注册验证码 repwd重置密码
 	 * @param userId	用户id	与mail二选一
 	 * @param mail		注册mail 与suerId二选一
 	 * @param callback	url注册链接中，回调地址
 	 * @param isCheckUserExist	检查用户是否存在 null不检查 true存在抛异常 false不存在抛异常
-     */
+	 */
 	public void sendMail(TokenVO token, String type, String userId, String mail, String callback, Boolean isCheckUserExist) {
 		if(VerifyUtils.isEmpty(type)) {
 			type = "mail";
 		}
 
-		// 用户所属client
-		ClientBO clientBO = clientService.baseFind(token.getClientId());
-		if(null == clientBO) {
-			throw new ThrowPrompt("用户client信息异常！", "072004");
+		if(null == token && VerifyUtils.isEmpty(userId)) {
+			throw new ThrowException("token或userId必传一个！", "072004");
 		}
 
 		UserVO user = null;
+		ClientBO clientBO = null;
 
 		// 校验用户权限
 		if(VerifyUtils.isNotEmpty(userId)) {
@@ -169,13 +185,18 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			if((user.getStatus() == 0 || user.getStatus() == 3) && type.startsWith("mail")) {
 				throw new ThrowPrompt("邮箱已验证！", "072007");
 			}
-			if((!Constants.PROJECT_NAME.equals(token.getClientId()) && !userId.equals(token.getUserId()))
-					|| (Constants.PROJECT_NAME.equals(token.getClientId()) && !clientService.isMyClient(token.getUserId(), user.getClientId()))) {
+			if(null != token
+					&& ((!Constants.PROJECT_NAME.equals(token.getClientId()) && !userId.equals(token.getUserId()))
+						|| (Constants.PROJECT_NAME.equals(token.getClientId()) && !clientService.isMyClient(token.getUserId(), user.getClientId())))) {
 				throw new ThrowPrompt("无权发送此用户邮件！", "072007");
 			}
 
+			clientBO = clientService.baseFind(user.getClientId());
+
 			mail = user.getMail();
 		} else if(VerifyUtils.isNotEmpty(mail)) {
+			clientBO = clientService.baseFind(token.getClientId());
+
 			UserVO queryUserVO = new UserVO();
 			queryUserVO.setClientId(clientBO.getId());
 			queryUserVO.setMail(mail);
@@ -191,6 +212,10 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			}
 		} else {
 			throw new ThrowPrompt("邮件信息错误！", "072035");
+		}
+
+		if(null == clientBO) {
+			throw new ThrowPrompt("用户client信息异常！", "072004");
 		}
 
 		// 用户是否存在校验
@@ -396,19 +421,17 @@ public class UserService extends BaseService<UserDao,UserVO> {
 
 	/**
 	 * 发送短信
-	 * @param token
+	 * @param token		为null则不校验权限，但userId必传
 	 * @param type
 	 * @param phone
 	 * @param isCheckUserExist	检查用户是否存在 null不检查 true存在抛异常 false不存在抛异常
      */
 	public void sendPhone(TokenVO token, String type, String userId, String phone, Boolean isCheckUserExist) {
-		// 查找短信平台
-		PhoneSender phoneSender = new PhoneSender();
-
-		ClientPhoneVO clientPhoneVO = clientPhoneService.find(token.getClientId(), type);
-		if(null == clientPhoneVO) {
-			throw new ThrowPrompt("该应用未配置短信平台！");
+		if(null == token && VerifyUtils.isEmpty(userId)) {
+			throw new ThrowException("token或userId必传一个！", "072004");
 		}
+
+		ClientPhoneVO clientPhoneVO = null;
 
 		// 设置code
 		Map<String, Object> params = new HashMap<>();
@@ -419,11 +442,16 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		UserVO user = null;
 		if(VerifyUtils.isNotEmpty(userId)) {
 			user = super.baseFind(userId);
-			if((!Constants.PROJECT_NAME.equals(token.getClientId()) && !userId.equals(token.getUserId()))
-					|| (Constants.PROJECT_NAME.equals(token.getClientId()) && !clientService.isMyClient(token.getUserId(), user.getClientId()))) {
+			if(null != token
+					&& ((!Constants.PROJECT_NAME.equals(token.getClientId()) && !userId.equals(token.getUserId()))
+						|| (Constants.PROJECT_NAME.equals(token.getClientId()) && !clientService.isMyClient(token.getUserId(), user.getClientId())))) {
 				throw new ThrowPrompt("无权发送此用户短信！", "072007");
 			}
+
+			clientPhoneVO = clientPhoneService.find(user.getClientId(), type);
 		} else {
+			clientPhoneVO = clientPhoneService.find(token.getClientId(), type);
+
 			UserVO queryUserVO = new UserVO();
 			queryUserVO.setClientId(token.getClientId());
 			queryUserVO.setPhone(phone);
@@ -432,6 +460,10 @@ public class UserService extends BaseService<UserDao,UserVO> {
 				user = users.get(0);
 				userId = user.getId();
 			}
+		}
+
+		if(null == clientPhoneVO) {
+			throw new ThrowPrompt("该应用未配置短信平台！");
 		}
 
 		if(VerifyUtils.isEmpty(phone)) {
@@ -472,7 +504,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		String sk = SecretUtil.aes128Decrypt(clientPhoneVO.getSk(), Constants.AES_128_SECRET);
 
 		// 发送短信
-		phoneSender.send(clientPhoneVO.getAk(), sk, phone, clientPhoneVO.getSign(), clientPhoneVO.getTmplate(), JSONObject.toJSONString(params));
+		new PhoneSender().send(clientPhoneVO.getAk(), sk, phone, clientPhoneVO.getSign(), clientPhoneVO.getTmplate(), JSONObject.toJSONString(params));
 	}
 
 	/**
@@ -494,6 +526,22 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		} else if(!isCheckUserExist && (VerifyUtils.isEmpty(userId) || userId.indexOf("_") != -1)) {
 			throw new ThrowPrompt("该" + text + "不存在！");
 		}
+	}
+
+	/**
+	 * 实名认证
+	 * @param userId
+	 * @param name
+	 * @param idcard
+     */
+	public void certification(TokenVO token, String userId, String name, String idcard) {
+		UserVO user = super.baseFind(userId);
+
+		if(null == user) {
+			throw new ThrowPrompt("无此用户！");
+		}
+
+		new Certification(userId, name, idcard);
 	}
 
 	/**
@@ -646,22 +694,29 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			throw new ThrowPrompt("用户信息错误！", "072023");
 		}
 
+		UserVO oldUserVO = super.baseFind(vo.getId());
+
+		if(VerifyUtils.isEmpty(vo.getClientId())) {
+			vo.setClientId(oldUserVO.getClientId());
+		}
 		if(Constants.PROJECT_NAME.equals(tokenVO.getClientId()) && !clientService.isMyClient(tokenVO.getUserId(), vo.getClientId())) {
 			throw new ThrowPrompt("client信息错误！", "072024");
 		}
-
-		UserVO oldUserVO = super.baseFind(vo.getId());
 
 		if(null == oldUserVO) {
 			throw new ThrowPrompt("无此用户！");
 		}
 
-		if(Constants.PROJECT_NAME.equals(tokenVO.getClientId()) && !clientService.isMyClient(tokenVO.getUserId(), oldUserVO.getClientId())) {
-			throw new ThrowPrompt("用户信息错误！", "072025");
-		}
-
 		// 校验修改的信息是否已存在
 		this.checkUserInfo(oldUserVO.getClientId(), oldUserVO.getId(), vo.getUsername(), vo.getMail(), vo.getPhone());
+
+		// 实名认证通过 不能修改姓名 身份证号码
+		if(oldUserVO.getCertification() == 3 && VerifyUtils.isNotEmpty(vo.getName()) && !vo.getName().equals(oldUserVO.getName())) {
+			throw new ThrowPrompt("已实名通过，不能修改姓名！");
+		}
+		if(oldUserVO.getCertification() == 3 && VerifyUtils.isNotEmpty(vo.getIdcard()) && !vo.getIdcard().equals(oldUserVO.getIdcard())) {
+			throw new ThrowPrompt("已实名通过，不能修改身份证号码！");
+		}
 
 		//设置修改值
 		UserVO upVO = this.setUpdateVlaue(oldUserVO, vo);
@@ -773,9 +828,9 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		if(null != upVO.getIdcard()) {
 			dbVO.setIdcard(upVO.getIdcard());
 		}
-		//身份证图片
-		if(null != upVO.getIdcardImg()) {
-			dbVO.setIdcardImg(upVO.getIdcardImg());
+		// 实名认证
+		if(null != upVO.getCertification()) {
+			dbVO.setCertification(upVO.getCertification());
 		}
 		//省
 		if(null != upVO.getProvince()) {

@@ -2,6 +2,9 @@ body, html {
 	height: 100%;
 }
 
+.width0 {
+	width: 100%;
+}
 .width5 {
 	width: 5px;
 }
@@ -11,6 +14,9 @@ body, html {
 .width55 {
 	width: 55px;
 }
+.width70 {
+	width: 70px;
+}
 .width100 {
 	width: 100px;
 }
@@ -18,10 +24,19 @@ body, html {
 	width: 105px;
 }
 .width200 {
-	width: 200px;
+	width: 200px !important;
 }
 .width700 {
 	width: 700px !important;
+}
+.width700 {
+	width: 700px !important;
+}
+.padding_top15 {
+	padding-top: 15px;
+}
+.text-align_left {
+	text-align: left !important;
 }
 
 .navigation {

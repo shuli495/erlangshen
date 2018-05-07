@@ -1,8 +1,15 @@
 package com.website.controller;
 
+import com.fastjavaframework.Setting;
 import com.website.common.Constants;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
 
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.util.VerifyUtils;
@@ -18,6 +25,7 @@ import com.fastjavaframework.page.Page;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.website.model.bo.UserBO;
 import com.website.service.UserService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 用户
@@ -94,8 +102,8 @@ public class UserController extends BaseElsController<UserService> {
 	public Object checkCode(@RequestParam(required = false) String code,@RequestParam(required = false) String type,
 							@RequestParam(required = false) String userId,
 						  @RequestParam(required = false) String mail, @RequestParam(required = false) String phone) {
-		if(VerifyUtils.isEmpty(mail) && VerifyUtils.isEmpty(phone)) {
-			throw new ThrowException("邮箱或手机必须填一个！", "071001");
+		if(VerifyUtils.isEmpty(mail) && VerifyUtils.isEmpty(phone) && VerifyUtils.isEmpty(userId)) {
+			throw new ThrowException("邮箱或手机或userId必须填一个！", "071001");
 		}
 		if(VerifyUtils.isEmpty(code)) {
 			throw new ThrowException("验证码必填！", "071002");
@@ -124,11 +132,142 @@ public class UserController extends BaseElsController<UserService> {
 	}
 
 	/**
+	 * 查找身份证
+	 * @param id
+	 * @return
+     */
+	@RequestMapping(value="/{id}/certification", method=RequestMethod.GET)
+	public Object findCertification(@PathVariable String id) {
+		if(!this.service.isMyUser(super.identity().getUserId(), id) && !super.identity().getUserId().equals(id)) {
+			throw new ThrowPrompt("无权操作此用户!");
+		}
+
+		Map<String, String> result = new HashMap<>();
+		String realPath = request.getSession().getServletContext().getRealPath("");
+		String imagePath = Setting.getProperty("idcard.image.path");
+
+		String forntPath = imagePath + id + "_0.jpg";
+		if(new File(realPath + forntPath).exists()) {
+			result.put("fornt", forntPath.replaceAll("\\\\","/"));
+		} else {
+			result.put("fornt", "");
+		}
+
+		String backPath = imagePath + id + "_1.jpg";
+		if(new File(realPath + backPath).exists()) {
+			result.put("back", backPath.replaceAll("\\\\","/"));
+		} else {
+			result.put("back", "");
+		}
+
+		return success(result);
+	}
+
+	/**
+	 * 实名认证
+	 * @param id
+	 * @param name	 姓名
+	 * @param idcard 身份证号
+	 * @param forntFile	 身份证正面图片
+	 * @param backFile	 身份证反面图片
+     * @return
+     */
+	@RequestMapping(value="/{id}/certification", method=RequestMethod.POST)
+	public Object certification(@PathVariable String id, String name, String idcard,
+								@RequestParam(value="forntFile",required=false) MultipartFile forntFile,
+								@RequestParam(value="backFile",required=false) MultipartFile backFile) {
+		if(!this.service.isMyUser(super.identity().getUserId(), id) && !super.identity().getUserId().equals(id)) {
+			throw new ThrowPrompt("无权操作此用户!");
+		}
+
+		if(VerifyUtils.isEmpty(id)) {
+			throw new ThrowPrompt("id不能为空！", "071002");
+		}
+		if(forntFile.isEmpty()) {
+			throw new ThrowPrompt("请上传身份证正面！");
+		}
+		if(backFile.isEmpty()) {
+			throw new ThrowPrompt("请上传身份证反面！");
+		}
+
+		String pathRoot = request.getSession().getServletContext().getRealPath("");
+
+		// 保存身份证正面照片
+		if(forntFile.getContentType().indexOf("jpg") == -1
+				&& forntFile.getContentType().indexOf("jpeg") == -1
+				&& forntFile.getContentType().indexOf("png") == -1
+				&& forntFile.getContentType().indexOf("bmp") == -1) {
+			throw new ThrowPrompt("上传文件类型只能是jpg/png/bmp格式");
+		}
+		try {
+			String forntPath = new StringBuilder(pathRoot)
+					.append(Setting.getProperty("idcard.image.path").replaceAll("\\\\", Matcher.quoteReplacement(File.separator)))
+					.append(id)
+					.append("_0.jpg").toString();
+			forntFile.transferTo(new File(forntPath));
+		} catch (IOException e) {
+			throw new ThrowException("身份证上传错误：" + e.getMessage());
+		}
+
+		// 保存身份证反面照片
+		if(backFile.getContentType().indexOf("jpg") == -1
+				&& backFile.getContentType().indexOf("jpeg") == -1
+				&& backFile.getContentType().indexOf("png") == -1
+				&& backFile.getContentType().indexOf("bmp") == -1) {
+			throw new ThrowPrompt("上传文件类型只能是jpg/png/bmp格式");
+		}
+		try {
+			String backPath = new StringBuilder(pathRoot)
+					.append(Setting.getProperty("idcard.image.path").replaceAll("\\\\", Matcher.quoteReplacement(File.separator)))
+					.append(id)
+					.append("_1.jpg").toString();
+			backFile.transferTo(new File(backPath));
+		} catch (IOException e) {
+			throw new ThrowException("身份证上传错误：" + e.getMessage());
+		}
+
+		// 实名认证
+		this.service.certification(super.identity(), id, name, idcard);
+
+		return success();
+	}
+
+	/**
+	 * 实名认证手动确认接口
+	 * certification 0未实名 1认证中 2认证失败 3认证成功
+	 * @param id
+	 * @param vo
+     * @return
+     */
+	@RequestMapping(value="/{id}/certification", method=RequestMethod.PUT)
+	public Object certificationConfirm(@PathVariable String id, @RequestBody UserVO vo) {
+		if(!this.service.isMyUser(super.identity().getUserId(), id) || super.identity().getUserId().equals(id)) {
+			throw new ThrowPrompt("无权进行此操作!");
+		}
+
+		if(VerifyUtils.isEmpty(vo.getCertification())) {
+			throw new ThrowPrompt("认证状态不能为空！", "071002");
+		}
+		if(vo.getCertification() != 2) {
+			vo.setCertificationFailMsg(null);
+		}
+
+		UserVO user = new UserVO();
+		user.setId(id);
+		user.setCertification(vo.getCertification());
+		user.setCertificationFailMsg(vo.getCertificationFailMsg());
+
+		this.service.update(super.identity(), user);
+
+		return success();
+	}
+
+	/**
 	 * 修改密码
 	 */
-	@RequestMapping(value="/rePwd", method=RequestMethod.POST)
-	public Object rePwd(@RequestBody UserVO vo) {
-		if(VerifyUtils.isEmpty(vo.getId())) {
+	@RequestMapping(value="/{id}/rePwd", method=RequestMethod.POST)
+	public Object rePwd(@PathVariable String id, @RequestBody UserVO vo) {
+		if(VerifyUtils.isEmpty(id)) {
 			throw new ThrowException("id必传!", "071003");
 		}
 		if(VerifyUtils.isEmpty(vo.getPwd())) {
@@ -138,6 +277,7 @@ public class UserController extends BaseElsController<UserService> {
 			throw new ThrowException("code或oldPwd必传一个!", "071005");
 		}
 
+		vo.setId(id);
 		this.service.rePwd(super.identity(), vo.getId(), vo.getCode(), vo.getOldPwd(), vo.getPwd());
 		return success();
 	}
@@ -168,7 +308,8 @@ public class UserController extends BaseElsController<UserService> {
 			// 非erlangshen用户查看他人详情，置空关键项
 			if(!super.identity().getUserId().equals(id)) {
 				user.setIdcard("");
-				user.setIdcardImg("");
+				user.setCertification(null);
+				user.setCertificationFailMsg("");
 				user.setAddress("");
 				user.setCreatedTime(null);
 				user.setStatus(null);

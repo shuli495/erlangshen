@@ -1,4 +1,4 @@
-package com.website.common;
+package com.website.Executor;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fastjavaframework.Setting;
@@ -11,10 +11,13 @@ import com.website.model.vo.TokenVO;
 import com.website.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 异地登录告警
  */
-public class LoginPlaceReport {
+public class LoginPlaceReportBack {
 
     private static Thread thread;   // 0点后将列表中的线程添加值线程池
     private static ExecutorService executorService; // 线程池
@@ -32,7 +35,7 @@ public class LoginPlaceReport {
     private static AtomicInteger index;     // 当前使用量，用于计算最大调用数
     private static AtomicBoolean qpsSwitch; // 线程开关，用于控制qps
 
-    public LoginPlaceReport(TokenVO token, String userId, String clientId, String beforeIp, String loginIp) {
+    public LoginPlaceReportBack(TokenVO token, String userId, String clientId, String beforeIp, String loginIp) {
         if(null == list) {
             list = new LinkedList<>();
         }
@@ -46,7 +49,6 @@ public class LoginPlaceReport {
             this.index = new AtomicInteger(0);
         }
 
-        //
         LoginPlaceReportThread checkLoginPlace = new LoginPlaceReportThread(token, userId, clientId, beforeIp, loginIp);
 
         // 最大调用数
@@ -59,7 +61,7 @@ public class LoginPlaceReport {
 
         // 未超过接口每日最大调用限制，直接放入线程池
         if(qpsMaxNum < 2 || index.get() <= qpsMaxNum) {
-            LoginPlaceReport.index.addAndGet(2);
+            LoginPlaceReportBack.index.addAndGet(2);
             executorService.execute(checkLoginPlace);
         } else {
             // 超出最大限制，存入列表
@@ -99,14 +101,14 @@ public class LoginPlaceReport {
             }
 
             // 重置索引
-            LoginPlaceReport.index.set(0);
+            LoginPlaceReportBack.index.set(0);
 
             // 从头部将线程放入线程池
-            if(!LoginPlaceReport.list.isEmpty()) {
-                LoginPlaceReportThread thread = LoginPlaceReport.list.remove(0);
+            if(!LoginPlaceReportBack.list.isEmpty()) {
+                LoginPlaceReportThread thread = LoginPlaceReportBack.list.remove(0);
                 if(null != thread) {
-                    LoginPlaceReport.index.addAndGet(2);
-                    LoginPlaceReport.executorService.execute(thread);
+                    LoginPlaceReportBack.index.addAndGet(2);
+                    LoginPlaceReportBack.executorService.execute(thread);
                 }
             }
         }
@@ -152,31 +154,31 @@ public class LoginPlaceReport {
                 if(VerifyUtils.isNotEmpty(qps)) {
                     qpsNum = Integer.valueOf(qps);
                 }
-                while (qpsNum > 0 && LoginPlaceReport.qpsSwitch.compareAndSet(true, true)) {
+                while (qpsNum > 0 && LoginPlaceReportBack.qpsSwitch.compareAndSet(true, true)) {
                     Thread.sleep(1000/qpsNum/2);
                 }
 
                 // 调用接口开关，开启，防止多线程超出qps
-                LoginPlaceReport.qpsSwitch.set(true);
+                LoginPlaceReportBack.qpsSwitch.set(true);
 
                 // 登录ip对应的地址
                 JSONObject oldIp = null;
                 JSONObject newIp = null;
                 try {
-                    oldIp = LoginPlaceReport.getAddress(this.beforeIp);
+                    oldIp = LoginPlaceReportBack.getAddress(this.beforeIp);
                 } catch (Exception e) {
-                    LoginPlaceReport.index.decrementAndGet();
+                    LoginPlaceReportBack.index.decrementAndGet();
                     throw new ThrowException(e.getMessage());
                 }
                 try {
-                    newIp = LoginPlaceReport.getAddress(this.loginIp);
+                    newIp = LoginPlaceReportBack.getAddress(this.loginIp);
                 } catch (Exception e) {
-                    LoginPlaceReport.index.decrementAndGet();
+                    LoginPlaceReportBack.index.decrementAndGet();
                     throw new ThrowException(e.getMessage());
                 }
 
                 // 调用完成，关闭开关
-                LoginPlaceReport.qpsSwitch.set(false);
+                LoginPlaceReportBack.qpsSwitch.set(false);
 
                 // 与上次登录地址不同
                 if(!oldIp.getJSONObject("content").getJSONObject("address_detail").getString("city")

@@ -9,10 +9,15 @@ class UserApp extends BaseComponents {
     constructor(props) {
             super(props, UserStore);
 
+            this.selectedUserId = "";
+
             this.handleQuery = this.handleQuery.bind(this);
             this.handleInfo = this.handleInfo.bind(this);
             this.handleUpdate = this.handleUpdate.bind(this);
             this.handleDel = this.handleDel.bind(this);
+            this.queryCertification = this.queryCertification.bind(this);
+            this.certificationUpload = this.certificationUpload.bind(this);
+            this.certificationConfirm = this.certificationConfirm.bind(this);
     }
 
     componentDidMount() {
@@ -29,9 +34,10 @@ class UserApp extends BaseComponents {
 
     handleInfo(id,status,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,clientId,province,city,area,address) {
         if(typeof(id) == "undefined" || id == "undefined" || typeof(id) == "object" || id == "") {
-            this.refs.id.value= "";
+            this.selectedUserId = "";
+            this.selectedUserStatus = "";
+
             this.refs.pwd.value= "";
-            this.refs.status.value = "";
             this.refs.source.value = "";
             this.refs.username.value = "";
             this.refs.nickname.value = "";
@@ -52,15 +58,15 @@ class UserApp extends BaseComponents {
             this.refs.addBut.style.display = "";
             this.refs.sendMailBut.hidden();
             this.refs.updateBut.style.display = "none";
-            this.refs.delBut.style.display = "none";
 
             this.refs.pwdContainer.style.display = "";
             this.refs.pwd.setAttribute("data-disabled","false");
 
             $("#pwdContainer").show();
         } else {
-            this.refs.id.value= id;
-            this.refs.status.value = status;
+            this.selectedUserId = id;
+            this.selectedUserStatus = status;
+
             this.refs.source.value = source;
             this.refs.username.value = username;
             this.refs.nickname.value = nickname;
@@ -81,7 +87,6 @@ class UserApp extends BaseComponents {
             this.refs.addBut.style.display = "none";
             this.refs.sendMailBut.show();
             this.refs.updateBut.style.display = "";
-            this.refs.delBut.style.display = "";
 
             this.refs.pwdContainer.style.display = "none";
             this.refs.pwd.setAttribute("data-disabled","true");
@@ -119,7 +124,7 @@ class UserApp extends BaseComponents {
             $("#clientError").html("");
         }
 
-        var id = this.refs.id.value;
+        var id = this.selectedUserId;
         if(typeof(id) == "undefined" || id == "undefined" || id == "") {
             var pwd = this.refs.pwd.value;
             if(pwd == "") {
@@ -140,6 +145,31 @@ class UserApp extends BaseComponents {
         }
 
         UserStore.del(id);
+    }
+
+    queryCertification(id,name,idcard,certificationStr,certificationFailMsg) {
+        this.selectedUserId = id;
+        this.refs.certificationName.value = name;
+        this.refs.certificationIdcard.value = idcard;
+
+        if(certificationFailMsg && certificationFailMsg != "") {
+            certificationStr +=  "(<span class='errorMsg'>" + certificationFailMsg + "</span>)";
+        }
+        this.refs.certificationDiv.innerHTML = certificationStr;
+
+        UserStore.findCertification(id);
+    }
+
+    certificationUpload() {
+        if(!$util_validateValue("user_certification")) {
+            return;
+        }
+
+        UserStore.uploadIdcard("certificationForm", this.selectedUserId);
+    }
+
+    certificationConfirm(certification) {
+        UserStore.confirmCertification(this.selectedUserId, certification);
     }
 
     render(){
@@ -178,11 +208,22 @@ class UserApp extends BaseComponents {
                 var weibo = typeof(this.state.users[i].weibo) == "undefined" ? "" : this.state.users[i].weibo;
                 var name = typeof(this.state.users[i].name) == "undefined" ? "" : this.state.users[i].name;
                 var idcard = typeof(this.state.users[i].idcard) == "undefined" ? "" : this.state.users[i].idcard;
+                var certification = typeof(this.state.users[i].certification) == "undefined" ? "" : this.state.users[i].certification;
+                var certificationFailMsg = typeof(this.state.users[i].certificationFailMsg) == "undefined" ? "" : this.state.users[i].certificationFailMsg;
                 var province = typeof(this.state.users[i].province) == "undefined" ? "" : this.state.users[i].province;
                 var city = typeof(this.state.users[i].city) == "undefined" ? "" : this.state.users[i].city;
                 var area = typeof(this.state.users[i].area) == "undefined" ? "" : this.state.users[i].area;
                 var clientId = typeof(this.state.users[i].clientId) == "undefined" ? "" : this.state.users[i].clientId;
                 var clientName = typeof(this.state.users[i].clientName) == "undefined" ? "" : this.state.users[i].clientName;
+
+                var certificationStr = "未认证";
+                if(certification == 1) {
+                    certificationStr = "认证中";
+                } else if(certification == 2) {
+                    certificationStr = "认证失败";
+                } else if(certification == 3) {
+                    certificationStr = "认证通过";
+                }
 
                 var address = this.state.users[i].address;
                 var addresses = [];
@@ -202,6 +243,8 @@ class UserApp extends BaseComponents {
                                             <td>
                                                 <a href="javascript:void(0);" className="fa fa-pencil-square-o" data-toggle="modal" data-target="#user_info" title="修改"
                                                 onClick={this.handleInfo.bind(this,id,status,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,clientId,province,city,area,addresses[addresses.length-1])}></a>&nbsp;
+                                                <a href="javascript:void(0);" className="fa fa-id-card" data-toggle="modal" data-target="#user_certification" title="实名认证"
+                                                onClick={this.queryCertification.bind(this,id,name,idcard,certificationStr, certificationFailMsg)}></a>&nbsp;
                                                 <a href="javascript:void(0);" className="fa fa-times errorBut" title="删除" onClick={this.handleDel.bind(this,id)}></a>
                                             </td>
                                             <td>{id}</td>
@@ -216,12 +259,60 @@ class UserApp extends BaseComponents {
                                             <td>{name}</td>
                                             <td>{sex}</td>
                                             <td>{idcard}</td>
+                                            <td>{certificationStr}</td>
                                             <td>{source}</td>
                                             <td>{clientName}</td>
                                             <td>{newAddres}</td>
                                             <td>{statusStr}</td>
                                         </tr>
                                       );
+            }
+
+            var forntImgHidn = "hidden";
+            var forntDomHidn = "hidden";
+            var forntDom;
+            var backImgHidn = "hidden";
+            var backDomHidn = "hidden";
+            var backDom;
+            if(this.state.idcardImage != "") {
+                if(this.state.idcardImage.fornt && this.state.idcardImage.fornt != "") {
+                    forntImgHidn = "";
+                    forntDomHidn = "hidden";
+                    var imgUrl = $setting.serverUrl + this.state.idcardImage.fornt;
+                    forntDom = <div className="file-preview">
+                                                <img src={imgUrl} className="kv-preview-data file-preview-image width0" />
+                                            </div>;
+                } else {
+                    forntImgHidn = "hidden";
+                    forntDomHidn = "";
+                }
+                if(this.state.idcardImage.back && this.state.idcardImage.back != "") {
+                    backImgHidn = "";
+                    backDomHidn = "hidden";
+                    var imgUrl = $setting.serverUrl + this.state.idcardImage.back;
+                    backDom = <div className="file-preview">
+                                                <img src={imgUrl} className="kv-preview-data file-preview-image width0" />
+                                            </div>;
+                } else {
+                    backImgHidn = "hidden";
+                    backDomHidn = "";
+                }
+
+                if(this.state.idcardImage.fornt && this.state.idcardImage.fornt != "" && this.state.idcardImage.back && this.state.idcardImage.back != "") {
+                    this.refs.certificationUploadBut.disabled = "disabled";
+                    this.refs.certificationUploadBut.setAttribute("data-disabled","true");
+                    this.refs.certificationYBut.disabled = "";
+                    this.refs.certificationYBut.removeAttribute("data-disabled");
+                    this.refs.certificationNBut.disabled = "";
+                    this.refs.certificationNBut.removeAttribute("data-disabled");
+                } else {
+                    this.refs.certificationUploadBut.disabled = "";
+                    this.refs.certificationUploadBut.removeAttribute("data-disabled");
+                    this.refs.certificationYBut.disabled = "disabled";
+                    this.refs.certificationYBut.setAttribute("data-disabled","true");
+                    this.refs.certificationNBut.disabled = "disabled";
+                    this.refs.certificationNBut.setAttribute("data-disabled","true");
+                }
             }
         }
 
@@ -238,6 +329,7 @@ class UserApp extends BaseComponents {
                     <input type="text" placeholder="微博" ref="schWeibo" />
                     <input type="text" placeholder="姓名" ref="schName" />
                     <input type="text" placeholder="身份证" ref="schIdcard" />
+                    <input type="text" placeholder="实名认证" ref="schIdcard" />
                     <select ref="schSex"><option value ="">性别</option><option value ="1">男</option><option value ="0">女</option></select>
                     <select ref="schStatus"><option value ="">状态</option><option value ="0">正常</option><option value ="1">手机邮箱未验证</option><option value ="2">邮箱未验证</option><option value ="3">手机未验证</option></select>
                     <input type="text" placeholder="来源" ref="schSource" />
@@ -248,7 +340,7 @@ class UserApp extends BaseComponents {
                 <table className="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th className="width55"><a href="javascript:void(0);" className="fa fa-plus" data-toggle="modal" data-target="#user_info" onClick={this.handleInfo} title="添加"></a></th>
+                            <th className="width70"><a href="javascript:void(0);" className="fa fa-plus" data-toggle="modal" data-target="#user_info" onClick={this.handleInfo} title="添加"></a></th>
                             <th>ID</th>
                             <th>用户名</th>
                             <th>昵称</th>
@@ -261,6 +353,7 @@ class UserApp extends BaseComponents {
                             <th>姓名</th>
                             <th>性别</th>
                             <th>身份证</th>
+                            <th>实名认证</th>
                             <th>来源</th>
                             <th>所属应用</th>
                             <th>地址</th>
@@ -281,8 +374,6 @@ class UserApp extends BaseComponents {
                                 <button type="button" className="close" id="info_close" data-dismiss="modal" aria-hidden="true">&times;</button>
                             </div>
                             <div className="modal-body search_content add_content show_body">
-                                <input type="hidden" ref="id" />
-                                <input type="hidden" ref="status" />
                                 <form className="form-horizontal">
                                     <div className="form-group">
                                         <label class="col-sm-2 control-label">用户名</label>
@@ -398,6 +489,78 @@ class UserApp extends BaseComponents {
                         </div>
                     </div>
                 </div>
+
+                <div className="modal fade" id="user_certification" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" id="certification_close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            </div>
+                            <div className="modal-body search_content add_content show_body">
+                                <form className="form-horizontal" id="certificationForm">
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">状态</label>
+                                        <div className="col-sm-9">
+                                            <label className="text-align_left width200" ref="certificationDiv"></label>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>姓名</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" name="name" placeholder="1-32个汉字" ref="certificationName" data-empty="true" data-emptyText="姓名不能为空" data-errMsgId="certificationNameError" data-max="32" data-maxText="1-32个字符"/>
+                                           <div id="certificationNameError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>身份证</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" name="idcard" placeholder="18位身份证号码" ref="certificationIdcard" data-empty="true" data-emptyText="身份证号码不能为空" data-errMsgId="certificationIdcardError"  data-idcard="true" data-length="18" data-lengthText="18位身份证号码"/>
+                                           <div id="certificationIdcardError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>身份证正面图片</label>
+                                        <div className="col-sm-9 padding_top15" hidden={forntImgHidn}>
+                                            {forntDom}
+                                        </div>
+                                        <div className="col-sm-9 padding_top15" hidden={forntDomHidn}>
+                                            <input name="forntFile" ref="forntFile" type="file" className="file"
+                                                data-errMsgId="certificationForntError" data-empty="true" data-emptyText="请上传身份证正面图片"
+                                                data-drop-zone-enabled="false" data-show-caption="false" data-show-remove="false" data-show-upload="false"
+                                                data-language="zh" data-min-image-width="15" data-max-image-width="4096" data-max-file-size="4096" data-max-file-count="1" data-auto-replace="true"
+                                                data-layout-templates='{"footer":""}'
+                                                data-preview-templates='{"image":"<div class=\"krajee-default kv-preview-thumb file-preview-error\" id=\"{previewId}\" data-fileindex=\"{fileindex}\" data-template=\"{template}\"><div class=\"kv-file-content\"><p/><img src=\"{data}\" class=\"kv-preview-data file-preview-image\" title=\"{caption}\" alt=\"{caption}\" {style}></div></div>"}'
+                                                data-allowed-file-extensions='["jpg","jpeg","bmp","png"]' />
+                                             <div id="certificationForntError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>身份证反面图片</label>
+                                        <div className="col-sm-9 padding_top15" hidden={backImgHidn}>
+                                            {backDom}
+                                        </div>
+                                        <div className="col-sm-9 padding_top15" hidden={backDomHidn}>
+                                            <input name="backFile" ref="backFile" type="file" className="file"
+                                                data-errMsgId="certificationBackError" data-empty="true" data-emptyText="请上传身份证反面图片"
+                                                data-drop-zone-enabled="false" data-show-caption="false" data-show-remove="false" data-show-upload="false"
+                                                data-language="zh" data-min-image-width="15" data-max-image-width="4096" data-max-file-size="4096" data-max-file-count="1" data-auto-replace="true"
+                                                data-layout-templates='{"footer":""}'
+                                                data-preview-templates='{"image":"<div class=\"krajee-default kv-preview-thumb file-preview-error\" id=\"{previewId}\" data-fileindex=\"{fileindex}\" data-template=\"{template}\"><div class=\"kv-file-content\"><p/><img src=\"{data}\" class=\"kv-preview-data file-preview-image\" title=\"{caption}\" alt=\"{caption}\" {style}></div></div>"}'
+                                                data-allowed-file-extensions='["jpg","jpeg","bmp","png"]' />
+                                             <div id="certificationBackError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="button button-primary button-rounded button-small" ref="certificationUploadBut" onClick={this.certificationUpload}>上传并认证</button>&nbsp;
+                                <button type="button" className="button button-primary button-rounded button-small" ref="certificationYBut" onClick={this.certificationConfirm.bind(this, 3)}>通过</button>&nbsp;
+                                <button type="button" className="button button-primary button-rounded button-small" ref="certificationNBut" onClick={this.certificationConfirm.bind(this, 2)}>不通过</button>&nbsp;
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         );
     }

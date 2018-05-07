@@ -19,7 +19,7 @@
 		<result column="NAME" property="name" />
 		<result column="SEX" property="sex" />
 		<result column="IDCARD" property="idcard" />
-		<result column="IDCARD_IMG" property="idcardImg" />
+		<result column="CERTIFICATION" property="certification" />
 		<result column="PROVINCE" property="province" />
 		<result column="CITY" property="city" />
 		<result column="AREA" property="area" />
@@ -33,17 +33,17 @@
 
 	<insert id="insert" parameterType="com.website.model.vo.UserRecycleVO" useGeneratedKeys="true" keyProperty="id">
 		INSERT user_recycle
-		(ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,IDCARD_IMG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,OPERATOR_TIME,STATUS)
+		(ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,CERTIFICATION,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,OPERATOR_TIME,STATUS)
 		VALUES
-		(#{id},#{clientId},#{source},#{pwd},#{username},#{nickname},#{mail},#{phone},#{tel},#{qq},#{weixin},#{wexinImg},#{weibo},#{head},#{name},#{sex},#{idcard},#{idcardImg},#{province},#{city},#{area},#{address},#{createdTime},#{operatorTime},#{status})
+		(#{id},#{clientId},#{source},#{pwd},#{username},#{nickname},#{mail},#{phone},#{tel},#{qq},#{weixin},#{wexinImg},#{weibo},#{head},#{name},#{sex},#{idcard},#{certification},#{province},#{city},#{area},#{address},#{createdTime},#{operatorTime},#{status})
 	</insert>
 
 	<insert id="insertBatch" parameterType="java.util.List">
 		INSERT user_recycle
-		(ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,IDCARD_IMG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,OPERATOR_TIME,STATUS)
+		(ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,CERTIFICATION,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,OPERATOR_TIME,STATUS)
 		VALUES
 		<foreach collection="list" item="item" index="index" separator=",">
-			(#{item.id},#{item.clientId},#{item.source},#{item.pwd},#{item.username},#{item.nickname},#{item.mail},#{item.phone},#{item.tel},#{item.qq},#{item.weixin},#{item.wexinImg},#{item.weibo},#{item.head},#{item.name},#{item.sex},#{item.idcard},#{item.idcardImg},#{item.province},#{item.city},#{item.area},#{item.address},#{item.createdTime},#{item.operatorTime},#{item.status})
+			(#{item.id},#{item.clientId},#{item.source},#{item.pwd},#{item.username},#{item.nickname},#{item.mail},#{item.phone},#{item.tel},#{item.qq},#{item.weixin},#{item.wexinImg},#{item.weibo},#{item.head},#{item.name},#{item.sex},#{item.idcard},#{item.certification},#{item.province},#{item.city},#{item.area},#{item.address},#{item.createdTime},#{item.operatorTime},#{item.status})
 		</foreach>
 	</insert>
 
@@ -98,8 +98,8 @@
 			<if test="idcard != null">
 				IDCARD=#{idcard},
 			</if>
-			<if test="idcardImg != null">
-				IDCARD_IMG=#{idcardImg},
+			<if test="certification != null">
+				CERTIFICATION=#{certification},
 			</if>
 			<if test="province != null">
 				PROVINCE=#{province},
@@ -178,8 +178,8 @@
 				<if test="idcard != null">
 					IDCARD=#{item.idcard},
 				</if>
-				<if test="idcardImg != null">
-					IDCARD_IMG=#{item.idcardImg},
+				<if test="certification != null">
+					CERTIFICATION=#{item.certification},
 				</if>
 				<if test="province != null">
 					PROVINCE=#{item.province},
@@ -220,14 +220,14 @@
 
 	<select id="findById" parameterType="string" resultMap="userRecycleVO">
 		SELECT
-		ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,IDCARD_IMG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,OPERATOR_TIME,STATUS
+		ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,CERTIFICATION,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,OPERATOR_TIME,STATUS
 		FROM user_recycle
 		WHERE id=#{id}
 	</select>
 
 	<select id="queryByOr" parameterType="com.website.model.vo.UserRecycleVO" resultMap="userRecycleVO">
 		SELECT
-		ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,IDCARD_IMG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,OPERATOR_TIME,STATUS
+		ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,CERTIFICATION,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,OPERATOR_TIME,STATUS
 		FROM user_recycle
 		<where>
 			<if test="clientId != null">
@@ -278,8 +278,8 @@
 			<if test="idcard != null">
 				OR IDCARD=#{idcard}
 			</if>
-			<if test="idcardImg != null">
-				OR IDCARD_IMG=#{idcardImg}
+			<if test="certification != null">
+				OR CERTIFICATION=#{certification}
 			</if>
 			<if test="province != null">
 				OR PROVINCE=#{province}
@@ -307,7 +307,7 @@
 
 	<select id="queryByAnd" parameterType="com.website.model.vo.UserRecycleVO" resultMap="userRecycleVO">
 		SELECT
-		ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,IDCARD_IMG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,OPERATOR_TIME,STATUS
+		ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,CERTIFICATION,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,OPERATOR_TIME,STATUS
 		FROM user_recycle
 		<where>
 			<if test="clientId != null">
@@ -358,8 +358,8 @@
 			<if test="idcard != null">
 				AND IDCARD=#{idcard}
 			</if>
-			<if test="idcardImg != null">
-				AND IDCARD_IMG=#{idcardImg}
+			<if test="certification != null">
+				AND CERTIFICATION=#{certification}
 			</if>
 			<if test="province != null">
 				AND PROVINCE=#{province}

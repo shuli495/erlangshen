@@ -19,7 +19,8 @@
 		<result column="NAME" property="name"/>
 		<result column="SEX" property="sex"/>
 		<result column="IDCARD" property="idcard"/>
-		<result column="IDCARD_IMG" property="idcardImg"/>
+		<result column="CERTIFICATION" property="certification"/>
+		<result column="CERTIFICATION_FAIL_MSG" property="certificationFailMsg"/>
 		<result column="PROVINCE" property="province"/>
 		<result column="CITY" property="city"/>
 		<result column="AREA" property="area"/>
@@ -33,7 +34,7 @@
 
 	<select id="check" parameterType="com.website.model.bo.UserBO" resultMap="userVO">
 		SELECT
-		t0.ID,t0.CLIENT_ID,t0.SOURCE,t0.PWD,t0.USERNAME,t0.NICKNAME,t0.MAIL,t0.PHONE,t0.TEL,t0.QQ,t0.WEIXIN,t0.WEXIN_IMG,t0.WEIBO,t0.HEAD,t0.`NAME`,t0.SEX,t0.IDCARD,t0.IDCARD_IMG,t0.PROVINCE,t0.CITY,t0.AREA,t0.ADDRESS,t0.CREATED_TIME,t0.STATUS
+		t0.ID,t0.CLIENT_ID,t0.SOURCE,t0.PWD,t0.USERNAME,t0.NICKNAME,t0.MAIL,t0.PHONE,t0.TEL,t0.QQ,t0.WEIXIN,t0.WEXIN_IMG,t0.WEIBO,t0.HEAD,t0.`NAME`,t0.SEX,t0.IDCARD,t0.CERTIFICATION,t0.PROVINCE,t0.CITY,t0.AREA,t0.ADDRESS,t0.CREATED_TIME,t0.STATUS
 		FROM `user` t0,client t1
 		WHERE t0.CLIENT_ID=t1.ID AND t1.DELETED=0
 		  AND t1.ID=#{clientId}
@@ -45,17 +46,17 @@
 
 	<insert id="insert" keyProperty="id" parameterType="com.website.model.bo.UserBO" useGeneratedKeys="true">
 		INSERT user
-		(ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,`NAME`,SEX,IDCARD,IDCARD_IMG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS)
+		(ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,`NAME`,SEX,IDCARD,CERTIFICATION,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS)
 		VALUES
-		(#{id},#{clientId},#{source},#{pwd},#{username},#{nickname},#{mail},#{phone},#{tel},#{qq},#{weixin},#{wexinImg},#{weibo},#{head},#{name},#{sex},#{idcard},#{idcardImg},#{province},#{city},#{area},#{address},#{createdTime},#{status})
+		(#{id},#{clientId},#{source},#{pwd},#{username},#{nickname},#{mail},#{phone},#{tel},#{qq},#{weixin},#{wexinImg},#{weibo},#{head},#{name},#{sex},#{idcard},#{certification},#{province},#{city},#{area},#{address},#{createdTime},#{status})
 	</insert>
 
 	<insert id="insertBatch" parameterType="java.util.List">
 		INSERT user
-		(ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,`NAME`,SEX,IDCARD,IDCARD_IMG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS)
+		(ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,`NAME`,SEX,IDCARD,CERTIFICATION,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS)
 		VALUES
 		<foreach collection="list" index="index" item="item" separator=",">
-			(#{item.id},#{item.clientId},#{item.source},#{item.pwd},#{item.username},#{item.nickname},#{item.mail},#{item.phone},#{item.tel},#{item.qq},#{item.weixin},#{item.wexinImg},#{item.weibo},#{item.head},#{item.name},#{item.sex},#{item.idcard},#{item.idcardImg},#{item.province},#{item.city},#{item.area},#{item.address},#{item.createdTime},#{item.status})
+			(#{item.id},#{item.clientId},#{item.source},#{item.pwd},#{item.username},#{item.nickname},#{item.mail},#{item.phone},#{item.tel},#{item.qq},#{item.weixin},#{item.wexinImg},#{item.weibo},#{item.head},#{item.name},#{item.sex},#{item.idcard},#{item.certification},#{item.province},#{item.city},#{item.area},#{item.address},#{item.createdTime},#{item.status})
 		</foreach>
 	</insert>
 
@@ -110,8 +111,11 @@
 			<if test="idcard != null">
 				IDCARD=#{idcard},
 			</if>
-			<if test="idcardImg != null">
-				IDCARD_IMG=#{idcardImg},
+			<if test="certification != null">
+				CERTIFICATION=#{certification},
+			</if>
+			<if test="certificationFailMsg != null">
+				CERTIFICATION_FAIL_MSG=#{certificationFailMsg},
 			</if>
 			<if test="province != null">
 				PROVINCE=#{province},
@@ -187,8 +191,11 @@
 				<if test="idcard != null">
 					IDCARD=#{item.idcard},
 				</if>
-				<if test="idcardImg != null">
-					IDCARD_IMG=#{item.idcardImg},
+				<if test="certification != null">
+					CERTIFICATION=#{item.certification},
+				</if>
+				<if test="certificationFailMsg != null">
+					CERTIFICATION_FAIL_MSG=#{item.certificationFailMsg},
 				</if>
 				<if test="province != null">
 					PROVINCE=#{item.province},
@@ -226,14 +233,14 @@
 
 	<select id="findById" parameterType="string" resultMap="userVO">
 		SELECT
-		ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,IDCARD_IMG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS
+		ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,CERTIFICATION,CERTIFICATION_FAIL_MSG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS
 		FROM user
 		WHERE id=#{id}
 	</select>
 
 	<select id="queryByOr" parameterType="com.website.model.bo.UserBO" resultMap="userVO">
 		SELECT
-		ID,CLIENT_ID,SOURCE,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,`NAME`,SEX,IDCARD,IDCARD_IMG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS
+		ID,CLIENT_ID,SOURCE,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,`NAME`,SEX,IDCARD,CERTIFICATION,CERTIFICATION_FAIL_MSG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS
 		FROM user
 		<where>
 			<if test="clientId != null">
@@ -281,8 +288,8 @@
 			<if test="idcard != null">
 				or IDCARD=#{idcard}
 			</if>
-			<if test="idcardImg != null">
-				or IDCARD_IMG=#{idcardImg}
+			<if test="certification != null">
+				or CERTIFICATION=#{certification}
 			</if>
 			<if test="province != null">
 				or PROVINCE=#{province}
@@ -307,7 +314,7 @@
 
 	<select id="queryByAnd" parameterType="com.website.model.bo.UserBO" resultMap="userVO">
 		SELECT
-		ID,CLIENT_ID,SOURCE,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,`NAME`,SEX,IDCARD,IDCARD_IMG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS
+		ID,CLIENT_ID,SOURCE,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,`NAME`,SEX,IDCARD,CERTIFICATION,CERTIFICATION_FAIL_MSG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS
 		FROM user
 		<where>
 			<if test="clientId != null">
@@ -355,8 +362,8 @@
 			<if test="idcard != null">
 				and IDCARD=#{idcard}
 			</if>
-			<if test="idcardImg != null">
-				and IDCARD_IMG=#{idcardImg}
+			<if test="certification != null">
+				and CERTIFICATION=#{certification}
 			</if>
 			<if test="province != null">
 				and PROVINCE=#{province}
@@ -381,7 +388,7 @@
 
 	<select id="queryByClient" parameterType="com.website.model.vo.UserVO" resultMap="userVO">
 		SELECT
-		`user`.ID,`user`.CLIENT_ID,`user`.SOURCE,`user`.USERNAME,`user`.NICKNAME,`user`.MAIL,`user`.PHONE,`user`.TEL,`user`.QQ,`user`.WEIXIN,`user`.WEXIN_IMG,`user`.WEIBO,`user`.HEAD,`user`.`NAME`,`user`.SEX,`user`.IDCARD,`user`.IDCARD_IMG,`user`.PROVINCE,`user`.CITY,`user`.AREA,`user`.ADDRESS,`user`.CREATED_TIME,`user`.STATUS,
+		`user`.ID,`user`.CLIENT_ID,`user`.SOURCE,`user`.USERNAME,`user`.NICKNAME,`user`.MAIL,`user`.PHONE,`user`.TEL,`user`.QQ,`user`.WEIXIN,`user`.WEXIN_IMG,`user`.WEIBO,`user`.HEAD,`user`.`NAME`,`user`.SEX,`user`.IDCARD,`user`.CERTIFICATION,`user`.CERTIFICATION_FAIL_MSG,`user`.PROVINCE,`user`.CITY,`user`.AREA,`user`.ADDRESS,`user`.CREATED_TIME,`user`.STATUS,
 		client.NAME as CLIENT_NAME
 		FROM `user`,client
 		WHERE `user`.CLIENT_ID=client.ID AND client.deleted=0
@@ -429,6 +436,9 @@
 		</if>
 		<if test="idcard != null">
 			and `user`.IDCARD like CONCAT('%',#{idcard},'%')
+		</if>
+		<if test="certification != null">
+			and `user`.CERTIFICATION=#{certification})
 		</if>
 		<if test="province != null">
 			and `user`.PROVINCE=#{province}

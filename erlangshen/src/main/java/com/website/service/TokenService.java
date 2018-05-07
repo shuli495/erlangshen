@@ -7,7 +7,7 @@ import com.fastjavaframework.util.SecretUtil;
 import com.fastjavaframework.util.UUID;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.common.HttpHelper;
-import com.website.common.LoginPlaceReport;
+import com.website.Executor.LoginPlaceReport;
 import com.website.model.bo.TokenBO;
 import com.website.model.bo.UserBO;
 import com.website.model.vo.ClientSecurityVO;
@@ -48,7 +48,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
      */
     public TokenBO inster(TokenVO token, boolean isCheckStatus,
                           String loginIp, String userName, String pwd, String platform) {
-        List<UserVO> users = userService.check(token.getClientId(), userName, null);
+        List<UserVO> users = userService.checkExist(token.getClientId(), userName, null);
 
         if(true == isCheckStatus) {
             for(UserVO user : users) {
@@ -84,7 +84,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
                 && !userTokens.get(0).getIp().equals(loginIp)
                 && (VerifyUtils.isNotEmpty(clientSecurityVO.getCheckPlaceMailTypeId())
                 || VerifyUtils.isNotEmpty(clientSecurityVO.getCheckPlacePhoneTypeId()))) {
-            new LoginPlaceReport(token, user.getId(), token.getClientId(), userTokens.get(0).getIp(), loginIp);
+            new LoginPlaceReport(user.getId(), token.getClientId(), userTokens.get(0).getIp(), loginIp);
         }
 
         if(VerifyUtils.isEmpty(loginIp)) {

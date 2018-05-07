@@ -75,9 +75,8 @@ public class UserRecycleBO extends BaseBean {
 	@Size(max=18, min=0, message="{user_recycle.idcard.size}")
 	private String idcard;
 
-	// 身份证图片
-	@Size(max=255, min=0, message="{user_recycle.idcardImg.size}")
-	private String idcardImg;
+	// 实名认证 0未实名 1认证中 2认证失败 3认证成功
+	private Integer certification;
 
 	// 省
 	@Size(max=64, min=0, message="{user_recycle.province.size}")
@@ -241,12 +240,12 @@ public class UserRecycleBO extends BaseBean {
 		this.idcard = idcard;
 	}
 
-	public String getIdcardImg() {
-		return idcardImg;
+	public Integer getCertification() {
+		return certification;
 	}
 
-	public void setIdcardImg(String idcardImg) {
-		this.idcardImg = idcardImg;
+	public void setCertification(Integer certification) {
+		this.certification = certification;
 	}
 
 	public String getProvince() {

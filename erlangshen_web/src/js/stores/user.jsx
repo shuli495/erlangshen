@@ -8,7 +8,8 @@ var UserStore = assign({}, EventEmitter.prototype, {
        pageSize: 10,
        pageNum: 1,
        retrieveId: "",
-       info: ""
+       info: "",
+       idcardImage:""
   },
 
   login: function (userName, pwd) {
@@ -142,14 +143,14 @@ var UserStore = assign({}, EventEmitter.prototype, {
   },
 
   repwd(id, oldPwd, pwd) {
-    var params = {"id" : id, "oldPwd" : oldPwd, "pwd": pwd};
+    var params = {"oldPwd" : oldPwd, "pwd": pwd};
 
     $.ajax({
         type : "POST",
         dataType: "json",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(params),
-        url: $setting.serverUrl + "user/rePwd",
+        url: $setting.serverUrl + "user/" + id + "/rePwd",
         headers : {"Token": $.cookie('token')},
         success: function(result) {
               $util_alertMsg('', '修改成功，请重新登录！',
@@ -485,7 +486,70 @@ var UserStore = assign({}, EventEmitter.prototype, {
               $util_alertMsg(xhr);
         }.bind(this)
     });
-  }
+  },
+
+  findCertification: function(userId) {
+     $.ajax({
+          url: $setting.serverUrl + "user/" + userId + "/certification",
+          type: 'GET',
+          headers : {"Token": $.cookie('token')},
+          success: function (result) {
+              this.data.idcardImage = result.data;
+              this.emit('change');
+          }.bind(this),
+          error: function (xhr, type, exception) {
+              $util_alertMsg(xhr);
+          }.bind(this)
+     });
+  },
+
+  uploadIdcard: function(formId, userId) {
+     var formData = new FormData(document.getElementById(formId));
+
+     $.ajax({
+          url: $setting.serverUrl + "user/" + userId + "/certification",
+          type: 'POST',
+          headers : {"Token": $.cookie('token')},
+          data: formData,
+          async: false,
+          cache: false,
+          contentType: false,
+          processData: false,
+          success: function (result) {
+              $util_alertMsg('', '上传成功，请稍后查看！',
+                function() {
+                  document.getElementById("certification_close").click()
+                });
+          }.bind(this),
+          error: function (xhr, type, exception) {
+              $util_alertMsg(xhr);
+          }.bind(this)
+     });
+  },
+
+  confirmCertification: function(userId, certification) {
+    var params = {"certification": certification};
+
+    $.ajax({
+        type : "PUT",
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(params),
+          url: $setting.serverUrl + "user/" + userId + "/certification",
+        headers : {"Token": $.cookie('token')},
+        success: function(result) {
+              $util_alertMsg('', '修改成功！',
+                function() {
+                  document.getElementById("certification_close").click()
+                });
+
+             this.page(1);
+        }.bind(this),
+        error: function(xhr, type, exception) {
+                $util_alertMsg(xhr);
+        }.bind(this)
+      });
+  },
 
 });
 
