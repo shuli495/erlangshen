@@ -9,14 +9,41 @@ var UserStore = assign({}, EventEmitter.prototype, {
        pageNum: 1,
        retrieveId: "",
        info: "",
-       idcardImage:""
+       codeImage: "",
+       idcardImage: ""
   },
 
-  login: function (userName, pwd) {
+  code: function (userName) {
+      var data = {
+          "userName" : userName
+      };
+    $.ajax({
+        data: data,
+        type : "GET",
+        url: $setting.serverUrl + "token/"+userName,
+        headers : {"Token": $setting.token},
+        success: function(result) {
+          this.data.codeImage = result.data;
+          this.emit('change');
+        }.bind(this),
+        error: function(xhr, type, exception) {
+          var errMsg = $util_getMsg(xhr);
+          this.data.info = errMsg;
+          this.emit('change');
+        }.bind(this)
+    });
+  },
+
+  login: function (userName, pwd, code) {
       var data = {
           "userName" : userName,
           "pwd" : pwd
       };
+
+    if(typeof(code) != "undefined" && code != "undefined" && code != "") {
+      data["code"] = code;
+    }
+
     $.ajax({
         data: data,
         type : "POST",
@@ -24,6 +51,7 @@ var UserStore = assign({}, EventEmitter.prototype, {
         url: $setting.serverUrl + "token",
         headers : {"Token": $setting.token},
         success: function(result) {
+          this.data.codeImage = "";
           var date = new Date();
           date.setTime(result.data.activeTime);
           $.cookie('token', result.data.id, { expires: date });
@@ -31,7 +59,14 @@ var UserStore = assign({}, EventEmitter.prototype, {
         }.bind(this),
         error: function(xhr, type, exception) {
           var errMsg = $util_getMsg(xhr);
-          this.data.info = errMsg;
+
+          if(eval('('+xhr.responseText+')').image) {
+            this.data.codeImage = eval('('+xhr.responseText+')').image;
+          }
+          if((typeof(code) == "undefined" || code == "undefined" || code == "")
+              && (eval('('+xhr.responseText+')').code && eval('('+xhr.responseText+')').code != "122009" && eval('('+xhr.responseText+')').code != "122010")) {
+            this.data.info = errMsg;
+          }
           this.emit('change');
         }.bind(this)
     });

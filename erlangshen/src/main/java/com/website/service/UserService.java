@@ -153,7 +153,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		// 删除验证码
 		if(VerifyUtils.isNotEmpty(vo.getCode()) && null != validateVO) {
 			try {
-				validateService.delete(validateVO);
+				validateService.delete(validateVO.getUserId(), validateVO.getType(), null);
 			} catch (Exception e){}
 		}
 	}
@@ -289,7 +289,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			if(VerifyUtils.isNotEmpty(codeNumStr)) {
 				codeNum = Integer.valueOf(codeNumStr);
 			}
-			String code = CommonUtil.randomCode("strAndNum", codeNum);
+			String code = CodeUtil.randomCode("strAndNum", codeNum);
 
 			text = text.replace("${code"+codeNumStr+"}", code);
 
@@ -299,7 +299,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 
 		// 替换url
 		if(text.indexOf("${url}") != -1) {
-			String code = CommonUtil.randomCode("strAndNum", 16);
+			String code = CodeUtil.randomCode("strAndNum", 16);
 			String url = "userId=" + user.getId() + "&type=" + type + "&code=" + code;
 			if(VerifyUtils.isNotEmpty(callback)) {
 				url += "&callback=" + callback;
@@ -414,9 +414,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		// 删除code
 		try {
 			ValidateVO validateVO = new ValidateVO();
-			validateVO.setUserId(userId);
-			validateVO.setType("mail");
-			validateService.delete(validateVO);
+			validateService.delete(userId, "mail", null);
 		} catch (Exception e) {
 		}
 
@@ -439,7 +437,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 
 		// 设置code
 		Map<String, Object> params = new HashMap<>();
-		String code = CommonUtil.randomCode("num", 6);
+		String code = CodeUtil.randomCode("num", 6);
 		params.put("code", code);
 
 		// 查找关联用户
@@ -591,7 +589,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 				ValidateVO validateVO = new ValidateVO();
 				validateVO.setUserId(userId);
 				validateVO.setCode(code);
-				validateService.delete(validateVO);
+				validateService.delete(userId, null, code);
 			} catch (Exception e) {
 			}
 		}

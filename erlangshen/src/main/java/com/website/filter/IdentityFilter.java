@@ -107,7 +107,9 @@ public class IdentityFilter extends OncePerRequestFilter {
                 // admin token只能用于以下操作
                 if(token.equals(Setting.getProperty("admin.token"))) {
                     // 获取token
-                    boolean isToken = request.getRequestURI().endsWith(Constants.URL_TOKEN) || request.getRequestURI().endsWith(Constants.URL_TOKEN+"/");
+                    boolean isToken = request.getRequestURI().endsWith(Constants.URL_TOKEN)
+                                    || request.getRequestURI().endsWith(Constants.URL_TOKEN+"/")
+                                    ||request.getRequestURI().indexOf(Constants.URL_TOKEN+"/") != -1;
                     // 用户查询或创建
                     boolean isCreateOrSel = (request.getRequestURI().endsWith(Constants.URL_USER) || request.getRequestURI().endsWith(Constants.URL_USER+"/"))
                             && (request.getMethod().equalsIgnoreCase("get") || request.getMethod().equalsIgnoreCase("post"));

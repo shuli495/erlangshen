@@ -38,7 +38,7 @@
 		<dependency>
 			<groupId>com.github.shuli495</groupId>
 			<artifactId>fastjava</artifactId>
-			<version>5cc713b6c2</version>
+			<version>master-0.9.4-gb1d093c-17</version>
 		</dependency>
 
 		<dependency>

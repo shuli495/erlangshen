@@ -7,18 +7,12 @@ import com.fastjavaframework.util.VerifyUtils;
 import com.website.model.vo.ClientMailVO;
 import com.website.model.vo.ClientPhoneVO;
 import com.website.model.vo.ClientSecurityVO;
-import com.website.model.vo.TokenVO;
 import com.website.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 异地登录告警

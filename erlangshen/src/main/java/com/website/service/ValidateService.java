@@ -27,10 +27,46 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
     private UserService userService;
 
     /**
-     * 根据userId,type删除
-     * @param validateVO
+     * 不存在则新增，存在修改
+     * @param userId
+     * @param type
+     * @param code
      */
-    public void delete(ValidateVO validateVO) {
+    public void insert(String userId, String type, String code) {
+        ValidateVO validateVO = new ValidateVO();
+        validateVO.setUserId(userId);
+        validateVO.setType(type);
+        List<ValidateVO> validates = this.dao.baseQueryByAnd(validateVO);
+
+        validateVO.setCode(code);
+        validateVO.setCreatedTime(new Date());
+        if(validates.size() > 0) {
+            this.dao.baseUpdate(validateVO);
+        } else {
+            this.dao.baseInsert(validateVO);
+        }
+    }
+
+    /**
+     * 删除
+     * @param userId
+     * @param type
+     * @param code
+     */
+    public void delete(String userId, String type, String code) {
+        ValidateVO validateVO = new ValidateVO();
+        if(VerifyUtils.isEmpty(userId)) {
+            throw new ThrowException("userId必传！", "152006");
+        }
+        validateVO.setUserId(userId);
+
+        if(VerifyUtils.isNotEmpty(type)) {
+            validateVO.setType(type);
+        }
+        if(VerifyUtils.isNotEmpty(code)) {
+            validateVO.setCode(code);
+        }
+
         this.dao.delete(validateVO);
     }
 

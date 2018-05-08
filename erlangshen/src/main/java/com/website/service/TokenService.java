@@ -1,26 +1,32 @@
 package com.website.service;
 
 import com.fastjavaframework.Setting;
+import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.page.OrderSort;
+import com.fastjavaframework.response.ReturnJson;
+import com.fastjavaframework.util.CodeUtil;
 import com.fastjavaframework.util.SecretUtil;
 import com.fastjavaframework.util.UUID;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.common.HttpHelper;
 import com.website.Executor.LoginPlaceReport;
-import com.website.model.bo.TokenBO;
 import com.website.model.bo.UserBO;
 import com.website.model.vo.ClientSecurityVO;
 import com.website.model.vo.TokenVO;
 import com.website.model.vo.UserVO;
+import com.website.model.vo.ValidateVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.fastjavaframework.base.BaseService;
 import com.website.dao.TokenDao;
+import sun.misc.BASE64Encoder;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.util.*;
 
 /**
  * token
@@ -31,12 +37,36 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
 
     @Autowired
     private UserService userService;
-
     @Autowired
     private LoginLogService loginLogService;
-
     @Autowired
     private ClientSecurityService clientSecurityService;
+    @Autowired
+    private ValidateService validateService;
+
+    /**
+     * 获取登录验证码
+     * @param tokenClientId
+     * @param userName
+     * @return base64图片
+     */
+    public String code(String tokenClientId, String userName) {
+        Map<String, Object> map = CodeUtil.codeImg();
+
+        // code入库
+        validateService.insert(tokenClientId + "_" + userName, "login", map.get("code").toString());
+
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ImageIO.write((BufferedImage)map.get("image"), "jpg", baos);
+			byte[] bytes = baos.toByteArray();
+
+			BASE64Encoder encoder = new sun.misc.BASE64Encoder();
+			return encoder.encodeBuffer(bytes).trim();
+		} catch (Exception e) {
+			throw new ThrowException("验证码转base64错误：" + e.getMessage(), "122009");
+		}
+    }
 
     /**
      * 生成token
@@ -48,12 +78,53 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
      * @param userName
      * @param pwd
      * @param platform 登录端，区分不同平台的登录，用于校验不同平台是否可以同事登录；入安卓登录、网页能同时登录，其他手机不能登录。空值全局校验
+     * @param code
      * @return
      */
-    public TokenBO inster(TokenVO token, boolean isCheckStatus,
-                          String loginIp, String userName, String pwd, String platform) {
-        List<UserVO> users = userService.checkExist(token.getClientId(), userName, null);
+    public Object inster(HttpServletResponse response, TokenVO token, boolean isCheckStatus,
+                          String loginIp, String userName, String pwd, String platform, String code) {
+        // 校验验证码
+        ValidateVO validateVO = new ValidateVO();
+        String validateId = token.getClientId()+"_"+userName;
+        validateVO.setUserId(validateId);
+        validateVO.setType("login");
+        List<ValidateVO> validates = validateService.baseQueryByAnd(validateVO);
 
+        for(ValidateVO Validate : validates) {
+            try {
+                validateService.checkOvertime("login", Validate.getCreatedTime());
+            } catch (Exception e) {
+                return this.returnCode(response, token.getClientId(), userName, "验证码超时！", "122009");
+            }
+            if(VerifyUtils.isEmpty(code)) {
+                return this.returnCode(response, token.getClientId(), userName, "请输入验证码！", "122010");
+            }
+            if(!Validate.getCode().equalsIgnoreCase(code)) {
+                throw new ThrowPrompt("验证码错误！", "122011");
+            }
+        }
+
+        // 根据用户名查询用户
+        List<UserVO> users = new ArrayList<>();
+        try {
+            users = userService.checkExist(token.getClientId(), userName, null);
+        } catch (Exception e) {
+            // 删除登录验证码
+            if(validates.size() != 0) {
+                validateService.delete(validateId, "login", null);
+            }
+            return this.returnCode(response, token.getClientId(), userName, "用户名或密码错误！", "122012");
+        }
+
+        if(users.size() == 0) {
+            // 删除登录验证码
+            if(validates.size() != 0) {
+                validateService.delete(validateId, "login", null);
+            }
+            return this.returnCode(response, token.getClientId(), userName, "用户名或密码错误！", "122013");
+        }
+
+        // 验证状态
         if(true == isCheckStatus) {
             for(UserVO user : users) {
                 if(userName.equals(user.getMail()) && user.getStatus() !=0 && user.getStatus() != 3) {
@@ -64,10 +135,12 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
                 }
             }
         }
+
         UserBO user = users.get(0);
 
+        // 校验密码
         if(!user.getPwd().equals(SecretUtil.md5(pwd))) {
-            throw new ThrowPrompt("账号或密码错误！", "122003");
+            return null;
         }
 
         // 查询已存在token
@@ -151,7 +224,6 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
                     if(isCheckPlatform == 2) {
                         this.delToken(checkPlatformType, userToken.getId(), loginApi);
                     }
-
                 }
             }
 
@@ -161,8 +233,31 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
             }
 
             loginLogService.insert(user.getId(), loginIp);
-            return reToken;
+
+            // 删除登录验证码
+            validateService.delete(validateId, "login", null);
+
+            // 返回token
+            return (new ReturnJson()).success(reToken);
         }
+    }
+
+    /**
+     * 返回code
+     * @param response
+     * @param tokenClientId
+     * @param userName
+     * @param data
+     * @param code
+     * @return
+     */
+    private Object returnCode(HttpServletResponse response, String tokenClientId, String userName, String data, String code) {
+        response.setStatus(400);
+        Map<String, String> result = new HashMap<>();
+        result.put("data", data);
+        result.put("code", code);
+        result.put("image", this.code(tokenClientId, userName));
+        return result;
     }
 
     /**
