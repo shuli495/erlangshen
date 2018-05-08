@@ -25,13 +25,13 @@ public class PermissionMenuService extends BaseService<PermissionMenuDao,Permiss
 	@Transactional
 	public void insert(TokenVO token, PermissionMenuVO vo) {
 		if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
-			throw new ThrowPrompt("无权操作此应用！");
+			throw new ThrowPrompt("无权操作此应用！", "082001");
 		}
 
 		if(null != vo.getParentId() && vo.getParentId() != 0) {
 			PermissionMenuVO parentVO = this.baseFind(vo.getParentId());
 			if(null != parentVO && !parentVO.getClientId().equals(vo.getClientId())) {
-				throw new ThrowPrompt("与父节点不在同一个应用下！");
+				throw new ThrowPrompt("与父节点不在同一个应用下！", "082002");
 			}
 		}
 
@@ -46,10 +46,10 @@ public class PermissionMenuService extends BaseService<PermissionMenuDao,Permiss
 	public void delete(TokenVO token, Integer id) {
 		PermissionMenuVO permissionMenuVO = super.baseFind(id);
 		if(null == permissionMenuVO) {
-			throw new ThrowPrompt("无此菜单！");
+			throw new ThrowPrompt("无此菜单！", "082003");
 		}
 		if(!clientService.isMyClient(token.getUserId() , permissionMenuVO.getClientId())) {
-			throw new ThrowPrompt("无权操作此应用！");
+			throw new ThrowPrompt("无权操作此应用！", "082004");
 		}
 
 		// 要删除的菜单及其子菜单
@@ -87,7 +87,7 @@ public class PermissionMenuService extends BaseService<PermissionMenuDao,Permiss
      */
 	public List<PermissionMenuVO> query(TokenVO token, PermissionMenuVO permissionMenuVO) {
 		if(!clientService.isMyClient(token.getUserId() , permissionMenuVO.getClientId())) {
-			throw new ThrowPrompt("无权操作此应用！");
+			throw new ThrowPrompt("无权操作此应用！", "082005");
 		}
 
 		List<PermissionMenuVO> queryPermissionMenuVO = super.baseQueryByAnd(permissionMenuVO);
@@ -151,7 +151,7 @@ public class PermissionMenuService extends BaseService<PermissionMenuDao,Permiss
 		PermissionMenuVO upVO = this.setUpdateVlaue(super.baseFind(vo.getId()), vo);
 
 		if(!clientService.isMyClient(token.getUserId() , upVO.getClientId())) {
-			throw new ThrowPrompt("无权操作此应用！");
+			throw new ThrowPrompt("无权操作此应用！", "082006");
 		}
 
 		//更新
@@ -166,7 +166,7 @@ public class PermissionMenuService extends BaseService<PermissionMenuDao,Permiss
 	 */
 	private PermissionMenuVO setUpdateVlaue(PermissionMenuVO dbVO, PermissionMenuVO upVO) {
 		if(null == dbVO) {
-			throw new ThrowPrompt("无"+upVO.getId()+"信息！");
+			throw new ThrowPrompt("无"+upVO.getId()+"信息！", "082007");
 		}
 
 		// 菜单名称

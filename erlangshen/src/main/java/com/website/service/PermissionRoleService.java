@@ -33,7 +33,7 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
      */
 	public void insert(TokenVO token, PermissionRoleVO vo) {
 		if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
-			throw new ThrowPrompt("无权操作此应用！");
+			throw new ThrowPrompt("无权操作此应用！", "102001");
 		}
 
 		super.baseInsert(vo);
@@ -48,7 +48,7 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
 	public void delete(TokenVO token, Integer id) {
 		PermissionRoleVO vo = super.baseFind(id);
 		if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
-			throw new ThrowPrompt("无权操作此应用！");
+			throw new ThrowPrompt("无权操作此应用！", "102002");
 		}
 
 		// 删除角色关联的用户
@@ -66,7 +66,7 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
      */
 	public List<PermissionRoleVO> query(TokenVO token, PermissionRoleVO vo) {
 		if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
-			throw new ThrowPrompt("无权操作此应用！");
+			throw new ThrowPrompt("无权操作此应用！", "102003");
 		}
 
 		List<PermissionRoleVO> roles = super.baseQueryByAnd(vo);
@@ -106,7 +106,7 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
 	public void userInsert(TokenVO token, Integer id, List<String> users) {
 		PermissionRoleVO vo = super.baseFind(id);
 		if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
-			throw new ThrowPrompt("无权操作此应用！");
+			throw new ThrowPrompt("无权操作此应用！", "102004");
 		}
 
 		// 去除已关联的用户
@@ -140,7 +140,7 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
 	public void userDelete(TokenVO token, Integer id, List<String> users) {
 		PermissionRoleVO vo = super.baseFind(id);
 		if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
-			throw new ThrowPrompt("无权操作此应用！");
+			throw new ThrowPrompt("无权操作此应用！", "102005");
 		}
 
 		// 批量取消关联
@@ -165,7 +165,7 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
 	public void menuInsert(TokenVO token, Integer id, List<Integer> menus) {
 		PermissionRoleVO vo = super.baseFind(id);
 		if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
-			throw new ThrowPrompt("无权操作此应用！");
+			throw new ThrowPrompt("无权操作此应用！", "102006");
 		}
 
 		PermissionRoleMenuVO permissionRoleMenuVO = new PermissionRoleMenuVO();
@@ -200,7 +200,7 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
 	public void menuDelete(TokenVO token, Integer id, List<Integer> menus) {
 		PermissionRoleVO vo = super.baseFind(id);
 		if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
-			throw new ThrowPrompt("无权操作此应用！");
+			throw new ThrowPrompt("无权操作此应用！", "102007");
 		}
 
 		// 批量取消关联

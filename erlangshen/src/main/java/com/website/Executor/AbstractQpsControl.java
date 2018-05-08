@@ -110,7 +110,7 @@ public abstract class AbstractQpsControl implements Runnable {
                 try {
                     Thread.sleep(this.sleepTime);
                 } catch (InterruptedException e) {
-                    throw new ThrowException("线程休眠异常："+ e.getMessage());
+                    throw new ThrowException("线程休眠异常："+ e.getMessage(), "801001");
                 }
             }
 

@@ -32,10 +32,10 @@ public class ClientPhoneService extends BaseService<ClientPhoneDao,ClientPhoneVO
 	public ClientPhoneVO find(String clientId, String type) {
 
 		if(VerifyUtils.isEmpty(clientId)) {
-			throw new ThrowException("clientId必填");
+			throw new ThrowException("clientId必填", "022001");
 		}
 		if(VerifyUtils.isEmpty(type)) {
-			throw new ThrowException("type必填");
+			throw new ThrowException("type必填", "022002");
 		}
 
 		return this.dao.find(clientId, type);
@@ -48,7 +48,7 @@ public class ClientPhoneService extends BaseService<ClientPhoneDao,ClientPhoneVO
 	 */
 	public void deleteByClientId(String clientId) {
 		if(VerifyUtils.isEmpty(clientId)) {
-			throw new ThrowException("clientId必填");
+			throw new ThrowException("clientId必填", "022003");
 		}
 
 		this.dao.deleteByClientId(clientId);
@@ -60,7 +60,7 @@ public class ClientPhoneService extends BaseService<ClientPhoneDao,ClientPhoneVO
      */
 	public void insert(TokenVO token, ClientPhoneVO clientPhoneVO) {
 		if(!clientService.isMyClient(token.getUserId(), clientPhoneVO.getClientId())) {
-			throw new ThrowPrompt("无权操作次应用！", "032005");
+			throw new ThrowPrompt("无权操作次应用！", "022004");
 		}
 
 		ClientPhoneVO queryClientPhoneVO = new ClientPhoneVO();
@@ -68,7 +68,7 @@ public class ClientPhoneService extends BaseService<ClientPhoneDao,ClientPhoneVO
 		queryClientPhoneVO.setType(clientPhoneVO.getType());
 		List<ClientPhoneVO> clientPhones = super.baseQueryByAnd(queryClientPhoneVO);
 		if(clientPhones.size() > 0) {
-			throw new ThrowPrompt("该类型短信已存在！", "072009");
+			throw new ThrowPrompt("该类型短信已存在！", "022005");
 		}
 
 		// 加密sk
@@ -91,7 +91,7 @@ public class ClientPhoneService extends BaseService<ClientPhoneDao,ClientPhoneVO
 		}
 
 		if(!clientService.isMyClient(token.getUserId(), clientPhoneVO.getClientId())) {
-			throw new ThrowPrompt("无权操作次应用！", "032005");
+			throw new ThrowPrompt("无权操作次应用！", "022006");
 		}
 
 		// 校验是否关联安全设置好
@@ -99,7 +99,7 @@ public class ClientPhoneService extends BaseService<ClientPhoneDao,ClientPhoneVO
 		clientSecurityVO.setClientId(clientPhoneVO.getClientId());
 		clientSecurityVO.setCheckPlaceMailTypeId(id);
 		if(clientSecurityService.baseQueryByAnd(clientSecurityVO).size() > 0) {
-			throw new ThrowPrompt("该邮件已关联安全设置，请取消关联后删除！", "032005");
+			throw new ThrowPrompt("该邮件已关联安全设置，请取消关联后删除！", "022007");
 		}
 
 
@@ -114,7 +114,7 @@ public class ClientPhoneService extends BaseService<ClientPhoneDao,ClientPhoneVO
      */
 	public List<ClientPhoneVO> list(TokenVO token, String clientId) {
 		if(!clientService.isMyClient(token.getUserId(), clientId)) {
-			throw new ThrowPrompt("无权操作次应用！", "032005");
+			throw new ThrowPrompt("无权操作次应用！", "022008");
 		}
 
 		ClientPhoneVO queryClientPhoneVO = new ClientPhoneVO();

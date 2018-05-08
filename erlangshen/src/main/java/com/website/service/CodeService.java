@@ -24,7 +24,7 @@ public class CodeService extends BaseService<CodeDao,CodeBO> {
 	public int insert(CodeBO bo) {
 		CodeBO isExist = super.baseFind(bo.getId());
 		if(null != isExist) {
-			throw new ThrowPrompt("当前id已存在，请重新输入！");
+			throw new ThrowPrompt("当前id已存在，请重新输入！", "052001");
 		}
 		
 		return super.baseInsert(bo);

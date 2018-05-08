@@ -23,7 +23,7 @@ public class KeyService extends BaseService<KeyDao,KeyVO> {
      */
     public void create(String tokenUserId, String clientId) {
         if(!clientService.isMyClient(tokenUserId, clientId)) {
-            throw new ThrowPrompt("无权操作次应用！", "032005");
+            throw new ThrowPrompt("无权操作次应用！", "062001");
         }
 
         KeyVO keyVO = new KeyVO();
@@ -48,18 +48,18 @@ public class KeyService extends BaseService<KeyDao,KeyVO> {
         KeyVO keyVO = super.baseFind(accessKey);
 
         if(null == keyVO) {
-            throw new ThrowPrompt("无此key！", "032005");
+            throw new ThrowPrompt("无此key！", "062002");
         }
 
         if(!clientService.isMyClient(tokenUserId, keyVO.getClientId())) {
-            throw new ThrowPrompt("无权操作次应用！", "032005");
+            throw new ThrowPrompt("无权操作次应用！", "062003");
         }
 
         if(keyVO.getStatus() == status) {
             if(status == 0) {
-                throw new ThrowPrompt("已是停用状态！", "032001");
+                throw new ThrowPrompt("已是停用状态！", "062004");
             } else {
-                throw new ThrowPrompt("已是启用状态！", "032002");
+                throw new ThrowPrompt("已是启用状态！", "062005");
             }
         }
 
@@ -75,15 +75,15 @@ public class KeyService extends BaseService<KeyDao,KeyVO> {
         KeyVO keyVO = super.baseFind(accessKey);
 
         if(null == keyVO) {
-            throw new ThrowPrompt("无此key！", "032005");
+            throw new ThrowPrompt("无此key！", "062006");
         }
 
         if(!clientService.isMyClient(tokenUserId, keyVO.getClientId())) {
-            throw new ThrowPrompt("无权操作次应用！", "032005");
+            throw new ThrowPrompt("无权操作次应用！", "062007");
         }
 
         if(null == keyVO || keyVO.getStatus() == 1) {
-            throw new ThrowPrompt("停用后才能删除！", "032003");
+            throw new ThrowPrompt("停用后才能删除！", "062008");
         }
 
         super.baseDelete(accessKey);

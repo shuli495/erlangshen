@@ -163,7 +163,7 @@ public class Certification extends AbstractQpsControl {
             updateUser.setCertification(2);
             updateUser.setCertificationFailMsg(e.getMessage());
             userService.baseUpdate(updateUser);
-            throw new ThrowException(e.getMessage());
+            throw new ThrowException(e.getMessage(), "811001");
         }
     }
 

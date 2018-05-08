@@ -1,7 +1,7 @@
 package com.website.controller;
 
 
-import com.fastjavaframework.exception.ThrowException;
+import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.common.BaseElsController;
 import com.website.common.Constants;
@@ -21,13 +21,13 @@ public class PermissionMenuController extends BaseElsController<PermissionMenuSe
 	@RequestMapping(method=RequestMethod.POST)
 	public Object create(@RequestBody PermissionMenuVO vo) {
 		if(VerifyUtils.isEmpty(vo.getClientId())) {
-			throw new ThrowException("应用不能为空！");
+			throw new ThrowPrompt("应用不能为空！", "051001");
 		}
 		if(VerifyUtils.isEmpty(vo.getName())) {
-			throw new ThrowException("名称不能为空！");
+			throw new ThrowPrompt("名称不能为空！", "051002");
 		}
 		if(VerifyUtils.isEmpty(vo.getType()) || vo.getType() > 1) {
-			throw new ThrowException("类型错误！");
+			throw new ThrowPrompt("类型错误！", "051003");
 		}
 
 		if(VerifyUtils.isEmpty(vo.getParentId())) {
@@ -44,7 +44,7 @@ public class PermissionMenuController extends BaseElsController<PermissionMenuSe
 	@RequestMapping(value="/{id}",method=RequestMethod.PUT)
 	public Object update(@PathVariable Integer id, @RequestBody PermissionMenuVO vo) {
 		if(VerifyUtils.isEmpty(vo.getName())) {
-			throw new ThrowException("名称不能为空！");
+			throw new ThrowPrompt("名称不能为空！", "051004");
 		}
 
 		vo.setId(id);
@@ -70,7 +70,7 @@ public class PermissionMenuController extends BaseElsController<PermissionMenuSe
 						@RequestParam(required = false) String tag) {
 		PermissionMenuVO vo = new PermissionMenuVO();
 		if(VerifyUtils.isEmpty(clientId)) {
-			throw new ThrowException("应用不能为空！");
+			throw new ThrowPrompt("应用不能为空！", "051005");
 		}
 
 		vo.setClientId(clientId);

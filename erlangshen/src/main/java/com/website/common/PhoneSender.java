@@ -40,7 +40,7 @@ public class PhoneSender {
 
             SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
             if(null == sendSmsResponse.getCode() || !sendSmsResponse.getCode().equals("OK")) {
-                throw new ThrowException(sendSmsResponse.getCode()+"("+sendSmsResponse.getMessage()+")", "991004");
+                throw new ThrowException(sendSmsResponse.getCode()+"("+sendSmsResponse.getMessage()+")", "911001");
             }
         } catch (Exception e) {
             if(e.getMessage().indexOf("isv.BUSINESS_LIMIT_CONTROL") != -1) {
@@ -51,11 +51,11 @@ public class PhoneSender {
                     level = text[0];
                     maxNum = text[1].split(":")[1].split("\\)")[0];
                 } catch (Exception e1) {
-                    throw new ThrowPrompt("短信发送失败：超出流量控制，请稍后再试！", "991001");
+                    throw new ThrowPrompt("短信发送失败：超出流量控制，请稍后再试！", "911002");
                 }
                 throw new ThrowPrompt("每个手机号码每" + level + "最多发送" + maxNum + "条短信");
             }
-            throw new ThrowException("短信发送失败：" + e.getMessage(), "991001");
+            throw new ThrowException("短信发送失败：" + e.getMessage(), "911003");
         }
     }
 }

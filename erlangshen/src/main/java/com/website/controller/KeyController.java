@@ -1,6 +1,6 @@
 package com.website.controller;
 
-import com.fastjavaframework.exception.ThrowException;
+import com.fastjavaframework.exception.ThrowPrompt;
 import com.website.common.BaseElsController;
 import com.website.common.Constants;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ public class KeyController extends BaseElsController<KeyService> {
 	@RequestMapping(value="/{clientId}",method=RequestMethod.POST)
 	public Object create(@PathVariable String clientId) {
 		if(null == clientId) {
-			throw new ThrowException("应用不能为空！");
+			throw new ThrowPrompt("应用不能为空！", "031001");
 		}
 
 		this.service.create(super.identity().getUserId(), clientId);

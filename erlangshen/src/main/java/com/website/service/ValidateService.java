@@ -38,7 +38,7 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
      */
     public ValidateVO checkByUserId(String userId, String type, String code) {
         if(VerifyUtils.isEmpty(userId) || VerifyUtils.isEmpty(code)) {
-            throw new ThrowException("认证信息不全！", "082001");
+            throw new ThrowException("认证信息不全！", "152001");
         }
         return this.queryAndCheck(userId, type, code).get(0);
     }
@@ -79,7 +79,7 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
      */
     public List<ValidateVO> queryAndCheck(String ObjectId, String type, String code)  {
         if(VerifyUtils.isEmpty(ObjectId) && VerifyUtils.isEmpty(type) && VerifyUtils.isEmpty(code)) {
-            throw new ThrowException("认证信息不全！", "082002");
+            throw new ThrowException("认证信息不全！", "152002");
         }
 
         // 根据code查询认证表数据
@@ -97,7 +97,7 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
 
         // 根据code未查到认证数据
         if(null == Validates || Validates.size() == 0) {
-            throw new ThrowPrompt("验证码不正确！", "082003");
+            throw new ThrowPrompt("验证码不正确！", "152003");
         } else {
             // 认证信息是否过期
             for(ValidateVO Validate : Validates) {
@@ -128,7 +128,7 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
         now.setTime(new Date());
 
         if (cal.before(now)) {
-            throw new ThrowPrompt("认证信息超时，请重新认证！", "082004");
+            throw new ThrowPrompt("认证信息超时，请重新认证！", "152004");
         }
     }
 
@@ -161,7 +161,7 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
                 - (int)((new Date().getTime() - createdTime.getTime()) / 1000);
 
         if(re > 0) {
-            throw new ThrowPrompt(re + "秒后再次操作！", "082006");
+            throw new ThrowPrompt(re + "秒后再次操作！", "152005");
         }
     }
 

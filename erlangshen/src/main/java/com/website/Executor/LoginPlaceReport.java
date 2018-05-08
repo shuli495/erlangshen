@@ -172,7 +172,7 @@ public class LoginPlaceReport extends AbstractQpsControl {
                 throw new ThrowException(result);
             }
         } catch (Exception e) {
-            throw new ThrowException("查询ip地址异常："+ e.getMessage());
+            throw new ThrowException("查询ip地址异常："+ e.getMessage(), "821001");
         }
     }
 

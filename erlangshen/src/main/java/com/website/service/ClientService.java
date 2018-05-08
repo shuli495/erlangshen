@@ -61,17 +61,17 @@ public class ClientService extends BaseService<ClientDao,ClientVO> {
      */
     public void update(String tokenUserId, ClientVO clientVO) {
         if(VerifyUtils.isEmpty(clientVO.getId())) {
-            throw new ThrowPrompt("id不能为空！");
+            throw new ThrowPrompt("id不能为空！", "042001");
         }
 
         ClientVO nowBO = super.baseFind(clientVO.getId());
 
         if(null == nowBO) {
-            throw new ThrowPrompt("无此应用");
+            throw new ThrowPrompt("无此应用", "042002");
         }
 
         if(!tokenUserId.equals(nowBO.getCreatedBy())) {
-            throw new ThrowPrompt("无权修改此数据！");
+            throw new ThrowPrompt("无权修改此数据！", "042003");
         }
 
         // 校验name group
@@ -100,7 +100,7 @@ public class ClientService extends BaseService<ClientDao,ClientVO> {
         // name不能重复
         for (ClientVO client : clientList) {
             if(!id.equals(client.getId()) && client.getName().equals(name)) {
-                throw new ThrowPrompt("名称"+name + "已存在！");
+                throw new ThrowPrompt("名称"+name + "已存在！", "042004");
             }
         }
     }
@@ -117,10 +117,10 @@ public class ClientService extends BaseService<ClientDao,ClientVO> {
         for (String id : ids) {
             ClientVO clientVO = super.baseFind(id);
             if(null == clientVO) {
-                throw new ThrowPrompt("无此应用");
+                throw new ThrowPrompt("无此应用", "042005");
             }
             if(!tokenVO.getUserId().equals(clientVO.getCreatedBy())) {
-                throw new ThrowPrompt("无权删除此数据！");
+                throw new ThrowPrompt("无权删除此数据！", "042006");
             }
 
             //删除用户
@@ -172,10 +172,10 @@ public class ClientService extends BaseService<ClientDao,ClientVO> {
         ClientVO clientVO = super.baseFind(id);
 
         if(null == clientVO) {
-            throw new ThrowPrompt("无此应用");
+            throw new ThrowPrompt("无此应用", "042007");
         }
         if(!tokenUserId.equals(clientVO.getCreatedBy())) {
-            throw new ThrowPrompt("无权删除此数据！");
+            throw new ThrowPrompt("无权删除此数据！", "042008");
         }
 
         UserVO userVO = new UserVO();
@@ -199,13 +199,13 @@ public class ClientService extends BaseService<ClientDao,ClientVO> {
      */
     public boolean isMyClient(String tokenUserId, String clientId) {
         if(VerifyUtils.isEmpty(tokenUserId)) {
-            throw new ThrowPrompt("token不能为空！");
+            throw new ThrowPrompt("token不能为空！", "042009");
         }
 
         ClientVO client = super.baseFind(clientId);
 
         if(null == client) {
-            throw new ThrowPrompt("无此应用");
+            throw new ThrowPrompt("无此应用", "042010");
         }
 
         if(client.getCreatedBy().equals(tokenUserId)) {

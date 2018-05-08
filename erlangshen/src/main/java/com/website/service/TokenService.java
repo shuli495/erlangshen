@@ -53,17 +53,17 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
         if(true == isCheckStatus) {
             for(UserVO user : users) {
                 if(userName.equals(user.getMail()) && user.getStatus() !=0 && user.getStatus() != 3) {
-                    throw new ThrowPrompt("用户邮箱未验证！", "052001");
+                    throw new ThrowPrompt("用户邮箱未验证！", "122001");
                 }
                 if(userName.equals(user.getPhone()) && user.getStatus() !=0 && user.getStatus() != 2) {
-                    throw new ThrowPrompt("用户手机未验证！", "052002");
+                    throw new ThrowPrompt("用户手机未验证！", "122002");
                 }
             }
         }
         UserBO user = users.get(0);
 
         if(!user.getPwd().equals(SecretUtil.md5(pwd))) {
-            throw new ThrowPrompt("账号或密码错误！", "052003");
+            throw new ThrowPrompt("账号或密码错误！", "122003");
         }
 
         // 查询已存在token
@@ -177,7 +177,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
         if(null == checkPlatformType || checkPlatformType == 0) {
             this.baseDelete(tokenId);
         } else {
-            throw new ThrowPrompt("已有账号登录！");
+            throw new ThrowPrompt("已有账号登录！", "122004");
         }
     }
 
@@ -215,22 +215,22 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
      */
     public TokenVO check(String token, String clientIp) {
         if(VerifyUtils.isEmpty(token)) {
-            throw new ThrowPrompt("token无效！");
+            throw new ThrowPrompt("token无效！", "122005");
         }
         TokenVO tokenVO = super.baseFind(token);
 
         if(null == tokenVO) {
-            throw new ThrowPrompt("token无效！");
+            throw new ThrowPrompt("token无效！", "122006");
         }
 
         if(VerifyUtils.isNotEmpty(clientIp) && !clientIp.equals(tokenVO.getIp())) {
-            throw new ThrowPrompt("token无效！");
+            throw new ThrowPrompt("token无效！", "122007");
         }
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         if(tokenVO.getActiveTime().before(cal.getTime())) {
-            throw new ThrowPrompt("token失效，请重新获取！");
+            throw new ThrowPrompt("token失效，请重新获取！", "122008");
         }
 
         return tokenVO;

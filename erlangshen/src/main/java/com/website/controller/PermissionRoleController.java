@@ -1,7 +1,7 @@
 package com.website.controller;
 
 
-import com.fastjavaframework.exception.ThrowException;
+import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.common.BaseElsController;
 import com.website.common.Constants;
@@ -41,7 +41,7 @@ public class PermissionRoleController extends BaseElsController<PermissionRoleSe
 						@RequestParam(required = false) String clientId, @RequestParam(required = false) String role) {
 		PermissionRoleVO vo = new PermissionRoleVO();
 		if(VerifyUtils.isEmpty(clientId)) {
-			throw new ThrowException("应用不能为空！");
+			throw new ThrowPrompt("应用不能为空！", "061001");
 		}
 
 		vo.setClientId(clientId);

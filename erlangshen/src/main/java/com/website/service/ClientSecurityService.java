@@ -22,7 +22,7 @@ public class ClientSecurityService extends BaseService<ClientSecurityDao,ClientS
 	 */
 	public ClientSecurityVO find(TokenVO token, String clientId) {
 		if(!clientService.isMyClient(token.getUserId(), clientId)) {
-			throw new ThrowPrompt("无权操作次应用！", "032005");
+			throw new ThrowPrompt("无权操作次应用！", "032001");
 		}
 
 		return super.baseFind(clientId);
@@ -33,7 +33,7 @@ public class ClientSecurityService extends BaseService<ClientSecurityDao,ClientS
 	 */
 	public int update(TokenVO token, ClientSecurityVO vo) {
 		if(!clientService.isMyClient(token.getUserId(), vo.getClientId())) {
-			throw new ThrowPrompt("无权操作次应用！", "032005");
+			throw new ThrowPrompt("无权操作次应用！", "032002");
 		}
 
 		//设置修改值
@@ -51,7 +51,7 @@ public class ClientSecurityService extends BaseService<ClientSecurityDao,ClientS
 	 */
 	private ClientSecurityVO setUpdateVlaue(ClientSecurityVO dbVO, ClientSecurityVO upVO) {
 		if(null == dbVO) {
-			throw new ThrowPrompt("无"+upVO.getClientId()+"信息！");
+			throw new ThrowPrompt("无"+upVO.getClientId()+"信息！", "032003");
 		}
 
 		// 是否异地登陆检查 0不检查 1检查

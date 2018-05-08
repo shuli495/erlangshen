@@ -35,7 +35,7 @@ public class CodeController extends BaseElsController<CodeService> {
 	@RequestMapping(value="/batch",method=RequestMethod.POST)
 	public Object createBatch(@RequestBody List<CodeBO> boList) {
 		if(boList.size() == 0) {
-			throw new ThrowPrompt("无创建内容！");
+			throw new ThrowPrompt("无创建内容！", "021001");
 		}
 
 		for(CodeBO bo : boList) {
@@ -61,7 +61,7 @@ public class CodeController extends BaseElsController<CodeService> {
 	@RequestMapping(value="/batch",method=RequestMethod.PUT)
 	public Object updateBatch(@RequestBody List<CodeBO> boList) {
 		if(boList.size() == 0) {
-			throw new ThrowPrompt("无修改内容！");
+			throw new ThrowPrompt("无修改内容！", "021002");
 		}
 
 		this.service.baseUpdateBatch(boList);
@@ -83,7 +83,7 @@ public class CodeController extends BaseElsController<CodeService> {
 	@RequestMapping(value="/batch",method=RequestMethod.DELETE)
 	public Object deleteBatch(@RequestBody List<String> idList) {
 		if(idList.size() == 0) {
-			throw new ThrowPrompt("无删除内容！");
+			throw new ThrowPrompt("无删除内容！", "021003");
 		}
 
 		this.service.baseDeleteBatch(idList);

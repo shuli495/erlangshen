@@ -42,7 +42,7 @@ public class MailSender {
             Sender sender = new Sender(from, nikeName, smtp, subject, content, mail, userName, pwd);
             this.executorService.execute(sender);
         } catch (Exception e) {
-            throw new ThrowException("邮件发送队列失败：" + e.getMessage(), "991001");
+            throw new ThrowException("邮件发送队列失败：" + e.getMessage(), "901001");
         }
     }
 
@@ -86,7 +86,7 @@ public class MailSender {
                 try {
                     props.setProperty("mail.host", this.smtp);
                 } catch (Exception e) {
-                    throw new ThrowException(this.subject+"的邮件格式（"+this.mail+"）错误！", "991002");
+                    throw new ThrowException(this.subject+"的邮件格式（"+this.mail+"）错误！", "901002");
                 }
                 props.setProperty("mail.transport.protocol", "smtp");
 
@@ -110,13 +110,13 @@ public class MailSender {
                     // 解密邮箱密码
                     transport.connect(this.userName, this.pwd);
                 } catch (Exception e) {
-                    throw new ThrowException("邮箱账号或密码错误！", "991003");
+                    throw new ThrowException("邮箱账号或密码错误！", "901003");
                 }
                 // 发送邮件
                 transport.sendMessage(msg, new Address[] {new InternetAddress(mail)});
                 transport.close();
             } catch (Exception e) {
-                throw new ThrowException("邮件发送失败：" + e.getMessage(), "991004");
+                throw new ThrowException("邮件发送失败：" + e.getMessage(), "901004");
             }
         }
     }

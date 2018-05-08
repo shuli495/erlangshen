@@ -666,7 +666,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	 */
 	public List<UserVO> queryByClient(UserVO userVO) {
 		if(VerifyUtils.isEmpty(userVO.getCreatedBy())) {
-			throw new ThrowPrompt("client创建人必传！", "072021");
+			throw new ThrowPrompt("client创建人必传！", "142001");
 		}
 		return this.dao.queryByClient(userVO);
 	}
@@ -678,7 +678,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	 */
 	public PageResult queryByClientPage(UserVO userVO) {
 		if(VerifyUtils.isEmpty(userVO.getCreatedBy())) {
-			throw new ThrowPrompt("client创建人必传！", "072022");
+			throw new ThrowPrompt("client创建人必传！", "142002");
 		}
 		return this.dao.queryByClientPage(userVO);
 	}
@@ -691,7 +691,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	@Transactional
 	public void update(TokenVO tokenVO, UserVO vo) {
 		if(!Constants.PROJECT_NAME.equals(tokenVO.getClientId()) && !tokenVO.getUserId().equals(vo.getId())) {
-			throw new ThrowPrompt("用户信息错误！", "072023");
+			throw new ThrowPrompt("用户信息错误！", "142003");
 		}
 
 		UserVO oldUserVO = super.baseFind(vo.getId());
@@ -700,11 +700,11 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			vo.setClientId(oldUserVO.getClientId());
 		}
 		if(Constants.PROJECT_NAME.equals(tokenVO.getClientId()) && !clientService.isMyClient(tokenVO.getUserId(), vo.getClientId())) {
-			throw new ThrowPrompt("client信息错误！", "072024");
+			throw new ThrowPrompt("client信息错误！", "142004");
 		}
 
 		if(null == oldUserVO) {
-			throw new ThrowPrompt("无此用户！");
+			throw new ThrowPrompt("无此用户！", "142005");
 		}
 
 		// 校验修改的信息是否已存在
@@ -712,17 +712,17 @@ public class UserService extends BaseService<UserDao,UserVO> {
 
 		// 实名认证通过 不能修改姓名 身份证号码
 		if(oldUserVO.getCertification() == 3 && VerifyUtils.isNotEmpty(vo.getName()) && !vo.getName().equals(oldUserVO.getName())) {
-			throw new ThrowPrompt("已实名通过，不能修改姓名！");
+			throw new ThrowPrompt("已实名通过，不能修改姓名！", "142006");
 		}
 		if(oldUserVO.getCertification() == 3 && VerifyUtils.isNotEmpty(vo.getIdcard()) && !vo.getIdcard().equals(oldUserVO.getIdcard())) {
-			throw new ThrowPrompt("已实名通过，不能修改身份证号码！");
+			throw new ThrowPrompt("已实名通过，不能修改身份证号码！", "142007");
 		}
 
 		//设置修改值
 		UserVO upVO = this.setUpdateVlaue(oldUserVO, vo);
 
 		if(VerifyUtils.isEmpty(upVO.getUsername()) && VerifyUtils.isEmpty(upVO.getMail()) && VerifyUtils.isEmpty(upVO.getPhone())) {
-			throw new ThrowPrompt("用户名、邮箱、手机必填一个！", "072026");
+			throw new ThrowPrompt("用户名、邮箱、手机必填一个！", "142008");
 		}
 
 
@@ -766,7 +766,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	 */
 	private UserVO setUpdateVlaue(UserVO dbVO, UserVO upVO) {
 		if(null == dbVO) {
-			throw new ThrowPrompt("无此信息！", "072027");
+			throw new ThrowPrompt("无此信息！", "142009");
 		}
 
 		if(null != upVO.getId()) {
@@ -896,7 +896,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			List<UserVO> users = this.dao.check(clientId, userName, null);
 			for(UserVO user : users) {
 				if((VerifyUtils.isEmpty(nowUserId) && user.getUsername().equals(userName)) || (!VerifyUtils.isEmpty(nowUserId) && !user.getId().equals(nowUserId))) {
-					throw new ThrowPrompt("该用户名已注册，请更换后再试！", "072028");
+					throw new ThrowPrompt("该用户名已注册，请更换后再试！", "142010");
 				}
 			}
 		}
@@ -906,9 +906,9 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			for(UserVO user : users) {
 				if((VerifyUtils.isEmpty(nowUserId) && user.getMail().equals(mail)) || (!VerifyUtils.isEmpty(nowUserId) && !user.getId().equals(nowUserId))) {
 					if(user.getStatus() == 1 || user.getStatus() == 2) {
-						throw new ThrowPrompt("该邮箱已注册，但未验证！", "072029");
+						throw new ThrowPrompt("该邮箱已注册，但未验证！", "142011");
 					} else {
-						throw new ThrowPrompt("该邮箱已注册，请更换后再试！", "072030");
+						throw new ThrowPrompt("该邮箱已注册，请更换后再试！", "142012");
 					}
 				}
 			}
@@ -918,9 +918,9 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			for(UserVO user : users) {
 				if((VerifyUtils.isEmpty(nowUserId) && user.getPhone().equals(phone)) || (!VerifyUtils.isEmpty(nowUserId) && !user.getId().equals(nowUserId))) {
 					if(user.getStatus() == 1 || user.getStatus() == 3) {
-						throw new ThrowPrompt("该手机号码已注册，但未验证！", "072031");
+						throw new ThrowPrompt("该手机号码已注册，但未验证！", "142013");
 					} else {
-						throw new ThrowPrompt("该手机号码已注册，请更换后再试！", "072032");
+						throw new ThrowPrompt("该手机号码已注册，请更换后再试！", "142014");
 					}
 				}
 			}

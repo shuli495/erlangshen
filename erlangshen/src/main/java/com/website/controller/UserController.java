@@ -103,13 +103,13 @@ public class UserController extends BaseElsController<UserService> {
 							@RequestParam(required = false) String userId,
 						  @RequestParam(required = false) String mail, @RequestParam(required = false) String phone) {
 		if(VerifyUtils.isEmpty(mail) && VerifyUtils.isEmpty(phone) && VerifyUtils.isEmpty(userId)) {
-			throw new ThrowException("邮箱或手机或userId必须填一个！", "071001");
+			throw new ThrowPrompt("邮箱或手机或userId必须填一个！", "081001");
 		}
 		if(VerifyUtils.isEmpty(code)) {
-			throw new ThrowException("验证码必填！", "071002");
+			throw new ThrowPrompt("验证码必填！", "081002");
 		}
 		if(VerifyUtils.isEmpty(type)) {
-			throw new ThrowException("类型必填！", "071002");
+			throw new ThrowPrompt("类型必填！", "081003");
 		}
 
 		if(VerifyUtils.isNotEmpty(userId)) {
@@ -139,7 +139,7 @@ public class UserController extends BaseElsController<UserService> {
 	@RequestMapping(value="/{id}/certification", method=RequestMethod.GET)
 	public Object findCertification(@PathVariable String id) {
 		if(!this.service.isMyUser(super.identity().getUserId(), id) && !super.identity().getUserId().equals(id)) {
-			throw new ThrowPrompt("无权操作此用户!");
+			throw new ThrowPrompt("无权操作此用户!", "081004");
 		}
 
 		Map<String, String> result = new HashMap<>();
@@ -177,17 +177,17 @@ public class UserController extends BaseElsController<UserService> {
 								@RequestParam(value="forntFile",required=false) MultipartFile forntFile,
 								@RequestParam(value="backFile",required=false) MultipartFile backFile) {
 		if(!this.service.isMyUser(super.identity().getUserId(), id) && !super.identity().getUserId().equals(id)) {
-			throw new ThrowPrompt("无权操作此用户!");
+			throw new ThrowPrompt("无权操作此用户!", "081005");
 		}
 
 		if(VerifyUtils.isEmpty(id)) {
-			throw new ThrowPrompt("id不能为空！", "071002");
+			throw new ThrowPrompt("id不能为空！", "081006");
 		}
 		if(forntFile.isEmpty()) {
-			throw new ThrowPrompt("请上传身份证正面！");
+			throw new ThrowPrompt("请上传身份证正面！", "081007");
 		}
 		if(backFile.isEmpty()) {
-			throw new ThrowPrompt("请上传身份证反面！");
+			throw new ThrowPrompt("请上传身份证反面！", "081008");
 		}
 
 		String pathRoot = request.getSession().getServletContext().getRealPath("");
@@ -197,7 +197,7 @@ public class UserController extends BaseElsController<UserService> {
 				&& forntFile.getContentType().indexOf("jpeg") == -1
 				&& forntFile.getContentType().indexOf("png") == -1
 				&& forntFile.getContentType().indexOf("bmp") == -1) {
-			throw new ThrowPrompt("上传文件类型只能是jpg/png/bmp格式");
+			throw new ThrowPrompt("上传文件类型只能是jpg/png/bmp格式", "081009");
 		}
 		try {
 			String forntPath = new StringBuilder(pathRoot)
@@ -214,7 +214,7 @@ public class UserController extends BaseElsController<UserService> {
 				&& backFile.getContentType().indexOf("jpeg") == -1
 				&& backFile.getContentType().indexOf("png") == -1
 				&& backFile.getContentType().indexOf("bmp") == -1) {
-			throw new ThrowPrompt("上传文件类型只能是jpg/png/bmp格式");
+			throw new ThrowPrompt("上传文件类型只能是jpg/png/bmp格式", "081010");
 		}
 		try {
 			String backPath = new StringBuilder(pathRoot)
@@ -223,7 +223,7 @@ public class UserController extends BaseElsController<UserService> {
 					.append("_1.jpg").toString();
 			backFile.transferTo(new File(backPath));
 		} catch (IOException e) {
-			throw new ThrowException("身份证上传错误：" + e.getMessage());
+			throw new ThrowException("身份证上传错误：" + e.getMessage(), "081011");
 		}
 
 		// 实名认证
@@ -246,7 +246,7 @@ public class UserController extends BaseElsController<UserService> {
 		}
 
 		if(VerifyUtils.isEmpty(vo.getCertification())) {
-			throw new ThrowPrompt("认证状态不能为空！", "071002");
+			throw new ThrowPrompt("认证状态不能为空！", "081012");
 		}
 		if(vo.getCertification() != 2) {
 			vo.setCertificationFailMsg(null);
@@ -268,13 +268,13 @@ public class UserController extends BaseElsController<UserService> {
 	@RequestMapping(value="/{id}/rePwd", method=RequestMethod.POST)
 	public Object rePwd(@PathVariable String id, @RequestBody UserVO vo) {
 		if(VerifyUtils.isEmpty(id)) {
-			throw new ThrowException("id必传!", "071003");
+			throw new ThrowPrompt("id必传!", "081013");
 		}
 		if(VerifyUtils.isEmpty(vo.getPwd())) {
-			throw new ThrowException("pwd必传!", "071004");
+			throw new ThrowPrompt("pwd必传!", "081014");
 		}
 		if(VerifyUtils.isEmpty(vo.getCode()) && VerifyUtils.isEmpty(vo.getOldPwd())) {
-			throw new ThrowException("code或oldPwd必传一个!", "071005");
+			throw new ThrowPrompt("code或oldPwd必传一个!", "081015");
 		}
 
 		vo.setId(id);
@@ -301,7 +301,7 @@ public class UserController extends BaseElsController<UserService> {
 		if(null == user
 				|| (Constants.PROJECT_NAME.equals(super.identity().getClientId())
 					&& !clientService.isMyClient(super.identity().getUserId(), user.getClientId()))) {
-			throw new ThrowPrompt("无此用户！", "071006");
+			throw new ThrowPrompt("无此用户！", "081016");
 		}
 
 		if(!Constants.PROJECT_NAME.equals(super.identity().getClientId())) {

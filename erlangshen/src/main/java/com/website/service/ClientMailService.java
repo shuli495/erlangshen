@@ -30,12 +30,11 @@ public class ClientMailService extends BaseService<ClientMailDao,ClientMailVO> {
 	 * @return
 	 */
 	public ClientMailVO find(String clientId, String type) {
-
 		if(VerifyUtils.isEmpty(clientId)) {
-			throw new ThrowException("clientId必填");
+			throw new ThrowException("clientId必填", "012001");
 		}
 		if(VerifyUtils.isEmpty(type)) {
-			throw new ThrowException("type必填");
+			throw new ThrowException("type必填", "012002");
 		}
 
 		return this.dao.find(clientId, type);
@@ -47,7 +46,7 @@ public class ClientMailService extends BaseService<ClientMailDao,ClientMailVO> {
 	 */
 	public void deleteByClientId(String clientId) {
 		if(VerifyUtils.isEmpty(clientId)) {
-			throw new ThrowException("clientId必填");
+			throw new ThrowException("clientId必填", "012003");
 		}
 
 		this.dao.deleteByClientId(clientId);
@@ -59,7 +58,7 @@ public class ClientMailService extends BaseService<ClientMailDao,ClientMailVO> {
      */
 	public void insert(TokenVO token, ClientMailVO clientMailVO) {
 		if(!clientService.isMyClient(token.getUserId(), clientMailVO.getClientId())) {
-			throw new ThrowPrompt("无权操作次应用！", "032005");
+			throw new ThrowPrompt("无权操作次应用！", "012004");
 		}
 
 		ClientMailVO queryClientMailVO = new ClientMailVO();
@@ -67,7 +66,7 @@ public class ClientMailService extends BaseService<ClientMailDao,ClientMailVO> {
 		queryClientMailVO.setType(clientMailVO.getType());
 		List<ClientMailVO> clientMails = super.baseQueryByAnd(queryClientMailVO);
 		if(clientMails.size() > 0) {
-			throw new ThrowPrompt("该类型邮件已存在！", "072009");
+			throw new ThrowPrompt("该类型邮件已存在！", "012005");
 		}
 
 		// 加密密码
@@ -89,7 +88,7 @@ public class ClientMailService extends BaseService<ClientMailDao,ClientMailVO> {
 			return;
 		}
 		if(!clientService.isMyClient(token.getUserId(), clientMailVO.getClientId())) {
-			throw new ThrowPrompt("无权操作次应用！", "032005");
+			throw new ThrowPrompt("无权操作次应用！", "012006");
 		}
 
 		// 校验是否关联安全设置好
@@ -97,7 +96,7 @@ public class ClientMailService extends BaseService<ClientMailDao,ClientMailVO> {
 		clientSecurityVO.setClientId(clientMailVO.getClientId());
 		clientSecurityVO.setCheckPlaceMailTypeId(id);
 		if(clientSecurityService.baseQueryByAnd(clientSecurityVO).size() > 0) {
-			throw new ThrowPrompt("该邮件已关联安全设置，请取消关联后删除！", "032005");
+			throw new ThrowPrompt("该邮件已关联安全设置，请取消关联后删除！", "012007");
 		}
 
 		super.baseDelete(id);
@@ -111,7 +110,7 @@ public class ClientMailService extends BaseService<ClientMailDao,ClientMailVO> {
      */
 	public List<ClientMailVO> list(TokenVO token, String clientId) {
 		if(!clientService.isMyClient(token.getUserId(), clientId)) {
-			throw new ThrowPrompt("无权操作次应用！", "032005");
+			throw new ThrowPrompt("无权操作次应用！", "012008");
 		}
 
 		ClientMailVO queryClientMailVO = new ClientMailVO();

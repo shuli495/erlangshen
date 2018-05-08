@@ -3,7 +3,6 @@ package com.website.controller;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.page.Page;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.common.BaseElsController;
@@ -67,7 +66,7 @@ public class ClientController extends BaseElsController<ClientService> {
 	@RequestMapping(method=RequestMethod.DELETE)
 	public Object deleteBatch(@RequestBody List<String> idList) {
 		if(idList.size() == 0) {
-			throw new ThrowPrompt("无删除内容！");
+			throw new ThrowPrompt("无删除内容！", "011001");
 		}
 
 		this.service.delete(super.identity(), idList);
@@ -119,19 +118,19 @@ public class ClientController extends BaseElsController<ClientService> {
 	@RequestMapping(value="/mail",method=RequestMethod.POST)
 	public Object mailInsert(@RequestBody ClientMailVO clientMailVO) {
 		if(VerifyUtils.isEmpty(clientMailVO.getClientId())) {
-			throw new ThrowException("应用不能为空！");
+			throw new ThrowPrompt("应用不能为空！", "011002");
 		}
 		if(VerifyUtils.isEmpty(clientMailVO.getMail())) {
-			throw new ThrowException("邮箱不能为空！");
+			throw new ThrowPrompt("邮箱不能为空！", "011003");
 		}
 		if(VerifyUtils.isEmpty(clientMailVO.getPwd())) {
-			throw new ThrowException("邮箱密码不能为空！");
+			throw new ThrowPrompt("邮箱密码不能为空！", "011004");
 		}
 		if(VerifyUtils.isEmpty(clientMailVO.getType())) {
-			throw new ThrowException("类型不能为空！");
+			throw new ThrowPrompt("类型不能为空！", "011005");
 		}
 		if(VerifyUtils.isEmpty(clientMailVO.getText())) {
-			throw new ThrowException("发送内容不能为空！");
+			throw new ThrowPrompt("发送内容不能为空！", "011006");
 		}
 
 		clientMailService.insert(super.identity(), clientMailVO);
@@ -157,7 +156,7 @@ public class ClientController extends BaseElsController<ClientService> {
 	@RequestMapping(value="/mail/{clientId}",method=RequestMethod.GET)
 	public Object maillist(@PathVariable String clientId) {
 		if(VerifyUtils.isEmpty(clientId)) {
-			throw new ThrowException("应用不能为空！");
+			throw new ThrowPrompt("应用不能为空！", "011007");
 		}
 
 		return success(clientMailService.list(super.identity(), clientId));
@@ -171,25 +170,25 @@ public class ClientController extends BaseElsController<ClientService> {
 	@RequestMapping(value="/phone",method=RequestMethod.POST)
 	public Object phoneInsert(@RequestBody ClientPhoneVO clientPhoneVO) {
 		if(VerifyUtils.isEmpty(clientPhoneVO.getClientId())) {
-			throw new ThrowException("应用不能为空！");
+			throw new ThrowPrompt("应用不能为空！", "011008");
 		}
 		if(VerifyUtils.isEmpty(clientPhoneVO.getPlatform())) {
-			throw new ThrowException("短信平台不能为空！");
+			throw new ThrowPrompt("短信平台不能为空！", "011009");
 		}
 		if(VerifyUtils.isEmpty(clientPhoneVO.getAk())) {
-			throw new ThrowException("AK不能为空！");
+			throw new ThrowPrompt("AK不能为空！", "011010");
 		}
 		if(VerifyUtils.isEmpty(clientPhoneVO.getSk())) {
-			throw new ThrowException("SK不能为空！");
+			throw new ThrowPrompt("SK不能为空！", "011011");
 		}
 		if(VerifyUtils.isEmpty(clientPhoneVO.getSign())) {
-			throw new ThrowException("签名不能为空！");
+			throw new ThrowPrompt("签名不能为空！", "011012");
 		}
 		if(VerifyUtils.isEmpty(clientPhoneVO.getTmplate())) {
-			throw new ThrowException("模板不能为空！");
+			throw new ThrowPrompt("模板不能为空！", "011013");
 		}
 		if(VerifyUtils.isEmpty(clientPhoneVO.getType())) {
-			throw new ThrowException("类型不能为空！");
+			throw new ThrowPrompt("类型不能为空！", "011014");
 		}
 
 		clientPhoneService.insert(super.identity(), clientPhoneVO);
@@ -215,7 +214,7 @@ public class ClientController extends BaseElsController<ClientService> {
 	@RequestMapping(value="/phone/{clientId}",method=RequestMethod.GET)
 	public Object phonelist(@PathVariable String clientId) {
 		if(VerifyUtils.isEmpty(clientId)) {
-			throw new ThrowException("应用不能为空！");
+			throw new ThrowPrompt("应用不能为空！", "011015");
 		}
 
 		return success(clientPhoneService.list(super.identity(), clientId));
@@ -229,7 +228,7 @@ public class ClientController extends BaseElsController<ClientService> {
 	@RequestMapping(value="/security/{clientId}",method=RequestMethod.GET)
 	public Object security(@PathVariable String clientId) {
 		if(VerifyUtils.isEmpty(clientId)) {
-			throw new ThrowException("应用不能为空！");
+			throw new ThrowPrompt("应用不能为空！", "011016");
 		}
 
 		return success(clientSecurityService.find(super.identity(), clientId));
@@ -243,7 +242,7 @@ public class ClientController extends BaseElsController<ClientService> {
 	@RequestMapping(value="/security/{clientId}",method=RequestMethod.PUT)
 	public Object securityUpdate(@PathVariable String clientId, @RequestBody ClientSecurityVO vo) {
 		if(VerifyUtils.isEmpty(clientId)) {
-			throw new ThrowException("应用不能为空！");
+			throw new ThrowPrompt("应用不能为空！", "011017");
 		}
 
 		vo.setClientId(clientId);
