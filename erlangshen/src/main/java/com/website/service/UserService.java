@@ -256,7 +256,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 					clientMailUsername = clientMail.split("@")[0];
 				}
 				// 解密邮箱密码
-				clientMailPwd = SecretUtil.aes128Decrypt(clientMailPwd, Constants.AES_128_SECRET);
+				clientMailPwd = SecretUtil.aes128Decrypt(clientMailPwd, Setting.getProperty("aes.secret"));
 
 				mailSender.send(clientMail, clientBO.getName(), clientMailSmtp, clientMailSubject, clientMailText, mail, clientMailUsername, clientMailPwd);
 			} catch (Exception e) {
@@ -305,7 +305,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 				url += "&callback=" + callback;
 			}
 
-			String secuetUrl = SecretUtil.aes128Encrypt(url, Constants.AES_128_SECRET);
+			String secuetUrl = SecretUtil.aes128Encrypt(url, Setting.getProperty("aes.secret"));
 			String checkMailUrl = Setting.getProperty("check.mail") + "?info=" + secuetUrl;
 
 			text = text.replace("${url}", checkMailUrl);
@@ -376,7 +376,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			throw new ThrowPrompt("无认证信息，请重新认证！", "072013");
 		}
 
-		String url = SecretUtil.aes128Decrypt(info, Constants.AES_128_SECRET);
+		String url = SecretUtil.aes128Decrypt(info, Setting.getProperty("aes.secret"));
 
 		if(url.indexOf("userId=") == -1 || url.indexOf("code=") == -1) {
 			throw new ThrowPrompt("认证信息错误，请重新认证！", "072014");
@@ -505,7 +505,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		params.put("datetime", DateUtil.format("yyyyMMDDHHssmm", new Date()));
 
 		// 解密sk
-		String sk = SecretUtil.aes128Decrypt(clientPhoneVO.getSk(), Constants.AES_128_SECRET);
+		String sk = SecretUtil.aes128Decrypt(clientPhoneVO.getSk(), Setting.getProperty("aes.secret"));
 
 		// 发送短信
 		new PhoneSender().send(clientPhoneVO.getAk(), sk, phone, clientPhoneVO.getSign(), clientPhoneVO.getTmplate(), JSONObject.toJSONString(params));

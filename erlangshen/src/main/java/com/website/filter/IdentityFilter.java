@@ -1,5 +1,6 @@
 package com.website.filter;
 
+import com.fastjavaframework.Setting;
 import com.fastjavaframework.common.SecretBase64Enum;
 import com.fastjavaframework.util.CommonUtil;
 import com.fastjavaframework.util.SecretUtil;
@@ -104,7 +105,7 @@ public class IdentityFilter extends OncePerRequestFilter {
             } else {    //token认证
                 String clientIp = "";
                 // admin token只能用于以下操作
-                if(token.equals(Constants.ADMIN_TOKEN)) {
+                if(token.equals(Setting.getProperty("admin.token"))) {
                     // 获取token
                     boolean isToken = request.getRequestURI().endsWith(Constants.URL_TOKEN) || request.getRequestURI().endsWith(Constants.URL_TOKEN+"/");
                     // 用户查询或创建

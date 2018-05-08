@@ -1,5 +1,6 @@
 package com.website.service;
 
+import com.fastjavaframework.Setting;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.util.SecretUtil;
@@ -77,7 +78,7 @@ public class ClientPhoneService extends BaseService<ClientPhoneDao,ClientPhoneVO
 
 		// 加密sk
 		if(VerifyUtils.isNotEmpty(clientPhoneVO.getSk())) {
-			clientPhoneVO.setSk(SecretUtil.aes128Encrypt(clientPhoneVO.getSk(), Constants.AES_128_SECRET));
+			clientPhoneVO.setSk(SecretUtil.aes128Encrypt(clientPhoneVO.getSk(), Setting.getProperty("aes.secret")));
 		}
 
 		super.baseInsert(clientPhoneVO);

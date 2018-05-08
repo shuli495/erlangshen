@@ -1,5 +1,6 @@
 package com.website.service;
 
+import com.fastjavaframework.Setting;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.util.SecretUtil;
@@ -75,7 +76,7 @@ public class ClientMailService extends BaseService<ClientMailDao,ClientMailVO> {
 
 		// 加密密码
 		if(VerifyUtils.isNotEmpty(clientMailVO.getPwd())) {
-			clientMailVO.setPwd(SecretUtil.aes128Encrypt(clientMailVO.getPwd(), Constants.AES_128_SECRET));
+			clientMailVO.setPwd(SecretUtil.aes128Encrypt(clientMailVO.getPwd(), Setting.getProperty("aes.secret")));
 		}
 
 		super.baseInsert(clientMailVO);

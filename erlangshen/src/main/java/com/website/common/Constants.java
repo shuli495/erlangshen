@@ -4,10 +4,6 @@ public class Constants {
 
 	public static final String PROJECT_NAME = "erlangshen";
 
-	public static final String AES_128_SECRET = "!ERlangSHEN@244.O0";
-
-	public static final String ADMIN_TOKEN = "b889209727db41a0a4cb271ff83069aa";
-
 	public static final String URL_CLIENT = "/client";
 	public static final String URL_CODE = "/code";
 	public static final String URL_KEY = "/key";
