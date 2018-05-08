@@ -16,6 +16,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 邮件、短信等验证码验证
+ * @author https://github.com/shuli495/erlangshen
+ */
 @Service
 public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
 

@@ -5,6 +5,9 @@ import com.fastjavaframework.base.BaseBean;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Size;
 
+/**
+ * @author https://github.com/shuli495/erlangshen
+ */
 public class CodeBO extends BaseBean {
 	private static final long serialVersionUID = 1L;
 

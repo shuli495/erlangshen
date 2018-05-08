@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import com.website.model.vo.PermissionMenuVO;
 import com.website.service.PermissionMenuService;
 
+/**
+ * 菜单权限
+ * @author https://github.com/shuli495/erlangshen
+ */
 @CrossOrigin
 @RestController
 @RequestMapping(value= Constants.URL_PERMISSION_MENU)

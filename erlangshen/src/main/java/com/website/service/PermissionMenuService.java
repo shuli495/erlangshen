@@ -11,6 +11,10 @@ import com.website.dao.PermissionMenuDao;
 import com.website.model.vo.PermissionMenuVO;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 菜单
+ * @author https://github.com/shuli495/erlangshen
+ */
 @Service
 public class PermissionMenuService extends BaseService<PermissionMenuDao,PermissionMenuVO> {
 

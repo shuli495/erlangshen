@@ -7,6 +7,10 @@ import com.website.model.vo.LoginLogVO;
 
 import java.util.Date;
 
+/**
+ * 登录日志
+ * @author https://github.com/shuli495/erlangshen
+ */
 @Service
 public class LoginLogService extends BaseService<LoginLogDao,LoginLogVO> {
 

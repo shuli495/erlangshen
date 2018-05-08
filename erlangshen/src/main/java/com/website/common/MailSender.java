@@ -14,7 +14,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Created by wsl on 2/26 0026.
+ * 邮件发送
+ * @author https://github.com/shuli495/erlangshen
  */
 public class MailSender {
     private static ExecutorService executorService;

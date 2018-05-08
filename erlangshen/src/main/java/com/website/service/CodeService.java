@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * sys_code service
+ * 字典表
+ * @author https://github.com/shuli495/erlangshen
  */
 @Service
 public class CodeService extends BaseService<CodeDao,CodeBO> {

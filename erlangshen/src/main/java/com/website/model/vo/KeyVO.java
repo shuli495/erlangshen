@@ -2,6 +2,9 @@ package com.website.model.vo;
 
 import com.website.model.bo.KeyBO;
 
+/**
+ * @author https://github.com/shuli495/erlangshen
+ */
 public class KeyVO extends KeyBO {
 	private static final long serialVersionUID = 1L;
 

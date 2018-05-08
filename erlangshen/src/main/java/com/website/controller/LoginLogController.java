@@ -7,6 +7,10 @@ import com.website.model.vo.LoginLogVO;
 import com.website.service.LoginLogService;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 登录日志
+ * @author https://github.com/shuli495/erlangshen
+ */
 @CrossOrigin
 @RestController
 @RequestMapping(value= Constants.URL_LOGIN_LOG)

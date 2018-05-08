@@ -6,8 +6,10 @@ import java.util.Date;
 
 import com.fastjavaframework.base.BaseBean;
 
-public class
-UserBO extends BaseBean {
+/**
+ * @author https://github.com/shuli495/erlangshen
+ */
+public class UserBO extends BaseBean {
 	private static final long serialVersionUID = 1L;
 
 	private String id;	

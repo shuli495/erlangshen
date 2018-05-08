@@ -15,6 +15,10 @@ import com.website.model.vo.ClientPhoneVO;
 
 import java.util.List;
 
+/**
+ * 应用发送短信平台
+ * @author https://github.com/shuli495/erlangshen
+ */
 @Service
 public class ClientPhoneService extends BaseService<ClientPhoneDao,ClientPhoneVO> {
 

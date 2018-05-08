@@ -1,7 +1,5 @@
 package com.website.common;
 
-import com.alibaba.fastjson.JSONObject;
-import com.fastjavaframework.Setting;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.util.VerifyUtils;
 
@@ -15,10 +13,16 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 /**
- * Created by wsl on 1/23 0023.
+ * http工具类
+ * @author https://github.com/shuli495/erlangshen
  */
 public class HttpHelper {
 
+    /**
+     * get请求
+     * @param url
+     * @return
+     */
     public static String get(String url) {
         if(VerifyUtils.isEmpty(url)) {
             return "";
@@ -44,6 +48,11 @@ public class HttpHelper {
         }
     }
 
+    /**
+     * 读取request body
+     * @param request
+     * @return
+     */
     public static String getBodyString(ServletRequest request) {
         StringBuilder sb = new StringBuilder();
         InputStream inputStream = null;

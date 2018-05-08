@@ -2,16 +2,23 @@ package com.website.model.vo;
 
 import com.website.model.bo.UserBO;
 
+/**
+ * @author https://github.com/shuli495/erlangshen
+ */
 public class UserVO extends UserBO {
 	private static final long serialVersionUID = 1L;
 
-	private String createdBy;	// client创建人
+    // client创建人
+	private String createdBy;
 
-    private String clientName;  // 客户端名称
+    // 客户端名称
+    private String clientName;
 
-    private String code;        // 验证码
+    // 验证码
+    private String code;
 
-    private String oldPwd;      // 新密码
+    // 新密码
+    private String oldPwd;
 
     public String getCreatedBy() {
         return createdBy;

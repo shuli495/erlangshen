@@ -5,6 +5,9 @@ import com.website.model.bo.PermissionMenuBO;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author https://github.com/shuli495/erlangshen
+ */
 public class PermissionMenuVO extends PermissionMenuBO {
 	private static final long serialVersionUID = 1L;
 

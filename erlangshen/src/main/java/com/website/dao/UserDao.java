@@ -8,6 +8,9 @@ import com.fastjavaframework.base.BaseDao;
 
 import java.util.List;
 
+/**
+ * @author https://github.com/shuli495/erlangshen
+ */
 @Repository
 public class UserDao extends BaseDao<UserVO> {
 

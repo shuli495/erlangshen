@@ -14,6 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * 权限
+ * @author https://github.com/shuli495/erlangshen
+ */
 @Service
 public class PermissionRoleService extends BaseService<PermissionRoleDao,PermissionRoleVO> {
 

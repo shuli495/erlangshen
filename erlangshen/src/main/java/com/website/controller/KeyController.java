@@ -9,6 +9,10 @@ import com.fastjavaframework.page.Page;
 import com.website.model.vo.KeyVO;
 import com.website.service.KeyService;
 
+/**
+ * AK/SK
+ * @author https://github.com/shuli495/erlangshen
+ */
 @CrossOrigin
 @RestController
 @RequestMapping(value= Constants.URL_KEY)

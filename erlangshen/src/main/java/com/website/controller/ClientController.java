@@ -19,6 +19,10 @@ import org.springframework.web.bind.annotation.*;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.website.service.ClientService;
 
+/**
+ * 应用
+ * @author https://github.com/shuli495/erlangshen
+ */
 @CrossOrigin
 @RestController
 @RequestMapping(value= Constants.URL_CLIENT)

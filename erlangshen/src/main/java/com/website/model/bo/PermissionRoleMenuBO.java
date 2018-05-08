@@ -5,6 +5,9 @@ import javax.validation.constraints.Max;
 
 import com.fastjavaframework.base.BaseBean;
 
+/**
+ * @author https://github.com/shuli495/erlangshen
+ */
 public class PermissionRoleMenuBO extends BaseBean {
 	private static final long serialVersionUID = 1L;
 

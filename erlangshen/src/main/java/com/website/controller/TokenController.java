@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.website.service.TokenService;
 
+/**
+ * @author https://github.com/shuli495/erlangshen
+ */
 @CrossOrigin
 @RestController
 @RequestMapping(value= Constants.URL_TOKEN)

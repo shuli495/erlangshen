@@ -11,7 +11,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
 /**
- * Created by wsl on 1/23 0023.
+ * 查询request body
+ * @author https://github.com/shuli495/erlangshen
  */
 public class BodyReaderHttpServletRequestWrapper extends HttpServletRequestWrapper {
     private final byte[] body;

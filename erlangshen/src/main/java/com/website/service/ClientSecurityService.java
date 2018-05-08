@@ -8,6 +8,10 @@ import com.fastjavaframework.base.BaseService;
 import com.website.dao.ClientSecurityDao;
 import com.website.model.vo.ClientSecurityVO;
 
+/**
+ * 应用安全设置
+ * @author https://github.com/shuli495/erlangshen
+ */
 @Service
 public class ClientSecurityService extends BaseService<ClientSecurityDao,ClientSecurityVO> {
 

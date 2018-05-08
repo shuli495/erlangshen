@@ -26,7 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Created by wsl on 1/23 0023.
+ * 登录权限过滤器 token/aksk
+ * @author https://github.com/shuli495/erlangshen
  */
 public class IdentityFilter extends OncePerRequestFilter {
 

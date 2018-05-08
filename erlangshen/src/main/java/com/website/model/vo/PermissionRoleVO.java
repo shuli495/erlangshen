@@ -4,6 +4,9 @@ import com.website.model.bo.PermissionRoleBO;
 
 import java.util.List;
 
+/**
+ * @author https://github.com/shuli495/erlangshen
+ */
 public class PermissionRoleVO extends PermissionRoleBO {
 	private static final long serialVersionUID = 1L;
 

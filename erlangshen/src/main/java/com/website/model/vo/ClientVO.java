@@ -4,16 +4,23 @@ import com.website.model.bo.ClientBO;
 
 import java.util.List;
 
+/**
+ * @author https://github.com/shuli495/erlangshen
+ */
 public class ClientVO extends ClientBO {
 	private static final long serialVersionUID = 1L;
 
-	private int setMailNum;	// 已设置邮箱数量
+	// 已设置邮箱数量
+	private int setMailNum;
 
-	private int setPhoneNum;	// 已设置手机信息数量
+	// 已设置手机信息数量
+	private int setPhoneNum;
 
-	private List<UserVO> users;	//用户列表
+	//用户列表
+	private List<UserVO> users;
 
-	private List<UserRecycleVO> delUsers;	//已删除用户列表
+	//已删除用户列表
+	private List<UserRecycleVO> delUsers;
 
 	public int getSetMailNum() {
 		return setMailNum;

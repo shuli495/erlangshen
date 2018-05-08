@@ -15,6 +15,10 @@ import com.website.model.vo.ClientMailVO;
 
 import java.util.List;
 
+/**
+ * 应用发送邮件配置
+ * @author https://github.com/shuli495/erlangshen
+ */
 @Service
 public class ClientMailService extends BaseService<ClientMailDao,ClientMailVO> {
 

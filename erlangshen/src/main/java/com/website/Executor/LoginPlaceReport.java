@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 异地登录告警
+ * @author https://github.com/shuli495/erlangshen
  */
 public class LoginPlaceReport extends AbstractQpsControl {
 

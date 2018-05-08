@@ -22,6 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+/**
+ * 用户
+ * @author https://github.com/shuli495/erlangshen
+ */
 @Service
 public class UserService extends BaseService<UserDao,UserVO> {
 

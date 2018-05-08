@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 用户
+ * @author https://github.com/shuli495/erlangshen
  */
 @CrossOrigin
 @RestController

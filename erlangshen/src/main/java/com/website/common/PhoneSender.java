@@ -11,7 +11,8 @@ import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 
 /**
- * Created by wsl on 2/26 0026.
+ * 短信发送
+ * @author https://github.com/shuli495/erlangshen
  */
 public class PhoneSender {
     /**

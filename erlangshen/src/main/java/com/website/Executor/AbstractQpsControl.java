@@ -11,6 +11,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 控制调用接口的qps
+ * 根据qps间隔调用接口
+ * 超过最大调用数，放入列表，24点后调用
+ * @author https://github.com/shuli495/erlangshen
+ */
 public abstract class AbstractQpsControl implements Runnable {
 
     private static Map<String, Object> map = new ConcurrentHashMap<>();

@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import com.website.model.vo.PermissionRoleVO;
 import com.website.service.PermissionRoleService;
 
+/**
+ * 权限规则
+ * @author https://github.com/shuli495/erlangshen
+ */
 @CrossOrigin
 @RestController
 @RequestMapping(value= Constants.URL_PERMISSION_ROLE)

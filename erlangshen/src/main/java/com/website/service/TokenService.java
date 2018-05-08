@@ -22,6 +22,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * token
+ * @author https://github.com/shuli495/erlangshen
+ */
 @Service
 public class TokenService extends BaseService<TokenDao,TokenVO> {
 

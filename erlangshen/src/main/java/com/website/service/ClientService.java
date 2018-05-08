@@ -13,6 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 应用
+ * @author https://github.com/shuli495/erlangshen
+ */
 @Service
 public class ClientService extends BaseService<ClientDao,ClientVO> {
 
