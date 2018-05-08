@@ -21,7 +21,7 @@ erlangshen-java-sdk java版sdk，很快竣工。
 1. 下载依赖包：进入erlangshen_web根目录，执行npm install
 2. 设置初始化参数：src\js\common\setting.js\
     token：数据库中管理员token\
-    serverUrl：后端url
+    serverUrl：后端url（例如http://127.0.0.1:8080/erlangshen）
 3. 设置运行ip和端口：package.json\
     scripts:dev --a IP --port 端口\
     scripts:deploy --host IP --port 端口
@@ -41,7 +41,7 @@ https://github.com/shuli495/fastFlux
 **初始化**
 1. 初始化sql：src\main\resources\init\
     table.sql：表结构\
-    admin.sql：管理员用户和token,默认密码123456（建议不使用管理员账号维护信息，新建账号）
+    admin.sql：管理员用户和token,默认账号admin@erlangshen.com/123456（建议不使用管理员账号维护信息，新建账号）
 2. 设置数据库：src\main\resources\setting.properties
     
 
