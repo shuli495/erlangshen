@@ -13,14 +13,11 @@ var UserStore = assign({}, EventEmitter.prototype, {
        idcardImage: ""
   },
 
-  code: function (userName) {
-      var data = {
-          "userName" : userName
-      };
+  code: function () {
     $.ajax({
-        data: data,
         type : "GET",
-        url: $setting.serverUrl + "token/"+userName,
+        dataType: "json",
+        url: $setting.serverUrl + "token",
         headers : {"Token": $setting.token},
         success: function(result) {
           this.data.codeImage = result.data;
@@ -63,7 +60,7 @@ var UserStore = assign({}, EventEmitter.prototype, {
           if(eval('('+xhr.responseText+')').image) {
             this.data.codeImage = eval('('+xhr.responseText+')').image;
           }
-          if((typeof(code) == "undefined" || code == "undefined" || code == "")
+          if((typeof(code) != "undefined" && code != "undefined" && code != "")
               && (eval('('+xhr.responseText+')').code && eval('('+xhr.responseText+')').code != "122009" && eval('('+xhr.responseText+')').code != "122010")) {
             this.data.info = errMsg;
           }

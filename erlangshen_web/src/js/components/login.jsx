@@ -41,8 +41,8 @@ class LoginApp extends BaseComponents {
         super.reloading();
     }
 
-    getCodeImg(userName) {
-        UserStore.code(userName);
+    getCodeImg() {
+        UserStore.code();
     }
 
     render(){
@@ -54,7 +54,7 @@ class LoginApp extends BaseComponents {
                 codeImage = "data:image/jpg;base64," + codeImage;
                 codeDom = <div className="login_line_content code_container">
                                             <input type="text" ref="code" placeholder="验证码" data-errMsgId="errorMsg" data-empty="true" data-emptyText="验证码不能为空！"/>
-                                            <img src={codeImage} onClick={this.getCodeImg.bind(this,  this.refs.userName.value)} />
+                                            <img src={codeImage} onClick={this.getCodeImg} />
                                         </div>
             }
         }

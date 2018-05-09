@@ -94,6 +94,7 @@ public class IdentityFilter extends OncePerRequestFilter {
                     TokenVO tokenVO = new TokenVO();
                     tokenVO.setUserId(clientVO.getCreatedBy());
                     tokenVO.setClientId(clientId);
+                    tokenVO.setAuthenticationMethod("KEY");
 
                     request.setAttribute("identity", tokenVO);
 
@@ -108,8 +109,7 @@ public class IdentityFilter extends OncePerRequestFilter {
                 if(token.equals(Setting.getProperty("admin.token"))) {
                     // 获取token
                     boolean isToken = request.getRequestURI().endsWith(Constants.URL_TOKEN)
-                                    || request.getRequestURI().endsWith(Constants.URL_TOKEN+"/")
-                                    ||request.getRequestURI().indexOf(Constants.URL_TOKEN+"/") != -1;
+                                    || request.getRequestURI().endsWith(Constants.URL_TOKEN+"/");
                     // 用户查询或创建
                     boolean isCreateOrSel = (request.getRequestURI().endsWith(Constants.URL_USER) || request.getRequestURI().endsWith(Constants.URL_USER+"/"))
                             && (request.getMethod().equalsIgnoreCase("get") || request.getMethod().equalsIgnoreCase("post"));
@@ -143,6 +143,7 @@ public class IdentityFilter extends OncePerRequestFilter {
                 TokenVO tokenVO = tokenService.check(token, clientIp);
 
                 // 设置身份认证信息
+                tokenVO.setAuthenticationMethod("TOKEN");
                 request.setAttribute("identity", tokenVO);
 
                 filterChain.doFilter(request, response);

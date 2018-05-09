@@ -84,8 +84,9 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
     public Object inster(HttpServletResponse response, TokenVO token, boolean isCheckStatus,
                           String loginIp, String userName, String pwd, String platform, String code) {
         // 校验验证码
+        String validateId = token.getClientId() + "_" + (VerifyUtils.isEmpty(loginIp)?userName:loginIp);
+
         ValidateVO validateVO = new ValidateVO();
-        String validateId = token.getClientId()+"_"+userName;
         validateVO.setUserId(validateId);
         validateVO.setType("login");
         List<ValidateVO> validates = validateService.baseQueryByAnd(validateVO);
@@ -140,7 +141,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
 
         // 校验密码
         if(!user.getPwd().equals(SecretUtil.md5(pwd))) {
-            return null;
+            return this.returnCode(response, token.getClientId(), userName, "用户名或密码错误！", "122014");
         }
 
         // 查询已存在token
@@ -170,8 +171,12 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
 
         // 没有token，新生成
         if (null == userTokens || userTokens.size() == 0) {
+            // 登录日志
             loginLogService.insert(user.getId(), loginIp);
-            return this.newToken(user.getId(), loginIp, platform);
+            // 删除登录验证码
+            validateService.delete(validateId, "login", null);
+            // 返回token
+            return (new ReturnJson()).success(this.newToken(user.getId(), loginIp, platform));
         } else {
             // token有效期剩余多少分钟后，生成新token
             Calendar cal = Calendar.getInstance();
@@ -203,7 +208,10 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
 
                     // 允许重复登录直接返回当前token，不用设置其他token
                     if(null == isCheckPlatform || isCheckPlatform == 0) {
-                        return reToken;
+                        // 删除登录验证码
+                        validateService.delete(validateId, "login", null);
+                        // 返回token
+                        return (new ReturnJson()).success(reToken);
                     }
 
                 // 同端异平台

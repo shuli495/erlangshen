@@ -10,6 +10,7 @@ public class TokenVO extends TokenBO {
 
 	private String clientId;
 	private String from;
+	private String authenticationMethod;
 
 	public String getClientId() {
 		return clientId;
@@ -25,5 +26,13 @@ public class TokenVO extends TokenBO {
 
 	public void setFrom(String from) {
 		this.from = from;
+	}
+
+	public String getAuthenticationMethod() {
+		return authenticationMethod;
+	}
+
+	public void setAuthenticationMethod(String authenticationMethod) {
+		this.authenticationMethod = authenticationMethod;
 	}
 }
