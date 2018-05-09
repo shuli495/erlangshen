@@ -42,8 +42,13 @@ https://github.com/shuli495/fastFlux
 1. 初始化sql：src\main\resources\init\
     table.sql：表结构\
     admin.sql：管理员用户和token,默认账号admin@erlangshen.com/123456（建议不使用管理员账号维护信息，新建账号）
-2. 设置数据库：src\main\resources\setting.properties
-    
+2. 设置配置：src\main\resources\setting.properties
+    jdbc：数据库\
+    admin.token：数据库初始化token\
+    aes.secret：加密密码的密钥\
+    bdmap.\*：百度地图API（根据ip查询城市），用于检测异地登录
+    bdyun.\*：百度云API，用于识别身份证图片
+
 
 **开发参考：**
 https://github.com/shuli495/fastJava
