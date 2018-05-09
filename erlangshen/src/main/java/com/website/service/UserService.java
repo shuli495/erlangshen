@@ -413,7 +413,6 @@ public class UserService extends BaseService<UserDao,UserVO> {
 
 		// 删除code
 		try {
-			ValidateVO validateVO = new ValidateVO();
 			validateService.delete(userId, "mail", null);
 		} catch (Exception e) {
 		}

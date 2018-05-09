@@ -7,11 +7,9 @@ import com.fastjavaframework.util.VerifyUtils;
 import com.website.model.vo.UserVO;
 import com.website.service.UserService;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.util.Calendar;
 import java.util.HashMap;

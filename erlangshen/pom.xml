@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com</groupId>
 	<artifactId>erlangshen</artifactId>
-	<packaging>pom</packaging>
+	<packaging>war</packaging>
 	<version>1.0.0</version>
 
 	<properties>
@@ -102,6 +102,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
