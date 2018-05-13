@@ -156,13 +156,7 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
         Calendar cal = Calendar.getInstance();
         cal.setTime(ValidateCreateTime);
 
-        if("mail".equals(type)) {
-            cal.add(Calendar.SECOND, +Integer.parseInt(Setting.getProperty("validate.code.mail.active.time")));
-        } else if("mailCode".equals(type)) {
-            cal.add(Calendar.SECOND, +Integer.parseInt(Setting.getProperty("validate.code.mailcode.active.time")));
-        } else {
-            cal.add(Calendar.SECOND, +Integer.parseInt(Setting.getProperty("validate.code.repwd.active.time")));
-        }
+        cal.add(Calendar.SECOND, +Integer.parseInt(Setting.getProperty("validate.code.active.time")));
 
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());

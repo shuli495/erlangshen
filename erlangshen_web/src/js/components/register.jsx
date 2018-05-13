@@ -33,7 +33,7 @@ class RegisterApp extends BaseComponents {
         }
 
         this.refs.sendBut.setAttribute('style', 'pointer-events:none');
-        this.reSendTime(30);
+        this.reSendTime(60);
     }
 
     // 发送邮件倒计时
