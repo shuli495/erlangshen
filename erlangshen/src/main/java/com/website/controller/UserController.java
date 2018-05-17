@@ -144,24 +144,40 @@ public class UserController extends BaseElsController<UserService> {
 		}
 
 		Map<String, String> result = new HashMap<>();
-		String realPath = request.getSession().getServletContext().getRealPath("");
-		String imagePath = Setting.getProperty("idcard.image.path");
 
-		String forntPath = imagePath + id + "_0.jpg";
-		if(new File(realPath + forntPath).exists()) {
-			result.put("fornt", forntPath.replaceAll("\\\\","/"));
-		} else {
-			result.put("fornt", "");
-		}
-
-		String backPath = imagePath + id + "_1.jpg";
-		if(new File(realPath + backPath).exists()) {
-			result.put("back", backPath.replaceAll("\\\\","/"));
-		} else {
-			result.put("back", "");
-		}
+		this.setIdcardImg(result, id, "1");
+		this.setIdcardImg(result, id, "2");
+		this.setIdcardImg(result, id, "3");
+		this.setIdcardImg(result, id, "4");
 
 		return success(result);
+	}
+
+	/**
+	 * 查询身份证图片
+	 * @param result
+	 * @param id
+	 * @param type
+     */
+	private void setIdcardImg(Map<String, String> result, String id, String type) {
+		String imagePath = Setting.getProperty("idcard.image.path");
+		String realPath = request.getSession().getServletContext().getRealPath("");
+
+		String holdBackPath = imagePath + id + "_" + type + ".jpg";
+
+		String key = "font";
+		switch (type) {
+			case "1" : key = "font"; break;
+			case "2" : key = "back"; break;
+			case "3" : key = "holdFont"; break;
+			case "4" : key = "holdBack"; break;
+		}
+
+		if(new File(realPath + holdBackPath).exists()) {
+			result.put(key, holdBackPath.replaceAll("\\\\","/"));
+		} else {
+			result.put(key, "");
+		}
 	}
 
 	/**
@@ -176,7 +192,9 @@ public class UserController extends BaseElsController<UserService> {
 	@RequestMapping(value="/{id}/certification", method=RequestMethod.POST)
 	public Object certification(@PathVariable String id, String name, String idcard,
 								@RequestParam(value="forntFile",required=false) MultipartFile forntFile,
-								@RequestParam(value="backFile",required=false) MultipartFile backFile) {
+								@RequestParam(value="backFile",required=false) MultipartFile backFile,
+								@RequestParam(value="holdForntFile",required=false) MultipartFile holdForntFile,
+								@RequestParam(value="holdBackFile",required=false) MultipartFile holdBackFile) {
 		if(!this.service.isMyUser(super.identity().getUserId(), id) && !super.identity().getUserId().equals(id)) {
 			throw new ThrowPrompt("无权操作此用户!", "081005");
 		}
@@ -184,53 +202,57 @@ public class UserController extends BaseElsController<UserService> {
 		if(VerifyUtils.isEmpty(id)) {
 			throw new ThrowPrompt("id不能为空！", "081006");
 		}
-		if(forntFile.isEmpty()) {
-			throw new ThrowPrompt("请上传身份证正面！", "081007");
+		if(forntFile.isEmpty() && holdForntFile.isEmpty()) {
+			throw new ThrowPrompt("请上传身份证正面或手持身份证正面照片！", "081007");
 		}
-		if(backFile.isEmpty()) {
-			throw new ThrowPrompt("请上传身份证反面！", "081008");
+		if(backFile.isEmpty() && holdBackFile.isEmpty()) {
+			throw new ThrowPrompt("请上传身份证反面或手持身份证反面照片！", "081008");
 		}
 
-		String pathRoot = request.getSession().getServletContext().getRealPath("");
+		// 优先手持身份证照片
+		if(!holdForntFile.isEmpty() && !holdBackFile.isEmpty()) {
+			// 保存手持身份证正面照片
+			this.uploadIdcard("1", id, holdForntFile);
+			// 保存手持身份证反面照片
+			this.uploadIdcard("2", id, holdBackFile);
+		} else if(!forntFile.isEmpty() && !backFile.isEmpty()) {
+			// 保存身份证正面照片
+			this.uploadIdcard("3", id, forntFile);
+			// 保存身份证反面照片
+			this.uploadIdcard("4", id, backFile);
 
-		// 保存身份证正面照片
-		if(forntFile.getContentType().indexOf("jpg") == -1
-				&& forntFile.getContentType().indexOf("jpeg") == -1
-				&& forntFile.getContentType().indexOf("png") == -1
-				&& forntFile.getContentType().indexOf("bmp") == -1) {
+			// 身份证照片自动实名认证
+			this.service.certification(super.identity(), id, name, idcard);
+		} else {
+			throw new ThrowPrompt("请上传身份照片！", "081011");
+		}
+
+		return success();
+	}
+
+	/**
+	 * 上传身份证到服务器
+	 * @param type	0正面 1反面
+	 * @param id	userId
+	 * @param file
+     */
+	private void uploadIdcard(String type, String id, MultipartFile file) {
+		if(file.getContentType().indexOf("jpg") == -1
+			&& file.getContentType().indexOf("jpeg") == -1
+			&& file.getContentType().indexOf("png") == -1
+			&& file.getContentType().indexOf("bmp") == -1) {
 			throw new ThrowPrompt("上传文件类型只能是jpg/png/bmp格式", "081009");
 		}
 		try {
-			String forntPath = new StringBuilder(pathRoot)
+			String pathRoot = request.getSession().getServletContext().getRealPath("");
+			String filePath = new StringBuilder(pathRoot)
 					.append(Setting.getProperty("idcard.image.path").replaceAll("\\\\", Matcher.quoteReplacement(File.separator)))
 					.append(id)
-					.append("_0.jpg").toString();
-			forntFile.transferTo(new File(forntPath));
+					.append("_").append(type).append(".jpg").toString();
+			file.transferTo(new File(filePath));
 		} catch (IOException e) {
-			throw new ThrowException("身份证上传错误：" + e.getMessage());
+			throw new ThrowException("身份证上传错误：" + e.getMessage(), "081010");
 		}
-
-		// 保存身份证反面照片
-		if(backFile.getContentType().indexOf("jpg") == -1
-				&& backFile.getContentType().indexOf("jpeg") == -1
-				&& backFile.getContentType().indexOf("png") == -1
-				&& backFile.getContentType().indexOf("bmp") == -1) {
-			throw new ThrowPrompt("上传文件类型只能是jpg/png/bmp格式", "081010");
-		}
-		try {
-			String backPath = new StringBuilder(pathRoot)
-					.append(Setting.getProperty("idcard.image.path").replaceAll("\\\\", Matcher.quoteReplacement(File.separator)))
-					.append(id)
-					.append("_1.jpg").toString();
-			backFile.transferTo(new File(backPath));
-		} catch (IOException e) {
-			throw new ThrowException("身份证上传错误：" + e.getMessage(), "081011");
-		}
-
-		// 实名认证
-		this.service.certification(super.identity(), id, name, idcard);
-
-		return success();
 	}
 
 	/**

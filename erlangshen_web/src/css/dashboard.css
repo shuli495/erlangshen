@@ -289,3 +289,17 @@ select {
 .errorBut {
 	color: #cc4242cc !important;
 }
+
+.form_group_margin {
+	margin-left: 0px !important;
+	margin-right: 20px !important;
+}
+.form_group_margin_font {
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+}
+.form_group_margin_back {
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+}

@@ -15,6 +15,7 @@ class UserApp extends BaseComponents {
             this.handleInfo = this.handleInfo.bind(this);
             this.handleUpdate = this.handleUpdate.bind(this);
             this.handleDel = this.handleDel.bind(this);
+            this.selectIdcard = this.selectIdcard.bind(this);
             this.queryCertification = this.queryCertification.bind(this);
             this.certificationUpload = this.certificationUpload.bind(this);
             this.certificationConfirm = this.certificationConfirm.bind(this);
@@ -147,6 +148,22 @@ class UserApp extends BaseComponents {
         UserStore.del(id);
     }
 
+    selectIdcard(type) {
+        if(type == "idcard") {
+            this.refs.idcardContainer.hidden = "";
+            this.refs.holdcardContainer.hidden = "hidden";
+
+            this.refs.idcardSelected.className = "active";
+            this.refs.holdcardSelected.className = "";
+        } else {
+            this.refs.idcardContainer.hidden = "hidden";
+            this.refs.holdcardContainer.hidden = "";
+
+            this.refs.idcardSelected.className = "";
+            this.refs.holdcardSelected.className = "active";
+        }
+    }
+
     queryCertification(id,name,idcard,certificationStr,certificationFailMsg) {
         this.selectedUserId = id;
         this.refs.certificationName.value = name;
@@ -163,6 +180,30 @@ class UserApp extends BaseComponents {
     certificationUpload() {
         if(!$util_validateValue("user_certification")) {
             return;
+        }
+
+        if(document.getElementsByName("idcardType")[0].checked) {
+            if(this.refs.forntFile.value == "") {
+                this.refs.certificationForntError.innerHTML = "请上传身份证正面照片！";
+                return;
+            } else if(this.refs.backFile.value == "") {
+                this.refs.certificationBackError.innerHTML = "请上传身份证反面照片！";
+                return;
+            } else {
+                this.refs.certificationForntError.innerHTML = "";
+                this.refs.certificationBackError.innerHTML = "";
+            }
+        } else {
+            if(this.refs.holdForntFile.value == "") {
+                this.refs.certificationHoldForntError.innerHTML = "请上传手持身份证正面照片！";
+                return;
+            } else if(this.refs.holdBackFile.value == "") {
+                this.refs.certificationHoldBackError.innerHTML = "请上传手持身份证反面照片！";
+                return;
+            } else {
+                this.refs.certificationHoldForntError.innerHTML = "";
+                this.refs.certificationHoldBackError.innerHTML = "";
+            }
         }
 
         UserStore.uploadIdcard("certificationForm", this.selectedUserId);
@@ -268,13 +309,33 @@ class UserApp extends BaseComponents {
                                       );
             }
 
+            var idcardSelected = "active";
+            var holdcardSelected = "";
+            var idcardHidn = "";
+            var holdcardHidn = "hidden";
+
             var forntImgHidn = "hidden";
             var forntDomHidn = "hidden";
             var forntDom;
             var backImgHidn = "hidden";
             var backDomHidn = "hidden";
             var backDom;
+            var holdForntImgHidn = "hidden";
+            var holdForntDomHidn = "hidden";
+            var holdForntDom;
+            var holdBackImgHidn = "hidden";
+            var holdBackDomHidn = "hidden";
+            var holdBackDom;
+
             if(this.state.idcardImage != "") {
+                if((this.state.idcardImage.holdFornt && this.state.idcardImage.holdFornt != "")
+                    || (this.state.idcardImage.holdBack && this.state.idcardImage.holdBack != "")) {
+                    idcardSelected = "";
+                    holdcardSelected = "active";
+                    idcardHidn = "hidden";
+                    holdcardHidn = "";
+                }
+
                 if(this.state.idcardImage.fornt && this.state.idcardImage.fornt != "") {
                     forntImgHidn = "";
                     forntDomHidn = "hidden";
@@ -298,7 +359,31 @@ class UserApp extends BaseComponents {
                     backDomHidn = "";
                 }
 
-                if(this.state.idcardImage.fornt && this.state.idcardImage.fornt != "" && this.state.idcardImage.back && this.state.idcardImage.back != "") {
+                if(this.state.idcardImage.holdFornt && this.state.idcardImage.holdFornt != "") {
+                    holdForntImgHidn = "";
+                    holdForntDomHidn = "hidden";
+                    var imgUrl = $setting.serverUrl + this.state.idcardImage.holdFornt;
+                    holdForntDom = <div className="file-preview">
+                                                    <img src={imgUrl} className="kv-preview-data file-preview-image width0" />
+                                                </div>;
+                } else {
+                    holdForntImgHidn = "hidden";
+                    holdForntDomHidn = "";
+                }
+                if(this.state.idcardImage.back && this.state.idcardImage.back != "") {
+                    holdBackImgHidn = "";
+                    holdBackDomHidn = "hidden";
+                    var imgUrl = $setting.serverUrl + this.state.idcardImage.back;
+                    holdBackDom = <div className="file-preview">
+                                                    <img src={imgUrl} className="kv-preview-data file-preview-image width0" />
+                                                </div>;
+                } else {
+                    holdBackImgHidn = "hidden";
+                    holdBackDomHidn = "";
+                }
+
+                if((this.state.idcardImage.fornt && this.state.idcardImage.fornt != "" && this.state.idcardImage.back && this.state.idcardImage.back != "")
+                    || (this.state.idcardImage.holdFornt && this.state.idcardImage.holdFornt != "" && this.state.idcardImage.holdBack && this.state.idcardImage.holdBack != "")) {
                     this.refs.certificationUploadBut.disabled = "disabled";
                     this.refs.certificationUploadBut.setAttribute("data-disabled","true");
                     this.refs.certificationYBut.disabled = "";
@@ -518,36 +603,74 @@ class UserApp extends BaseComponents {
                                            <div id="certificationIdcardError" className="errorMsg"></div>
                                         </div>
                                     </div>
-                                    <div className="form-group">
-                                        <label>身份证正面图片</label>
-                                        <div className="col-sm-9 padding_top15" hidden={forntImgHidn}>
-                                            {forntDom}
+                                    <div className="form-group form_group_margin">
+                                        <ul className="nav nav-tabs">
+                                            <li className={idcardSelected} ref="idcardSelected"><a href="#" onClick={this.selectIdcard.bind(this, "idcard")}>身份证</a></li>
+                                            <li className={holdcardSelected} ref="holdcardSelected"><a href="#" onClick={this.selectIdcard.bind(this, "holdcard")}>手持身份证</a></li>
+                                        </ul>
+                                    </div>
+                                    <div ref="idcardContainer" hidden={idcardHidn}>
+                                        <div className="form-group form_group_margin form_group_margin_font">
+                                            <label>身份证正面图片</label>
+                                            <div className="col-sm-9 padding_top15" hidden={forntImgHidn}>
+                                                {forntDom}
+                                            </div>
+                                            <div className="col-sm-9 padding_top15" hidden={forntDomHidn}>
+                                                <input name="forntFile" ref="forntFile" type="file" className="file"
+                                                    data-drop-zone-enabled="false" data-show-caption="false" data-show-remove="false" data-show-upload="false"
+                                                    data-language="zh" data-min-image-width="15" data-max-image-width="4096" data-max-file-size="4096" data-max-file-count="1" data-auto-replace="true"
+                                                    data-layout-templates='{"footer":""}'
+                                                    data-preview-templates='{"image":"<div class=\"krajee-default kv-preview-thumb file-preview-error\" id=\"{previewId}\" data-fileindex=\"{fileindex}\" data-template=\"{template}\"><div class=\"kv-file-content\"><p/><img src=\"{data}\" class=\"kv-preview-data file-preview-image\" title=\"{caption}\" alt=\"{caption}\" {style}></div></div>"}'
+                                                    data-allowed-file-extensions='["jpg","jpeg","bmp","png"]' />
+                                                 <div ref="certificationForntError" className="errorMsg"></div>
+                                            </div>
                                         </div>
-                                        <div className="col-sm-9 padding_top15" hidden={forntDomHidn}>
-                                            <input name="forntFile" ref="forntFile" type="file" className="file"
-                                                data-errMsgId="certificationForntError" data-empty="true" data-emptyText="请上传身份证正面图片"
-                                                data-drop-zone-enabled="false" data-show-caption="false" data-show-remove="false" data-show-upload="false"
-                                                data-language="zh" data-min-image-width="15" data-max-image-width="4096" data-max-file-size="4096" data-max-file-count="1" data-auto-replace="true"
-                                                data-layout-templates='{"footer":""}'
-                                                data-preview-templates='{"image":"<div class=\"krajee-default kv-preview-thumb file-preview-error\" id=\"{previewId}\" data-fileindex=\"{fileindex}\" data-template=\"{template}\"><div class=\"kv-file-content\"><p/><img src=\"{data}\" class=\"kv-preview-data file-preview-image\" title=\"{caption}\" alt=\"{caption}\" {style}></div></div>"}'
-                                                data-allowed-file-extensions='["jpg","jpeg","bmp","png"]' />
-                                             <div id="certificationForntError" className="errorMsg"></div>
+                                        <div className="form-group form_group_margin form_group_margin_back">
+                                            <label>身份证反面图片</label>
+                                            <div className="col-sm-9 padding_top15" hidden={backImgHidn}>
+                                                {backDom}
+                                            </div>
+                                            <div className="col-sm-9 padding_top15" hidden={backDomHidn}>
+                                                <input name="backFile" ref="backFile" type="file" className="file"
+                                                    data-drop-zone-enabled="false" data-show-caption="false" data-show-remove="false" data-show-upload="false"
+                                                    data-language="zh" data-min-image-width="15" data-max-image-width="4096" data-max-file-size="4096" data-max-file-count="1" data-auto-replace="true"
+                                                    data-layout-templates='{"footer":""}'
+                                                    data-preview-templates='{"image":"<div class=\"krajee-default kv-preview-thumb file-preview-error\" id=\"{previewId}\" data-fileindex=\"{fileindex}\" data-template=\"{template}\"><div class=\"kv-file-content\"><p/><img src=\"{data}\" class=\"kv-preview-data file-preview-image\" title=\"{caption}\" alt=\"{caption}\" {style}></div></div>"}'
+                                                    data-allowed-file-extensions='["jpg","jpeg","bmp","png"]' />
+                                                 <div ref="certificationBackError" className="errorMsg"></div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="form-group">
-                                        <label>身份证反面图片</label>
-                                        <div className="col-sm-9 padding_top15" hidden={backImgHidn}>
-                                            {backDom}
+                                    <div ref="holdcardContainer" hidden={holdcardHidn}>
+                                        <div className="form-group form_group_margin form_group_margin_font">
+                                            <label>手持正面图片</label>
+                                            <div className="col-sm-9 padding_top15" hidden={holdForntImgHidn}>
+                                                {holdForntDom}
+                                            </div>
+                                            <div className="col-sm-9 padding_top15" hidden={holdForntDomHidn}>
+                                                <input name="holdForntFile" ref="holdForntFile" type="file" className="file"
+                                                    data-drop-zone-enabled="false" data-show-caption="false" data-show-remove="false" data-show-upload="false"
+                                                    data-language="zh" data-min-image-width="15" data-max-image-width="4096" data-max-file-size="4096" data-max-file-count="1" data-auto-replace="true"
+                                                    data-layout-templates='{"footer":""}'
+                                                    data-preview-templates='{"image":"<div class=\"krajee-default kv-preview-thumb file-preview-error\" id=\"{previewId}\" data-fileindex=\"{fileindex}\" data-template=\"{template}\"><div class=\"kv-file-content\"><p/><img src=\"{data}\" class=\"kv-preview-data file-preview-image\" title=\"{caption}\" alt=\"{caption}\" {style}></div></div>"}'
+                                                    data-allowed-file-extensions='["jpg","jpeg","bmp","png"]' />
+                                                 <div ref="certificationHoldForntError" className="errorMsg"></div>
+                                            </div>
                                         </div>
-                                        <div className="col-sm-9 padding_top15" hidden={backDomHidn}>
-                                            <input name="backFile" ref="backFile" type="file" className="file"
-                                                data-errMsgId="certificationBackError" data-empty="true" data-emptyText="请上传身份证反面图片"
-                                                data-drop-zone-enabled="false" data-show-caption="false" data-show-remove="false" data-show-upload="false"
-                                                data-language="zh" data-min-image-width="15" data-max-image-width="4096" data-max-file-size="4096" data-max-file-count="1" data-auto-replace="true"
-                                                data-layout-templates='{"footer":""}'
-                                                data-preview-templates='{"image":"<div class=\"krajee-default kv-preview-thumb file-preview-error\" id=\"{previewId}\" data-fileindex=\"{fileindex}\" data-template=\"{template}\"><div class=\"kv-file-content\"><p/><img src=\"{data}\" class=\"kv-preview-data file-preview-image\" title=\"{caption}\" alt=\"{caption}\" {style}></div></div>"}'
-                                                data-allowed-file-extensions='["jpg","jpeg","bmp","png"]' />
-                                             <div id="certificationBackError" className="errorMsg"></div>
+                                        <div className="form-group form_group_margin form_group_margin_back">
+                                            <label>手持反面图片</label>
+                                            <div className="col-sm-9 padding_top15" hidden={holdBackImgHidn}>
+                                                {holdBackDom}
+                                            </div>
+                                            <div className="col-sm-9 padding_top15" hidden={holdBackDomHidn}>
+                                                <input name="holdBackFile" ref="holdBackFile" type="file" className="file"
+                                                    data-drop-zone-enabled="false" data-show-caption="false" data-show-remove="false" data-show-upload="false"
+                                                    data-language="zh" data-min-image-width="15" data-max-image-width="4096" data-max-file-size="4096" data-max-file-count="1" data-auto-replace="true"
+                                                    data-layout-templates='{"footer":""}'
+                                                    data-preview-templates='{"image":"<div class=\"krajee-default kv-preview-thumb file-preview-error\" id=\"{previewId}\" data-fileindex=\"{fileindex}\" data-template=\"{template}\"><div class=\"kv-file-content\"><p/><img src=\"{data}\" class=\"kv-preview-data file-preview-image\" title=\"{caption}\" alt=\"{caption}\" {style}></div></div>"}'
+                                                    data-allowed-file-extensions='["jpg","jpeg","bmp","png"]' />
+                                                 <div ref="certificationHoldBackError" className="errorMsg"></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>
