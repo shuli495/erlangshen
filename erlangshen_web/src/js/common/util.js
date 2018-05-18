@@ -145,6 +145,8 @@ function $util_checkIdCard(idcard) {
 //data-includeText：非空包含提示文本
 //data-same：与id的value是否相同
 //data-sameText：与id的value是不同提示文本
+//data-num：数字格式
+//data-numText：数字格式不正确提示文本
 //data-mail：邮箱格式
 //data-mailText：邮箱格式不正确提示文本
 //data-phone：手机号格式
@@ -287,6 +289,25 @@ function $util_validateDOMs(doms) {
 				errMsgDomTmp.innerHTML = sameText;
 
 				if(doms[i].value != document.getElementById(same).value) {
+					errMsgDom.hidden = "hidden";
+					errMsgDomTmp.hidden = "";
+					return false;
+				} else {
+					errMsgDom.hidden = "";
+					errMsgDomTmp.hidden = "hidden";
+				}
+			}
+
+			//数字格式
+			var num = doms[i].getAttribute("data-num");
+			if(num != null && num == "true") {
+				var numText = doms[i].getAttribute("data-numText");
+				if(numText == null || numText == "") {
+					numText = "只能输入数字";
+				}
+				errMsgDomTmp.innerHTML = numText;
+
+				if(doms[i].value != "" && doms[i].value != null && isNaN(doms[i].value)) {
 					errMsgDom.hidden = "hidden";
 					errMsgDomTmp.hidden = "";
 					return false;
