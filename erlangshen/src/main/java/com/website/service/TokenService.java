@@ -128,10 +128,10 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
         // 验证状态
         if(true == isCheckStatus) {
             for(UserVO user : users) {
-                if(userName.equals(user.getMail()) && user.getStatus() !=0 && user.getStatus() != 3) {
+                if(userName.equals(user.getMail()) && user.getMailVerify() == 0) {
                     throw new ThrowPrompt("用户邮箱未验证！", "122001");
                 }
-                if(userName.equals(user.getPhone()) && user.getStatus() !=0 && user.getStatus() != 2) {
+                if(userName.equals(user.getPhone()) && user.getPhoneVerify() == 0) {
                     throw new ThrowPrompt("用户手机未验证！", "122002");
                 }
             }

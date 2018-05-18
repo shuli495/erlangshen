@@ -259,7 +259,7 @@ var UserStore = assign({}, EventEmitter.prototype, {
     });
   },
 
-  query: function (pageNum,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,status,province,city,area,address,clientId) {
+  query: function (pageNum,source,username,nickname,mail,mailVerify,phone,phoneVerify,tel,qq,weixin,weibo,name,idcard,schCertification,sex,status,province,city,area,address,clientId) {
     var url = $setting.serverUrl + 'user?';
 
     if(pageNum != '' && typeof(pageNum) != "undefined" && pageNum != "undefined") {
@@ -277,8 +277,14 @@ var UserStore = assign({}, EventEmitter.prototype, {
     if(typeof(mail) != "undefined" && mail != "undefined" && mail != "") {
       url += "&mail="+mail;
     }
+    if(typeof(mailVerify) != "undefined" && mailVerify != "undefined" && mailVerify != "") {
+      url += "&mailVerify="+mailVerify;
+    }
     if(typeof(phone) != "undefined" && phone != "undefined" && phone != "") {
       url += "&phone="+phone;
+    }
+    if(typeof(phoneVerify) != "undefined" && phoneVerify != "undefined" && phoneVerify != "") {
+      url += "&phoneVerify="+phoneVerify;
     }
     if(typeof(tel) != "undefined" && tel != "undefined" && tel != "") {
       url += "&tel="+tel;
@@ -297,6 +303,9 @@ var UserStore = assign({}, EventEmitter.prototype, {
     }
     if(typeof(idcard) != "undefined" && idcard != "undefined" && idcard != "") {
       url += "&idcard="+idcard;
+    }
+    if(typeof(schCertification) != "undefined" && schCertification != "undefined" && schCertification != "") {
+      url += "&certification="+schCertification;
     }
     if(typeof(sex) != "undefined" && sex != "undefined" && sex != "") {
       url += "&sex="+sex;
@@ -342,19 +351,19 @@ var UserStore = assign({}, EventEmitter.prototype, {
     });
   },
 
-  page: function (pageNum,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,status,province,city,area,address,clientId) {
+  page: function (pageNum,source,username,nickname,mail,mailVerify,phone,phoneVerify,tel,qq,weixin,weibo,name,idcard,schCertification,sex,status,province,city,area,address,clientId) {
     if(pageNum == '' || typeof(pageNum) == "undefined" || pageNum == "undefined") {
       pageNum = 1;
     }
 
-    this.query(pageNum,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,status,province,city,area,address,clientId);
+    this.query(pageNum,source,username,nickname,mail,mailVerify,phone,phoneVerify,tel,qq,weixin,weibo,name,idcard,schCertification,sex,status,province,city,area,address,clientId);
   },
 
-  list: function (source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,status,province,city,area,address,clientId) {
-    this.query("",source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,status,province,city,area,address,clientId);
+  list: function (source,username,nickname,mail,mailVerify,phone,phoneVerify,tel,qq,weixin,weibo,name,idcard,schCertification,sex,status,province,city,area,address,clientId) {
+    this.query("",source,username,nickname,mail,mailVerify,phone,phoneVerify,tel,qq,weixin,weibo,name,idcard,schCertification,sex,status,province,city,area,address,clientId);
   },
 
-  add: function (source,username,pwd,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,clientId,province,city,area,address) {
+  add: function (source,username,pwd,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,clientId,province,city,area,address,status) {
     var params = {"checkMail" : true};
 
     if(typeof(source) != "undefined" && source != "undefined" && source != "") {
@@ -411,6 +420,9 @@ var UserStore = assign({}, EventEmitter.prototype, {
     if(typeof(clientId) != "undefined" && clientId != "undefined" && clientId != "") {
       params["clientId"] = clientId;
     }
+    if(typeof(status) != "undefined" && status != "undefined" && status != "") {
+      params["status"] = status;
+    }
 
     $.ajax({
         type : "POST",
@@ -430,7 +442,7 @@ var UserStore = assign({}, EventEmitter.prototype, {
     });
   },
 
-  update: function (id,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,clientId,province,city,area,address) {
+  update: function (id,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,clientId,province,city,area,address,status) {
     var params = {"checkMail" : true};
 
     if(typeof(source) != "undefined" && source != "undefined") {
@@ -483,6 +495,9 @@ var UserStore = assign({}, EventEmitter.prototype, {
     }
     if(typeof(clientId) != "undefined" && clientId != "undefined" && clientId != "") {
       params["clientId"] = clientId;
+    }
+    if(typeof(status) != "undefined" && status != "undefined" && status != "") {
+      params["status"] = status;
     }
 
     $.ajax({

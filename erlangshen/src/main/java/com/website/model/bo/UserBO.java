@@ -26,11 +26,15 @@ public class UserBO extends BaseBean {
 	@Size(max=32, min=0, message="{user.mail.size}")
 	private String mail;	//邮箱
 
+	private Integer mailVerify;	//邮箱是否验证 0未验证 1已验证
+
 	@Size(max=32, min=0, message="{user.phone.size}")
 	private String phone;	//手机号码
 
+	private Integer phoneVerify;	//手机号码是否验证 0未验证 1已验证
+
 	@NotNull(message="{user.status.null}")
-	private Integer status;	//状态 0正常 1邮箱手机未验证 2邮箱未验证 3手机未验证
+	private Integer status;
 
 
 	public String getId() {
@@ -73,12 +77,28 @@ public class UserBO extends BaseBean {
 		this.mail = mail;
 	}
 
+	public Integer getMailVerify() {
+		return mailVerify;
+	}
+
+	public void setMailVerify(Integer mailVerify) {
+		this.mailVerify = mailVerify;
+	}
+
 	public String getPhone() {
 		return phone;
 	}
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public Integer getPhoneVerify() {
+		return phoneVerify;
+	}
+
+	public void setPhoneVerify(Integer phoneVerify) {
+		this.phoneVerify = phoneVerify;
 	}
 
 	public Integer getStatus() {

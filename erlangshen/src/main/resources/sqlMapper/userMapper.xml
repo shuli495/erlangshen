@@ -7,32 +7,37 @@
 		<result column="PWD" property="pwd"/>
 		<result column="USERNAME" property="username"/>
 		<result column="MAIL" property="mail"/>
+		<result column="MAIL_VERIFY" property="mailVerify"/>
 		<result column="PHONE" property="phone"/>
+		<result column="PHONE_VERIFY" property="phoneVerify"/>
 		<result column="STATUS" property="status"/>
-		<result column="SOURCE" property="source"/>
-		<result column="NICKNAME" property="nickname"/>
-		<result column="TEL" property="tel"/>
-		<result column="QQ" property="qq"/>
-		<result column="WEIXIN" property="weixin"/>
-		<result column="WEIBO" property="weibo"/>
-		<result column="NAME" property="name"/>
-		<result column="SEX" property="sex"/>
-		<result column="IDCARD" property="idcard"/>
-		<result column="CERTIFICATION" property="certification"/>
-		<result column="CERTIFICATION_FAIL_MSG" property="certificationFailMsg"/>
-		<result column="PROVINCE" property="province"/>
-		<result column="CITY" property="city"/>
-		<result column="AREA" property="area"/>
-		<result column="ADDRESS" property="address"/>
-		<result column="CREATED_TIME" property="createdTime"/>
 	</resultMap>
-	<resultMap extends="userBO" id="userVO" type="com.website.model.vo.UserVO">
+	<resultMap id="userInfoBO" type="com.website.model.bo.UserInfoBO" extends="userBO">
+		<id column="ID" property="id" />
+		<result column="SOURCE" property="source" />
+		<result column="NICKNAME" property="nickname" />
+		<result column="TEL" property="tel" />
+		<result column="QQ" property="qq" />
+		<result column="WEIXIN" property="weixin" />
+		<result column="WEIBO" property="weibo" />
+		<result column="NAME" property="name" />
+		<result column="SEX" property="sex" />
+		<result column="IDCARD" property="idcard" />
+		<result column="CERTIFICATION" property="certification" />
+		<result column="CERTIFICATION_FAIL_MSG" property="certificationFailMsg" />
+		<result column="PROVINCE" property="province" />
+		<result column="CITY" property="city" />
+		<result column="AREA" property="area" />
+		<result column="ADDRESS" property="address" />
+		<result column="CREATED_TIME" property="createdTime" />
+	</resultMap>
+	<resultMap id="userVO" type="com.website.model.vo.UserVO" extends="userInfoBO">
 		<result column="CLIENT_NAME" property="clientName"/>
 	</resultMap>
 
 	<select id="check" parameterType="com.website.model.bo.UserBO" resultMap="userVO">
 		SELECT
-		t0.ID,t0.CLIENT_ID,t0.PWD,t0.USERNAME,t0.MAIL,t0.PHONE,t0.STATUS
+		t0.ID,t0.CLIENT_ID,t0.PWD,t0.USERNAME,t0.MAIL,t0.MAIL_VERIFY,t0.PHONE,t0.PHONE_VERIFY,t0.STATUS
 		FROM `user` t0,client t1
 		WHERE t0.CLIENT_ID=t1.ID AND t1.DELETED=0
 		  AND t1.ID=#{clientId}
@@ -44,17 +49,17 @@
 
 	<insert id="insert" keyProperty="id" parameterType="com.website.model.bo.UserBO" useGeneratedKeys="true">
 		INSERT user
-		(ID,CLIENT_ID,PWD,USERNAME,MAIL,PHONE,STATUS)
+		(ID,CLIENT_ID,PWD,USERNAME,MAIL,MAIL_VERIFY,PHONE,PHONE_VERIFY,STATUS)
 		VALUES
-		(#{id},#{clientId},#{pwd},#{username},#{mail},#{phone}#{status})
+		(#{id},#{clientId},#{pwd},#{username},#{mail},#{mailVerify},#{phone},#{phoneVerify},#{status})
 	</insert>
 
 	<insert id="insertBatch" parameterType="java.util.List">
 		INSERT user
-		(ID,CLIENT_ID,PWD,USERNAME,MAIL,PHONE,STATUS)
+		(ID,CLIENT_ID,PWD,USERNAME,MAIL,MAIL_VERIFY,PHONE,PHONE_VERIFY,STATUS)
 		VALUES
 		<foreach collection="list" index="index" item="item" separator=",">
-			(#{item.id},#{item.clientId},#{item.pwd},#{item.username},#{item.mail},#{item.phone}#{item.status})
+			(#{item.id},#{item.clientId},#{item.pwd},#{item.username},#{item.mail},#{item.mailVerify},#{item.phone},#{item.phoneVerify},#{item.status})
 		</foreach>
 	</insert>
 
@@ -73,8 +78,14 @@
 			<if test="mail != null">
 				MAIL=#{mail},
 			</if>
+			<if test="mailVerify != null">
+				MAIL_VERIFY=#{mailVerify},
+			</if>
 			<if test="phone != null">
 				PHONE=#{phone},
+			</if>
+			<if test="phoneVerify != null">
+				PHONE_VERIFY=#{phoneVerify},
 			</if>
 			<if test="status != null">
 				STATUS=#{status},
@@ -99,8 +110,14 @@
 				<if test="mail != null">
 					MAIL=#{item.mail},
 				</if>
+				<if test="mailVerify != null">
+					MAIL_VERIFY=#{mailVerify},
+				</if>
 				<if test="phone != null">
 					PHONE=#{item.phone},
+				</if>
+				<if test="phoneVerify != null">
+					PHONE_VERIFY=#{phoneVerify},
 				</if>
 				<if test="status != null">
 					STATUS=#{item.status},
@@ -123,14 +140,14 @@
 
 	<select id="findById" parameterType="string" resultMap="userVO">
 		SELECT
-		ID,CLIENT_ID,PWD,USERNAME,MAIL,PHONE,STATUS
+		ID,CLIENT_ID,PWD,USERNAME,MAIL,MAIL_VERIFY,PHONE,PHONE_VERIFY,STATUS
 		FROM user
 		WHERE id=#{id}
 	</select>
 
 	<select id="queryByAnd" parameterType="com.website.model.bo.UserBO" resultMap="userVO">
 		SELECT
-		ID,CLIENT_ID,USERNAME,MAIL,PHONE,STATUS
+		ID,CLIENT_ID,PWD,USERNAME,MAIL,MAIL_VERIFY,PHONE,PHONE_VERIFY,STATUS
 		FROM user
 		<where>
 			<if test="clientId != null">
@@ -142,8 +159,14 @@
 			<if test="mail != null">
 				and MAIL=#{mail}
 			</if>
+			<if test="mailVerify != null">
+				and MAIL_VERIFY=#{mailVerify},
+			</if>
 			<if test="phone != null">
 				and PHONE=#{phone}
+			</if>
+			<if test="phoneVerify != null">
+				and PHONE_VERIFY=#{phoneVerify},
 			</if>
 			<if test="status != null">
 				and STATUS=#{status}
@@ -153,10 +176,10 @@
 
 	<select id="queryByClient" parameterType="com.website.model.vo.UserVO" resultMap="userVO">
 		SELECT
-		t0.ID,t0.CLIENT_ID,t0.USERNAME,t0.MAIL,t0.PHONE,t0.STATUS,
+		t0.ID,t0.CLIENT_ID,t0.USERNAME,t0.MAIL,t0.MAIL_VERIFY,t0.PHONE,t0.PHONE_VERIFY,t0.STATUS,
 		t1.SOURCE,t1.NICKNAME,t1.TEL,t1.QQ,t1.WEIXIN,t1.WEIBO,t1.`NAME`,t1.SEX,t1.IDCARD,t1.CERTIFICATION,t1.CERTIFICATION_FAIL_MSG,t1.PROVINCE,t1.CITY,t1.AREA,t1.ADDRESS,t1.CREATED_TIME,
 		t2.NAME as CLIENT_NAME
-		FROM t0 t0, user_info t1, client t2
+		FROM `user` t0, user_info t1, client t2
 		WHERE t0.ID=t1.ID AND t0.CLIENT_ID=t2.ID AND t2.deleted=0
 		<if test="clientName != null">
 			and t2.NAME=#{clientName}
@@ -173,8 +196,14 @@
 		<if test="mail != null">
 			and t0.MAIL like CONCAT('%',#{mail},'%')
 		</if>
+		<if test="mailVerify != null">
+			and t0.MAIL_VERIFY=#{mailVerify},
+		</if>
 		<if test="phone != null">
 			and t0.PHONE like CONCAT('%',#{phone},'%')
+		</if>
+		<if test="phoneVerify != null">
+			and t0.PHONE_VERIFY=#{phoneVerify},
 		</if>
 		<if test="status != null">
 			and t0.STATUS=#{status}

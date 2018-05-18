@@ -112,6 +112,8 @@ public class UserService extends BaseService<UserDao,UserVO> {
 				user.setCertificationFailMsg("");
 				user.setAddress("");
 				user.setCreatedTime(null);
+				user.setMailVerify(null);
+				user.setPhoneVerify(null);
 				user.setStatus(null);
 			}
 		}
@@ -174,15 +176,19 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		if(VerifyUtils.isNotEmpty(vo.getCode())) {
 			validateVO = validateService.checkByMailOrPhone(clientId, mail, phone, vo.getCode(), null);
 
-			if(VerifyUtils.isEmpty(vo.getStatus())) {
-				if(VerifyUtils.isNotEmpty(phone)) {
-					vo.setStatus(2);
-				} else if (VerifyUtils.isNotEmpty(mail)) {
-					vo.setStatus(3);
-				}
+			if(VerifyUtils.isNotEmpty(phone)) {
+				vo.setPhoneVerify(1);
+			} else if(VerifyUtils.isNotEmpty(mail)) {
+				vo.setMailVerify(1);
 			}
 		}
 
+		if(null == vo.getMailVerify()) {
+			vo.setMailVerify(0);
+		}
+		if(null == vo.getPhoneVerify()) {
+			vo.setPhoneVerify(0);
+		}
 		if(VerifyUtils.isEmpty(vo.getStatus())) {
 			vo.setStatus(1);
 		}
@@ -228,7 +234,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			if(null == user) {
 				throw new ThrowException("用户信息错误！", "072006");
 			}
-			if((user.getStatus() == 0 || user.getStatus() == 3) && type.startsWith("mail")) {
+			if(user.getMailVerify() == 1 && type.startsWith("mail")) {
 				throw new ThrowPrompt("邮箱已验证！", "072007");
 			}
 			if(null != token
@@ -448,11 +454,8 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		}
 
 		// code、mail都匹配，修改状态
-		if(user.getStatus() == 1) {	//手机、邮箱都未认证，改为手机未认证
-			user.setStatus(3);
-			super.baseUpdate(user);
-		} else if(user.getStatus() == 2) {	//邮箱未认证，改为正常状态
-			user.setStatus(0);
+		if(user.getMailVerify() == 0) {
+			user.setMailVerify(1);
 			super.baseUpdate(user);
 		}
 
@@ -783,10 +786,8 @@ public class UserService extends BaseService<UserDao,UserVO> {
 					validateService.checkByMailOrPhone(oldUserVO.getClientId(), vo.getMail(), null, vo.getCode(), null);
 				}
 
-				if(upVO.getStatus() == 0 && VerifyUtils.isEmpty(vo.getCode())) {
-					upVO.setStatus(2);
-				} else if(upVO.getStatus() == 3 && VerifyUtils.isEmpty(vo.getCode())) {
-					upVO.setStatus(1);
+				if(upVO.getMailVerify() == 1 && VerifyUtils.isEmpty(vo.getCode())) {
+					upVO.setMailVerify(0);
 				}
 			}
 
@@ -797,10 +798,8 @@ public class UserService extends BaseService<UserDao,UserVO> {
 					validateService.checkByMailOrPhone(oldUserVO.getClientId(), null, vo.getPhone(), vo.getCode(), null);
 				}
 
-				if(upVO.getStatus() == 0 && VerifyUtils.isEmpty(vo.getCode())) {
-					upVO.setStatus(3);
-				} else if(upVO.getStatus() == 2 && VerifyUtils.isEmpty(vo.getCode())) {
-					upVO.setStatus(1);
+				if(upVO.getPhoneVerify() == 1 && VerifyUtils.isEmpty(vo.getCode())) {
+					upVO.setPhoneVerify(0);
 				}
 			}
 
@@ -848,12 +847,22 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			dbVO.setMail(upVO.getMail());
 			isUpdate = true;
 		}
+		//邮箱认证状态
+		if(null != upVO.getMailVerify()) {
+			dbVO.setMailVerify(upVO.getMailVerify());
+			isUpdate = true;
+		}
 		//手机号码
 		if(null != upVO.getPhone()) {
 			dbVO.setPhone(upVO.getPhone());
 			isUpdate = true;
 		}
-		//状态 0正常
+		//手机号码认证状态
+		if(null != upVO.getPhoneVerify()) {
+			dbVO.setPhoneVerify(upVO.getPhoneVerify());
+			isUpdate = true;
+		}
+		//状态
 		if(null != upVO.getStatus()) {
 			dbVO.setStatus(upVO.getStatus());
 			isUpdate = true;
@@ -984,7 +993,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			List<UserVO> users = this.dao.check(clientId, mail, null);
 			for(UserVO user : users) {
 				if((VerifyUtils.isEmpty(nowUserId) && user.getMail().equals(mail)) || (!VerifyUtils.isEmpty(nowUserId) && !user.getId().equals(nowUserId))) {
-					if(user.getStatus() == 1 || user.getStatus() == 2) {
+					if(user.getMailVerify() == 0) {
 						throw new ThrowPrompt("该邮箱已注册，但未验证！", "142011");
 					} else {
 						throw new ThrowPrompt("该邮箱已注册，请更换后再试！", "142012");
@@ -996,7 +1005,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			List<UserVO> users = this.dao.check(clientId, phone, null);
 			for(UserVO user : users) {
 				if((VerifyUtils.isEmpty(nowUserId) && user.getPhone().equals(phone)) || (!VerifyUtils.isEmpty(nowUserId) && !user.getId().equals(nowUserId))) {
-					if(user.getStatus() == 1 || user.getStatus() == 3) {
+					if(user.getPhoneVerify() == 0) {
 						throw new ThrowPrompt("该手机号码已注册，但未验证！", "142013");
 					} else {
 						throw new ThrowPrompt("该手机号码已注册，请更换后再试！", "142014");

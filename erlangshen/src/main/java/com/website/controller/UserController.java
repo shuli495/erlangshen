@@ -330,7 +330,8 @@ public class UserController extends BaseElsController<UserService> {
 						@RequestParam(required = false) String sort, @RequestParam(required = false) String order,
 						@RequestParam(required = false) String clientId, @RequestParam(required = false) String source,
 						@RequestParam(required = false) String username, @RequestParam(required = false) String nickname,
-						@RequestParam(required = false) String mail, @RequestParam(required = false) String phone,
+						@RequestParam(required = false) String mail, @RequestParam(required = false) Integer mailVerify,
+						@RequestParam(required = false) String phone, @RequestParam(required = false) Integer phoneVerify,
 						@RequestParam(required = false) String tel, @RequestParam(required = false) String qq,
 						@RequestParam(required = false) String weixin, @RequestParam(required = false) String weibo,
 						@RequestParam(required = false) String name, @RequestParam(required = false) Boolean sex,
@@ -360,9 +361,17 @@ public class UserController extends BaseElsController<UserService> {
 		if(null != mail) {
 			vo.setMail(mail);
 		}
+		//邮箱认证状态
+		if(null != mailVerify) {
+			vo.setMailVerify(mailVerify);
+		}
 		//手机号码
 		if(null != phone) {
 			vo.setPhone(phone);
+		}
+		//手机号码认证状态
+		if(null != phoneVerify) {
+			vo.setPhoneVerify(phoneVerify);
 		}
 		//电话
 		if(null != tel) {
@@ -408,7 +417,7 @@ public class UserController extends BaseElsController<UserService> {
 		if(null != address) {
 			vo.setAddress(address);
 		}
-		//状态 0正常
+		//状态
 		if(null != status) {
 			vo.setStatus(status);
 		}

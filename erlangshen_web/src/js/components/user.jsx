@@ -27,16 +27,16 @@ class UserApp extends BaseComponents {
     }
 
     handleQuery(pageNum) {
-        UserStore.page(pageNum,this.refs.schSource.value,this.refs.schUsername.value,this.refs.schNickname.value,this.refs.schMail.value,this.refs.schPhone.value,this.refs.schTel.value,
-            this.refs.schQQ.value,this.refs.schWeixin.value,this.refs.schWeibo.value,this.refs.schName.value,this.refs.schIdcard.value,this.refs.schSex.value,this.refs.schStatus.value,
-            this.refs.schAddressApp.refs.province.value,this.refs.schAddressApp.refs.city.value,this.refs.schAddressApp.refs.area.value,this.refs.schAddressApp.refs.address.value,
-            this.refs.schClientApp.refs.clientId.value);
+        UserStore.page(pageNum,this.refs.schSource.value,this.refs.schUsername.value,this.refs.schNickname.value,
+            this.refs.schMail.value,this.refs.schMailVerify.value,this.refs.schPhone.value,this.refs.schPhoneVerify.value,this.refs.schTel.value,
+            this.refs.schQQ.value,this.refs.schWeixin.value,this.refs.schWeibo.value,this.refs.schName.value,this.refs.schIdcard.value,this.refs.schCertification.value,
+            this.refs.schSex.value,this.refs.schStatus.value,this.refs.schAddressApp.refs.province.value,this.refs.schAddressApp.refs.city.value,this.refs.schAddressApp.refs.area.value,
+            this.refs.schAddressApp.refs.address.value,this.refs.schClientApp.refs.clientId.value);
     }
 
     handleInfo(id,status,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,clientId,province,city,area,address) {
         if(typeof(id) == "undefined" || id == "undefined" || typeof(id) == "object" || id == "") {
             this.selectedUserId = "";
-            this.selectedUserStatus = "";
 
             this.refs.pwd.value= "";
             this.refs.source.value = "";
@@ -55,6 +55,7 @@ class UserApp extends BaseComponents {
             this.refs.address.refs.area.value = "";
             this.refs.address.refs.address.value = "";
             this.refs.client.refs.clientId.value = "";
+            this.refs.status.value = "";
 
             this.refs.addBut.style.display = "";
             this.refs.sendMailBut.hidden();
@@ -66,7 +67,6 @@ class UserApp extends BaseComponents {
             $("#pwdContainer").show();
         } else {
             this.selectedUserId = id;
-            this.selectedUserStatus = status;
 
             this.refs.source.value = source;
             this.refs.username.value = username;
@@ -84,6 +84,7 @@ class UserApp extends BaseComponents {
             this.refs.address.handleSelectCity(area);
             this.refs.address.refs.address.value = address;
             this.refs.client.selected(clientId);
+            this.refs.status.value = status;
 
             this.refs.addBut.style.display = "none";
             this.refs.sendMailBut.show();
@@ -114,6 +115,7 @@ class UserApp extends BaseComponents {
         var area = this.refs.address.refs.area.value;
         var address = this.refs.address.refs.address.value;
         var clientId = this.refs.client.refs.clientId.value;
+        var status = this.refs.status.value;
 
         if(!$util_validateValue("user_info")) {
             return;
@@ -134,9 +136,9 @@ class UserApp extends BaseComponents {
             } else {
                 $("#pwdError").html("");
             }
-            UserStore.add(source,username,pwd,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,clientId,province,city,area,address);
+            UserStore.add(source,username,pwd,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,clientId,province,city,area,address,status);
         } else {
-            UserStore.update(id,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,clientId,province,city,area,address);
+            UserStore.update(id,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,sex,clientId,province,city,area,address,status);
         }
     }
 
@@ -227,22 +229,25 @@ class UserApp extends BaseComponents {
                     sex = "男";
                 }
 
-                var statusStr = "正常";
-                var status = this.state.users[i].status;
-                if(status == 1) {
-                    statusStr = "邮箱手机未验证";
-                } else if(status == 2) {
-                    statusStr = "邮箱未验证";
-                } else if(status == 3) {
-                    statusStr = "手机未验证";
+                var mailVerify = typeof(this.state.users[i].mailVerify) == "undefined" ? "" : this.state.users[i].mailVerify;
+                var mailVerifyStr = "未验证";
+                if(mailVerify == 1) {
+                    mailVerifyStr = "已验证";
+                }
+                var phoneVerify = typeof(this.state.users[i].phoneVerify) == "undefined" ? "" : this.state.users[i].phoneVerify;
+                var phoneVerifyStr = "未验证";
+                if(phoneVerifyStr == 1) {
+                    phoneVerifyStr = "已验证";
                 }
 
                 var id = typeof(this.state.users[i].id) == "undefined" ? "" : this.state.users[i].id;
-                var source = typeof(this.state.users[i].source) == "undefined" ? "" : this.state.users[i].source;
                 var username = typeof(this.state.users[i].username) == "undefined" ? "" : this.state.users[i].username;
-                var nickname = typeof(this.state.users[i].nickname) == "undefined" ? "" : this.state.users[i].nickname;
                 var mail = typeof(this.state.users[i].mail) == "undefined" ? "" : this.state.users[i].mail;
                 var phone = typeof(this.state.users[i].phone) == "undefined" ? "" : this.state.users[i].phone;
+                var status = typeof(this.state.users[i].status) == "undefined" ? "" : this.state.users[i].status;
+
+                var source = typeof(this.state.users[i].source) == "undefined" ? "" : this.state.users[i].source;
+                var nickname = typeof(this.state.users[i].nickname) == "undefined" ? "" : this.state.users[i].nickname;
                 var tel = typeof(this.state.users[i].tel) == "undefined" ? "" : this.state.users[i].tel;
                 var qq = typeof(this.state.users[i].qq) == "undefined" ? "" : this.state.users[i].qq;
                 var weixin = typeof(this.state.users[i].weixin) == "undefined" ? "" : this.state.users[i].weixin;
@@ -292,7 +297,9 @@ class UserApp extends BaseComponents {
                                             <td>{username}</td>
                                             <td>{nickname}</td>
                                             <td>{mail}</td>
+                                            <td>{mailVerifyStr}</td>
                                             <td>{phone}</td>
+                                            <td>{phoneVerifyStr}</td>
                                             <td>{tel}</td>
                                             <td>{qq}</td>
                                             <td>{weixin}</td>
@@ -304,7 +311,7 @@ class UserApp extends BaseComponents {
                                             <td>{source}</td>
                                             <td>{clientName}</td>
                                             <td>{newAddres}</td>
-                                            <td>{statusStr}</td>
+                                            <td>{status}</td>
                                         </tr>
                                       );
             }
@@ -414,9 +421,11 @@ class UserApp extends BaseComponents {
                     <input type="text" placeholder="微博" ref="schWeibo" />
                     <input type="text" placeholder="姓名" ref="schName" />
                     <input type="text" placeholder="身份证" ref="schIdcard" />
-                    <input type="text" placeholder="实名认证" ref="schIdcard" />
                     <select ref="schSex"><option value ="">性别</option><option value ="1">男</option><option value ="0">女</option></select>
-                    <select ref="schStatus"><option value ="">状态</option><option value ="0">正常</option><option value ="1">手机邮箱未验证</option><option value ="2">邮箱未验证</option><option value ="3">手机未验证</option></select>
+                    <select ref="schCertification"><option value ="">实名认证</option><option value ="0">未认证</option><option value ="1">认证中</option><option value ="2">认证失败</option><option value ="3">认证成功</option></select>
+                    <select ref="schMailVerify"><option value ="">邮箱认证</option><option value ="0">未认证</option><option value ="1">已认证</option></select>
+                    <select ref="schPhoneVerify"><option value ="">手机认证</option><option value ="0">未认证</option><option value ="1">已认证</option></select>
+                    <input type="text" placeholder="状态" ref="schStatus" />
                     <input type="text" placeholder="来源" ref="schSource" />
                     <CommonClientApp ref="schClientApp"/>
                     <CommonAddressApp ref="schAddressApp"/>
@@ -430,7 +439,9 @@ class UserApp extends BaseComponents {
                             <th>用户名</th>
                             <th>昵称</th>
                             <th>邮箱</th>
+                            <th>邮箱认证</th>
                             <th>手机号</th>
+                            <th>手机号认证</th>
                             <th>电话</th>
                             <th>QQ</th>
                             <th>微信</th>
@@ -562,6 +573,13 @@ class UserApp extends BaseComponents {
                                         <div className="col-sm-9">
                                           <CommonClientApp ref="client"/>
                                            <div id="clientError" className="errorMsg"></div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label class="col-sm-2 control-label">状态</label>
+                                        <div className="col-sm-9">
+                                          <input type="text" placeholder="请输入数字" ref="status" data-errMsgId="statusError" data-num="true" data-numText="状态只能输入数字"/>
+                                           <div id="statusError" className="errorMsg"></div>
                                         </div>
                                     </div>
                                 </form>
