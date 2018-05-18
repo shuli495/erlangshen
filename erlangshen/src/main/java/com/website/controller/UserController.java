@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import com.fastjavaframework.util.UUID;
 import com.fastjavaframework.page.Page;
 import com.fastjavaframework.exception.ThrowPrompt;
-import com.website.model.bo.UserBO;
 import com.website.service.UserService;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -320,28 +319,7 @@ public class UserController extends BaseElsController<UserService> {
 	 */
 	@RequestMapping(value="/{id}",method=RequestMethod.GET)
 	public Object findById(@PathVariable String id) {
-		UserBO user = this.service.baseFind(id);
-		if(null == user
-				|| (Constants.PROJECT_NAME.equals(super.identity().getClientId())
-					&& !clientService.isMyClient(super.identity().getUserId(), user.getClientId()))) {
-			throw new ThrowPrompt("无此用户！", "081016");
-		}
-
-		if(!Constants.PROJECT_NAME.equals(super.identity().getClientId())) {
-			// 非erlangshen用户查看他人详情，置空关键项
-			if(!super.identity().getUserId().equals(id)) {
-				user.setIdcard("");
-				user.setCertification(null);
-				user.setCertificationFailMsg("");
-				user.setAddress("");
-				user.setCreatedTime(null);
-				user.setStatus(null);
-			}
-		}
-
-		// 密码置空
-		user.setPwd("");
-		return success(user);
+		return success(this.service.find(super.identity(), id));
 	}
 
 	/**

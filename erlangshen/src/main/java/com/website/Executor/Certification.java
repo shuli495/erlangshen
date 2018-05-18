@@ -5,7 +5,7 @@ import com.fastjavaframework.Setting;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.model.vo.UserVO;
-import com.website.service.UserService;
+import com.website.service.UserInfoService;
 import org.json.JSONObject;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -39,22 +39,22 @@ public class Certification extends AbstractQpsControl {
     @Override
     public void run() {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:config/applicationContext.xml");
-        UserService userService = (UserService) ctx.getBean("userService");
+        UserInfoService userInfoService = (UserInfoService) ctx.getBean("userInfoService");
 
         try {
             if(VerifyUtils.isEmpty(userId)) {
                 throw new Exception("userId不能为空！");
             }
 
-            UserVO user = userService.baseFind(userId);
+            UserVO user = userInfoService.baseFind(userId);
+
+            if(null == user) {
+                throw new Exception(userId+" 该用户不存在！");
+            }
 
             // 认证中、认证成功
             if(user.getCertification() == 1 || user.getCertification() == 3) {
                 return;
-            }
-
-            if(null == user) {
-                throw new Exception(userId+" 该用户不存在！");
             }
 
             // 不传name、idcard取user表中数据
@@ -150,7 +150,7 @@ public class Certification extends AbstractQpsControl {
                 updateUser.setIdcard(idcard);
                 updateUser.setCertification(3);
                 updateUser.setCertificationFailMsg("");
-                userService.baseUpdate(updateUser);
+                userInfoService.baseUpdate(updateUser);
             } else {
                 // 认证失败
                 throw new Exception("身份信息错误！");
@@ -161,7 +161,7 @@ public class Certification extends AbstractQpsControl {
             updateUser.setId(userId);
             updateUser.setCertification(2);
             updateUser.setCertificationFailMsg(e.getMessage());
-            userService.baseUpdate(updateUser);
+            userInfoService.baseUpdate(updateUser);
             throw new ThrowException(e.getMessage(), "811001");
         }
     }

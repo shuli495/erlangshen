@@ -40,6 +40,8 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	@Autowired
 	public ValidateService validateService;
 	@Autowired
+	public UserInfoService userInfoService;
+	@Autowired
 	public UserRecycleService userRecycleService;
 
 	/**
@@ -80,6 +82,44 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		}
 
 		return users;
+	}
+
+	/**
+	 * 详情查询
+	 * @param token
+	 * @param userId
+     * @return
+     */
+	public UserVO find(TokenVO token, String userId) {
+		UserVO user = super.baseFind(userId);
+		if(null == user
+				|| (Constants.PROJECT_NAME.equals(token.getClientId())
+				&& !clientService.isMyClient(token.getUserId(), user.getClientId()))) {
+			throw new ThrowPrompt("无此用户！", "081016");
+		}
+
+		UserVO userInfo = userInfoService.baseFind(userId);
+
+		if(null != userInfo) {
+			user = this.setUpdateVlaue(userInfo, user);
+		}
+
+		if(!Constants.PROJECT_NAME.equals(token.getClientId())) {
+			// 非erlangshen用户查看他人详情，置空关键项
+			if(!token.getUserId().equals(userId)) {
+				user.setIdcard("");
+				user.setCertification(null);
+				user.setCertificationFailMsg("");
+				user.setAddress("");
+				user.setCreatedTime(null);
+				user.setStatus(null);
+			}
+		}
+
+		// 密码置空
+		user.setPwd("");
+
+		return user;
 	}
 
 	/**
@@ -146,9 +186,11 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		if(VerifyUtils.isEmpty(vo.getStatus())) {
 			vo.setStatus(1);
 		}
-
 		vo.setCertification(0);
+
+		// 插入数据
 		this.dao.baseInsert(vo);
+		userInfoService.baseInsert(vo);
 
 		// 删除验证码
 		if(VerifyUtils.isNotEmpty(vo.getCode()) && null != validateVO) {
@@ -326,20 +368,23 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		}
 
 		// 替换用户属性
-		if(text.indexOf("${nickname}") != -1) {
-			text = text.replace("${nickname}", user.getNickname());
-		}
-		if(text.indexOf("${username}") != -1) {
-			text = text.replace("${username}", user.getUsername());
-		}
-		if(text.indexOf("${name}") != -1) {
-			text = text.replace("${name}", user.getName());
-		}
 		if(text.indexOf("${mail}") != -1) {
 			text = text.replace("${mail}", user.getMail());
 		}
 		if(text.indexOf("${phone}") != -1) {
 			text = text.replace("${phone}", user.getPhone());
+		}
+		if(text.indexOf("${nickname}") != -1 || text.indexOf("${username}") != -1 || text.indexOf("${name}") != -1) {
+			UserVO userInfo = userInfoService.baseFind(user.getId());
+			if(text.indexOf("${nickname}") != -1) {
+				text = text.replace("${nickname}", userInfo.getNickname());
+			}
+			if(text.indexOf("${username}") != -1) {
+				text = text.replace("${username}", userInfo.getUsername());
+			}
+			if(text.indexOf("${name}") != -1) {
+				text = text.replace("${name}", userInfo.getName());
+			}
 		}
 
 		return text;
@@ -483,17 +528,20 @@ public class UserService extends BaseService<UserDao,UserVO> {
 
 		// 设置参数
 		if(null != user) {
-			if(user.getNickname().matches("([a-z]|[A-Z]|[0-9]){1,}")) {
-				params.put("nickname", user.getNickname());
-			}
-			if(user.getUsername().matches("([a-z]|[A-Z]|[0-9]){1,}")) {
-				params.put("username", user.getUsername());
-			}
-			if(user.getName().matches("([a-z]|[A-Z]|[0-9]){1,}")) {
-				params.put("name", user.getName());
-			}
 			if(phone.matches("([a-z]|[A-Z]|[0-9]){1,}")) {
 				params.put("phone", phone);
+			}
+		}
+		UserVO userInfo = userInfoService.baseFind(user.getId());
+		if(null != userInfo) {
+			if(user.getNickname().matches("([a-z]|[A-Z]|[0-9]){1,}")) {
+				params.put("nickname", userInfo.getNickname());
+			}
+			if(user.getUsername().matches("([a-z]|[A-Z]|[0-9]){1,}")) {
+				params.put("username", userInfo.getUsername());
+			}
+			if(user.getName().matches("([a-z]|[A-Z]|[0-9]){1,}")) {
+				params.put("name", userInfo.getName());
 			}
 		}
 
@@ -601,24 +649,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
      */
 	@Transactional
 	public void delete(TokenVO tokenVO, String id) {
-		if(VerifyUtils.isEmpty(id)) {
-			throw new ThrowPrompt("无此用户！", "072017");
-		}
-		UserVO userVO = super.baseFind(id);
-		if(null == userVO) {
-			throw new ThrowPrompt("无此用户！", "072018");
-		}
-		if(!Constants.PROJECT_NAME.equals(tokenVO.getClientId())) {
-			throw new ThrowPrompt("无权删除用户！", "072019");
-		}
-		if(!clientService.isMyClient(tokenVO.getUserId(), userVO.getClientId())) {
-			throw new ThrowPrompt("无此用户！", "072020");
-		}
-
-		//存入回收表中
-		UserRecycleVO userRecycleVO = new UserRecycleVO();
-		BeanUtils.copyProperties(userVO, userRecycleVO);
-		userRecycleVO.setOperatorTime(new Date());
+		UserRecycleVO userRecycleVO = this.setRecycle(tokenVO, id);
 
 		userRecycleService.baseInsert(userRecycleVO);
 		super.baseDelete(id);
@@ -634,30 +665,46 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		List<UserRecycleVO> recycles = new ArrayList<>();
 
 		for(String id : ids) {
-			if(VerifyUtils.isEmpty(id)) {
-				throw new ThrowPrompt("无此用户！", "072017");
-			}
-			UserVO userVO = super.baseFind(id);
-			if(null == userVO) {
-				throw new ThrowPrompt("无此用户！", "072018");
-			}
-			if(!Constants.PROJECT_NAME.equals(tokenVO.getClientId())) {
-				throw new ThrowPrompt("无权删除用户！", "072019");
-			}
-			if(!clientService.isMyClient(tokenVO.getUserId(), userVO.getClientId())) {
-				throw new ThrowPrompt("无此用户！", "072020");
-			}
-
-			//存入回收表中
-			UserRecycleVO userRecycleVO = new UserRecycleVO();
-			BeanUtils.copyProperties(userVO, userRecycleVO);
-			userRecycleVO.setOperatorTime(new Date());
-
-			recycles.add(userRecycleVO);
+			recycles.add(this.setRecycle(tokenVO, id));
 		}
 
 		userRecycleService.baseInsertBatch(recycles);
 		super.baseDeleteBatch(ids);
+	}
+
+	/**
+	 * 设置回收数据
+	 * @param tokenVO
+	 * @param userId
+     * @return
+     */
+	private UserRecycleVO setRecycle(TokenVO tokenVO, String userId) {
+		if(VerifyUtils.isEmpty(userId)) {
+			throw new ThrowPrompt("无此用户！", "072017");
+		}
+
+		UserVO userVO = super.baseFind(userId);
+		if(null == userVO) {
+			throw new ThrowPrompt("无此用户！", "072018");
+		}
+		if(!Constants.PROJECT_NAME.equals(tokenVO.getClientId())) {
+			throw new ThrowPrompt("无权删除用户！", "072019");
+		}
+		if(!clientService.isMyClient(tokenVO.getUserId(), userVO.getClientId())) {
+			throw new ThrowPrompt("无此用户！", "072020");
+		}
+
+		UserVO userInfo = userInfoService.baseFind(userId);
+
+		//存入回收表中
+		UserRecycleVO userRecycleVO = new UserRecycleVO();
+		BeanUtils.copyProperties(userVO, userRecycleVO);
+		if(null != userInfo) {
+			BeanUtils.copyProperties(userInfo, userRecycleVO);
+		}
+		userRecycleVO.setOperatorTime(new Date());
+
+		return userRecycleVO;
 	}
 
 	/**
@@ -696,6 +743,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		}
 
 		UserVO oldUserVO = super.baseFind(vo.getId());
+		UserVO oldUserInfoVO = userInfoService.baseFind(vo.getId());
 
 		if(VerifyUtils.isEmpty(vo.getClientId())) {
 			vo.setClientId(oldUserVO.getClientId());
@@ -712,138 +760,169 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		this.checkUserInfo(oldUserVO.getClientId(), oldUserVO.getId(), vo.getUsername(), vo.getMail(), vo.getPhone());
 
 		// 实名认证通过 不能修改姓名 身份证号码
-		if(oldUserVO.getCertification() == 3 && VerifyUtils.isNotEmpty(vo.getName()) && !vo.getName().equals(oldUserVO.getName())) {
+		if(oldUserInfoVO.getCertification() == 3 && VerifyUtils.isNotEmpty(vo.getName()) && !vo.getName().equals(oldUserInfoVO.getName())) {
 			throw new ThrowPrompt("已实名通过，不能修改姓名！", "142006");
 		}
-		if(oldUserVO.getCertification() == 3 && VerifyUtils.isNotEmpty(vo.getIdcard()) && !vo.getIdcard().equals(oldUserVO.getIdcard())) {
+		if(oldUserInfoVO.getCertification() == 3 && VerifyUtils.isNotEmpty(vo.getIdcard()) && !vo.getIdcard().equals(oldUserInfoVO.getIdcard())) {
 			throw new ThrowPrompt("已实名通过，不能修改身份证号码！", "142007");
 		}
 
-		//设置修改值
+		//设置user修改值
 		UserVO upVO = this.setUpdateVlaue(oldUserVO, vo);
 
-		if(VerifyUtils.isEmpty(upVO.getUsername()) && VerifyUtils.isEmpty(upVO.getMail()) && VerifyUtils.isEmpty(upVO.getPhone())) {
-			throw new ThrowPrompt("用户名、邮箱、手机必填一个！", "142008");
+		//更新user
+		if(null != upVO) {
+			if(VerifyUtils.isEmpty(upVO.getUsername()) && VerifyUtils.isEmpty(upVO.getMail()) && VerifyUtils.isEmpty(upVO.getPhone())) {
+				throw new ThrowPrompt("用户名、邮箱、手机必填一个！", "142008");
+			}
+
+			// 修改邮箱 改状态
+			if(null != oldUserVO.getMail() && !oldUserVO.getMail().equalsIgnoreCase(vo.getMail()) && !VerifyUtils.isEmpty(vo.getMail())) {
+				// 校验验证码
+				if(VerifyUtils.isNotEmpty(vo.getCode())) {
+					validateService.checkByMailOrPhone(oldUserVO.getClientId(), vo.getMail(), null, vo.getCode(), null);
+				}
+
+				if(upVO.getStatus() == 0 && VerifyUtils.isEmpty(vo.getCode())) {
+					upVO.setStatus(2);
+				} else if(upVO.getStatus() == 3 && VerifyUtils.isEmpty(vo.getCode())) {
+					upVO.setStatus(1);
+				}
+			}
+
+			// 修改手机 该状态
+			if(null != oldUserVO.getPhone() && !oldUserVO.getPhone().equals(vo.getPhone()) && !VerifyUtils.isEmpty(vo.getPhone())) {
+				// 校验验证码
+				if(VerifyUtils.isNotEmpty(vo.getCode())) {
+					validateService.checkByMailOrPhone(oldUserVO.getClientId(), null, vo.getPhone(), vo.getCode(), null);
+				}
+
+				if(upVO.getStatus() == 0 && VerifyUtils.isEmpty(vo.getCode())) {
+					upVO.setStatus(3);
+				} else if(upVO.getStatus() == 2 && VerifyUtils.isEmpty(vo.getCode())) {
+					upVO.setStatus(1);
+				}
+			}
+
+			super.baseUpdate(upVO);
 		}
 
+		//设置user_info修改值
+		UserVO upInfoVO = this.setUpdateVlaue(oldUserInfoVO, vo);
 
-		// 修改邮箱 改状态
-		if(null != oldUserVO.getMail() && !oldUserVO.getMail().equalsIgnoreCase(vo.getMail()) && !VerifyUtils.isEmpty(vo.getMail())) {
-			// 校验验证码
-			if(VerifyUtils.isNotEmpty(vo.getCode())) {
-				validateService.checkByMailOrPhone(oldUserVO.getClientId(), vo.getMail(), null, vo.getCode(), null);
-			}
-
-			if(upVO.getStatus() == 0 && VerifyUtils.isEmpty(vo.getCode())) {
-				upVO.setStatus(2);
-			} else if(upVO.getStatus() == 3 && VerifyUtils.isEmpty(vo.getCode())) {
-				upVO.setStatus(1);
-			}
+		//更新user_info
+		if(null != upInfoVO) {
+			userInfoService.baseUpdate(upInfoVO);
 		}
-
-		// 修改手机 该状态
-		if(null != oldUserVO.getPhone() && !oldUserVO.getPhone().equals(vo.getPhone()) && !VerifyUtils.isEmpty(vo.getPhone())) {
-			// 校验验证码
-			if(VerifyUtils.isNotEmpty(vo.getCode())) {
-				validateService.checkByMailOrPhone(oldUserVO.getClientId(), null, vo.getPhone(), vo.getCode(), null);
-			}
-
-			if(upVO.getStatus() == 0 && VerifyUtils.isEmpty(vo.getCode())) {
-				upVO.setStatus(3);
-			} else if(upVO.getStatus() == 2 && VerifyUtils.isEmpty(vo.getCode())) {
-				upVO.setStatus(1);
-			}
-		}
-
-		//更新
-		super.baseUpdate(upVO);
 	}
 
 	/**
 	 * 设置修改的属性(不为null为修改)
 	 * @param dbVO 库中最新bo
 	 * @param upVO	修改的bo
-	 * @return 修改后的bo
+	 * @return 修改后的bo 没修改数据返回null
 	 */
 	private UserVO setUpdateVlaue(UserVO dbVO, UserVO upVO) {
 		if(null == dbVO) {
-			throw new ThrowPrompt("无此信息！", "142009");
+			return dbVO;
 		}
+
+		boolean isUpdate = false;
 
 		if(null != upVO.getId()) {
 			dbVO.setId(upVO.getId());
+			isUpdate = true;
 		}
 		//客户端id
 		if(null != upVO.getClientId()) {
 			dbVO.setClientId(upVO.getClientId());
+			isUpdate = true;
 		}
 		//用户名
 		if(null != upVO.getUsername()) {
 			dbVO.setUsername(upVO.getUsername());
-		}
-		//昵称
-		if(null != upVO.getNickname()) {
-			dbVO.setNickname(upVO.getNickname());
+			isUpdate = true;
 		}
 		//邮箱
 		if(null != upVO.getMail()) {
 			dbVO.setMail(upVO.getMail());
+			isUpdate = true;
 		}
 		//手机号码
 		if(null != upVO.getPhone()) {
 			dbVO.setPhone(upVO.getPhone());
+			isUpdate = true;
+		}
+		//状态 0正常
+		if(null != upVO.getStatus()) {
+			dbVO.setStatus(upVO.getStatus());
+			isUpdate = true;
+		}
+
+
+		if(null != upVO.getId()) {
+			dbVO.setId(upVO.getId());
+			isUpdate = true;
+		}
+		//昵称
+		if(null != upVO.getNickname()) {
+			dbVO.setNickname(upVO.getNickname());
+			isUpdate = true;
 		}
 		//电话
 		if(null != upVO.getTel()) {
 			dbVO.setTel(upVO.getTel());
+			isUpdate = true;
 		}
 		//QQ
 		if(null != upVO.getQq()) {
 			dbVO.setQq(upVO.getQq());
+			isUpdate = true;
 		}
 		//微信
 		if(null != upVO.getWeixin()) {
 			dbVO.setWeixin(upVO.getWeixin());
-		}
-		//微信二维码
-		if(null != upVO.getWexinImg()) {
-			dbVO.setWexinImg(upVO.getWexinImg());
+			isUpdate = true;
 		}
 		//新浪微博
 		if(null != upVO.getWeibo()) {
 			dbVO.setWeibo(upVO.getWeibo());
-		}
-		//头像
-		if(null != upVO.getHead()) {
-			dbVO.setHead(upVO.getHead());
+			isUpdate = true;
 		}
 		//姓名
 		if(null != upVO.getName()) {
 			dbVO.setName(upVO.getName());
+			isUpdate = true;
 		}
 		//性别 0女 1男
 		if(null != upVO.getSex()) {
 			dbVO.setSex(upVO.getSex());
+			isUpdate = true;
 		}
 		//身份证号
 		if(null != upVO.getIdcard()) {
 			dbVO.setIdcard(upVO.getIdcard());
+			isUpdate = true;
 		}
 		// 实名认证
 		if(null != upVO.getCertification()) {
 			dbVO.setCertification(upVO.getCertification());
+			isUpdate = true;
 		}
 		//省
 		if(null != upVO.getProvince()) {
 			dbVO.setProvince(upVO.getProvince());
+			isUpdate = true;
 		}
 		//市
 		if(null != upVO.getCity()) {
 			dbVO.setCity(upVO.getCity());
+			isUpdate = true;
 		}
 		//区
 		if(null != upVO.getArea()) {
 			dbVO.setArea(upVO.getArea());
+			isUpdate = true;
 		}
 		//地址
 		if(null != upVO.getAddress()) {
@@ -868,19 +947,18 @@ public class UserService extends BaseService<UserDao,UserVO> {
 				}
 			}
 			dbVO.setAddress(address);
-		}
-		//创建时间
-		if(null != upVO.getCreatedTime()) {
-			dbVO.setCreatedTime(upVO.getCreatedTime());
-		}
-		//状态 0正常
-		if(null != upVO.getStatus()) {
-			dbVO.setStatus(upVO.getStatus());
+			isUpdate = true;
 		}
 		// 来源
 		if(null != upVO.getSource()) {
 			dbVO.setSource(upVO.getSource());
+			isUpdate = true;
 		}
+
+		if(!isUpdate) {
+			return null;
+		}
+
 		return dbVO;
 	}
 

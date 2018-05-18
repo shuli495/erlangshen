@@ -4,18 +4,17 @@
 	<resultMap id="userBO" type="com.website.model.bo.UserBO">
 		<id column="ID" property="id"/>
 		<result column="CLIENT_ID" property="clientId"/>
-        <result column="SOURCE" property="source"/>
 		<result column="PWD" property="pwd"/>
 		<result column="USERNAME" property="username"/>
-		<result column="NICKNAME" property="nickname"/>
 		<result column="MAIL" property="mail"/>
 		<result column="PHONE" property="phone"/>
+		<result column="STATUS" property="status"/>
+		<result column="SOURCE" property="source"/>
+		<result column="NICKNAME" property="nickname"/>
 		<result column="TEL" property="tel"/>
 		<result column="QQ" property="qq"/>
 		<result column="WEIXIN" property="weixin"/>
-		<result column="WEXIN_IMG" property="wexinImg"/>
 		<result column="WEIBO" property="weibo"/>
-		<result column="HEAD" property="head"/>
 		<result column="NAME" property="name"/>
 		<result column="SEX" property="sex"/>
 		<result column="IDCARD" property="idcard"/>
@@ -26,7 +25,6 @@
 		<result column="AREA" property="area"/>
 		<result column="ADDRESS" property="address"/>
 		<result column="CREATED_TIME" property="createdTime"/>
-		<result column="STATUS" property="status"/>
 	</resultMap>
 	<resultMap extends="userBO" id="userVO" type="com.website.model.vo.UserVO">
 		<result column="CLIENT_NAME" property="clientName"/>
@@ -34,7 +32,7 @@
 
 	<select id="check" parameterType="com.website.model.bo.UserBO" resultMap="userVO">
 		SELECT
-		t0.ID,t0.CLIENT_ID,t0.SOURCE,t0.PWD,t0.USERNAME,t0.NICKNAME,t0.MAIL,t0.PHONE,t0.TEL,t0.QQ,t0.WEIXIN,t0.WEXIN_IMG,t0.WEIBO,t0.HEAD,t0.`NAME`,t0.SEX,t0.IDCARD,t0.CERTIFICATION,t0.PROVINCE,t0.CITY,t0.AREA,t0.ADDRESS,t0.CREATED_TIME,t0.STATUS
+		t0.ID,t0.CLIENT_ID,t0.PWD,t0.USERNAME,t0.MAIL,t0.PHONE,t0.STATUS
 		FROM `user` t0,client t1
 		WHERE t0.CLIENT_ID=t1.ID AND t1.DELETED=0
 		  AND t1.ID=#{clientId}
@@ -46,17 +44,17 @@
 
 	<insert id="insert" keyProperty="id" parameterType="com.website.model.bo.UserBO" useGeneratedKeys="true">
 		INSERT user
-		(ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,`NAME`,SEX,IDCARD,CERTIFICATION,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS)
+		(ID,CLIENT_ID,PWD,USERNAME,MAIL,PHONE,STATUS)
 		VALUES
-		(#{id},#{clientId},#{source},#{pwd},#{username},#{nickname},#{mail},#{phone},#{tel},#{qq},#{weixin},#{wexinImg},#{weibo},#{head},#{name},#{sex},#{idcard},#{certification},#{province},#{city},#{area},#{address},#{createdTime},#{status})
+		(#{id},#{clientId},#{pwd},#{username},#{mail},#{phone}#{status})
 	</insert>
 
 	<insert id="insertBatch" parameterType="java.util.List">
 		INSERT user
-		(ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,`NAME`,SEX,IDCARD,CERTIFICATION,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS)
+		(ID,CLIENT_ID,PWD,USERNAME,MAIL,PHONE,STATUS)
 		VALUES
 		<foreach collection="list" index="index" item="item" separator=",">
-			(#{item.id},#{item.clientId},#{item.source},#{item.pwd},#{item.username},#{item.nickname},#{item.mail},#{item.phone},#{item.tel},#{item.qq},#{item.weixin},#{item.wexinImg},#{item.weibo},#{item.head},#{item.name},#{item.sex},#{item.idcard},#{item.certification},#{item.province},#{item.city},#{item.area},#{item.address},#{item.createdTime},#{item.status})
+			(#{item.id},#{item.clientId},#{item.pwd},#{item.username},#{item.mail},#{item.phone}#{item.status})
 		</foreach>
 	</insert>
 
@@ -66,71 +64,17 @@
 			<if test="clientId != null">
 				CLIENT_ID=#{clientId},
 			</if>
-			<if test="source != null">
-				SOURCE=#{source},
-			</if>
 			<if test="pwd != null">
 				PWD=#{pwd},
 			</if>
 			<if test="username != null">
 				USERNAME=#{username},
 			</if>
-			<if test="nickname != null">
-				NICKNAME=#{nickname},
-			</if>
 			<if test="mail != null">
 				MAIL=#{mail},
 			</if>
 			<if test="phone != null">
 				PHONE=#{phone},
-			</if>
-			<if test="tel != null">
-				TEL=#{tel},
-			</if>
-			<if test="qq != null">
-				QQ=#{qq},
-			</if>
-			<if test="weixin != null">
-				WEIXIN=#{weixin},
-			</if>
-			<if test="wexinImg != null">
-				WEXIN_IMG=#{wexinImg},
-			</if>
-			<if test="weibo != null">
-				WEIBO=#{weibo},
-			</if>
-			<if test="head != null">
-				HEAD=#{head},
-			</if>
-			<if test="name != null">
-				`NAME`=#{name},
-			</if>
-			<if test="sex != null">
-				SEX=#{sex},
-			</if>
-			<if test="idcard != null">
-				IDCARD=#{idcard},
-			</if>
-			<if test="certification != null">
-				CERTIFICATION=#{certification},
-			</if>
-			<if test="certificationFailMsg != null">
-				CERTIFICATION_FAIL_MSG=#{certificationFailMsg},
-			</if>
-			<if test="province != null">
-				PROVINCE=#{province},
-			</if>
-			<if test="city != null">
-				CITY=#{city},
-			</if>
-			<if test="area != null">
-				AREA=#{area},
-			</if>
-			<if test="address != null">
-				ADDRESS=#{address},
-			</if>
-			<if test="createdTime != null">
-				CREATED_TIME=#{createdTime},
 			</if>
 			<if test="status != null">
 				STATUS=#{status},
@@ -146,71 +90,17 @@
 				<if test="clientId != null">
 					CLIENT_ID=#{item.clientId},
 				</if>
-				<if test="source != null">
-					SOURCE=#{source},
-				</if>
 				<if test="pwd != null">
 					PWD=#{item.pwd},
 				</if>
 				<if test="username != null">
 					USERNAME=#{item.username},
 				</if>
-				<if test="nickname != null">
-					NICKNAME=#{item.nickname},
-				</if>
 				<if test="mail != null">
 					MAIL=#{item.mail},
 				</if>
 				<if test="phone != null">
 					PHONE=#{item.phone},
-				</if>
-				<if test="tel != null">
-					TEL=#{item.tel},
-				</if>
-				<if test="qq != null">
-					QQ=#{item.qq},
-				</if>
-				<if test="weixin != null">
-					WEIXIN=#{item.weixin},
-				</if>
-				<if test="wexinImg != null">
-					WEXIN_IMG=#{item.wexinImg},
-				</if>
-				<if test="weibo != null">
-					WEIBO=#{item.weibo},
-				</if>
-				<if test="head != null">
-					HEAD=#{item.head},
-				</if>
-				<if test="name != null">
-					`NAME`=#{item.name},
-				</if>
-				<if test="sex != null">
-					SEX=#{item.sex},
-				</if>
-				<if test="idcard != null">
-					IDCARD=#{item.idcard},
-				</if>
-				<if test="certification != null">
-					CERTIFICATION=#{item.certification},
-				</if>
-				<if test="certificationFailMsg != null">
-					CERTIFICATION_FAIL_MSG=#{item.certificationFailMsg},
-				</if>
-				<if test="province != null">
-					PROVINCE=#{item.province},
-				</if>
-				<if test="city != null">
-					CITY=#{item.city},
-				</if>
-				<if test="area != null">
-					AREA=#{item.area},
-				</if>
-				<if test="address != null">
-					ADDRESS=#{item.address},
-				</if>
-				<if test="createdTime != null">
-					CREATED_TIME=#{item.createdTime},
 				</if>
 				<if test="status != null">
 					STATUS=#{item.status},
@@ -233,152 +123,27 @@
 
 	<select id="findById" parameterType="string" resultMap="userVO">
 		SELECT
-		ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,CERTIFICATION,CERTIFICATION_FAIL_MSG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS
+		ID,CLIENT_ID,PWD,USERNAME,MAIL,PHONE,STATUS
 		FROM user
 		WHERE id=#{id}
 	</select>
 
-	<select id="queryByOr" parameterType="com.website.model.bo.UserBO" resultMap="userVO">
-		SELECT
-		ID,CLIENT_ID,SOURCE,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,`NAME`,SEX,IDCARD,CERTIFICATION,CERTIFICATION_FAIL_MSG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS
-		FROM user
-		<where>
-			<if test="clientId != null">
-				or CLIENT_ID=#{clientId}
-			</if>
-			<if test="source != null">
-				OR SOURCE=#{source}
-			</if>
-			<if test="username != null">
-				or USERNAME=#{username}
-			</if>
-			<if test="nickname != null">
-				or NICKNAME=#{nickname}
-			</if>
-			<if test="mail != null">
-				or MAIL=#{mail}
-			</if>
-			<if test="phone != null">
-				or PHONE=#{phone}
-			</if>
-			<if test="tel != null">
-				or TEL=#{tel}
-			</if>
-			<if test="qq != null">
-				or QQ=#{qq}
-			</if>
-			<if test="weixin != null">
-				or WEIXIN=#{weixin}
-			</if>
-			<if test="wexinImg != null">
-				or WEXIN_IMG=#{wexinImg}
-			</if>
-			<if test="weibo != null">
-				or WEIBO=#{weibo}
-			</if>
-			<if test="head != null">
-				or HEAD=#{head}
-			</if>
-			<if test="name != null">
-				or `NAME`=#{name}
-			</if>
-			<if test="sex != null">
-				or SEX=#{sex}
-			</if>
-			<if test="idcard != null">
-				or IDCARD=#{idcard}
-			</if>
-			<if test="certification != null">
-				or CERTIFICATION=#{certification}
-			</if>
-			<if test="province != null">
-				or PROVINCE=#{province}
-			</if>
-			<if test="city != null">
-				or CITY=#{city}
-			</if>
-			<if test="area != null">
-				or AREA=#{area}
-			</if>
-			<if test="address != null">
-				or ADDRESS=#{address}
-			</if>
-			<if test="createdTime != null">
-				or CREATED_TIME=#{createdTime}
-			</if>
-			<if test="status != null">
-				or STATUS=#{status}
-			</if>
-		</where>
-	</select>
-
 	<select id="queryByAnd" parameterType="com.website.model.bo.UserBO" resultMap="userVO">
 		SELECT
-		ID,CLIENT_ID,SOURCE,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,`NAME`,SEX,IDCARD,CERTIFICATION,CERTIFICATION_FAIL_MSG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,STATUS
+		ID,CLIENT_ID,USERNAME,MAIL,PHONE,STATUS
 		FROM user
 		<where>
 			<if test="clientId != null">
 				and CLIENT_ID=#{clientId}
 			</if>
-			<if test="source != null">
-				OR SOURCE=#{source}
-			</if>
 			<if test="username != null">
 				and USERNAME=#{username}
-			</if>
-			<if test="nickname != null">
-				and NICKNAME=#{nickname}
 			</if>
 			<if test="mail != null">
 				and MAIL=#{mail}
 			</if>
 			<if test="phone != null">
 				and PHONE=#{phone}
-			</if>
-			<if test="tel != null">
-				and TEL=#{tel}
-			</if>
-			<if test="qq != null">
-				and QQ=#{qq}
-			</if>
-			<if test="weixin != null">
-				and WEIXIN=#{weixin}
-			</if>
-			<if test="wexinImg != null">
-				and WEXIN_IMG=#{wexinImg}
-			</if>
-			<if test="weibo != null">
-				and WEIBO=#{weibo}
-			</if>
-			<if test="head != null">
-				and HEAD=#{head}
-			</if>
-			<if test="name != null">
-				and `NAME`=#{name}
-			</if>
-			<if test="sex != null">
-				and SEX=#{sex}
-			</if>
-			<if test="idcard != null">
-				and IDCARD=#{idcard}
-			</if>
-			<if test="certification != null">
-				and CERTIFICATION=#{certification}
-			</if>
-			<if test="province != null">
-				and PROVINCE=#{province}
-			</if>
-			<if test="city != null">
-				and CITY=#{city}
-			</if>
-			<if test="area != null">
-				and AREA=#{area}
-			</if>
-			<if test="address != null">
-				and ADDRESS=#{address}
-			</if>
-			<if test="createdTime != null">
-				and CREATED_TIME=#{createdTime}
 			</if>
 			<if test="status != null">
 				and STATUS=#{status}
@@ -388,72 +153,73 @@
 
 	<select id="queryByClient" parameterType="com.website.model.vo.UserVO" resultMap="userVO">
 		SELECT
-		`user`.ID,`user`.CLIENT_ID,`user`.SOURCE,`user`.USERNAME,`user`.NICKNAME,`user`.MAIL,`user`.PHONE,`user`.TEL,`user`.QQ,`user`.WEIXIN,`user`.WEXIN_IMG,`user`.WEIBO,`user`.HEAD,`user`.`NAME`,`user`.SEX,`user`.IDCARD,`user`.CERTIFICATION,`user`.CERTIFICATION_FAIL_MSG,`user`.PROVINCE,`user`.CITY,`user`.AREA,`user`.ADDRESS,`user`.CREATED_TIME,`user`.STATUS,
-		client.NAME as CLIENT_NAME
-		FROM `user`,client
-		WHERE `user`.CLIENT_ID=client.ID AND client.deleted=0
+		t0.ID,t0.CLIENT_ID,t0.USERNAME,t0.MAIL,t0.PHONE,t0.STATUS,
+		t1.SOURCE,t1.NICKNAME,t1.TEL,t1.QQ,t1.WEIXIN,t1.WEIBO,t1.`NAME`,t1.SEX,t1.IDCARD,t1.CERTIFICATION,t1.CERTIFICATION_FAIL_MSG,t1.PROVINCE,t1.CITY,t1.AREA,t1.ADDRESS,t1.CREATED_TIME,
+		t2.NAME as CLIENT_NAME
+		FROM t0 t0, user_info t1, client t2
+		WHERE t0.ID=t1.ID AND t0.CLIENT_ID=t2.ID AND t2.deleted=0
 		<if test="clientName != null">
-			and client.NAME=#{clientName}
+			and t2.NAME=#{clientName}
 		</if>
 		<if test="createdBy != null">
-			and client.CREATED_BY=#{createdBy}
+			and t2.CREATED_BY=#{createdBy}
 		</if>
 		<if test="clientId != null">
-			and `user`.CLIENT_ID=#{clientId}
-		</if>
-		<if test="source != null">
-			and `user`.SOURCE=#{source}
+			and t0.CLIENT_ID=#{clientId}
 		</if>
 		<if test="username != null">
-			and `user`.USERNAME like CONCAT('%',#{username},'%')
-		</if>
-		<if test="nickname != null">
-			and `user`.NICKNAME like CONCAT('%',#{nickname},'%')
+			and t0.USERNAME like CONCAT('%',#{username},'%')
 		</if>
 		<if test="mail != null">
-			and `user`.MAIL like CONCAT('%',#{mail},'%')
+			and t0.MAIL like CONCAT('%',#{mail},'%')
 		</if>
 		<if test="phone != null">
-			and `user`.PHONE like CONCAT('%',#{phone},'%')
-		</if>
-		<if test="tel != null">
-			and `user`.TEL like CONCAT('%',#{tel},'%')
-		</if>
-		<if test="qq != null">
-			and `user`.QQ like CONCAT('%',#{qq},'%')
-		</if>
-		<if test="weixin != null">
-			and `user`.WEIXIN like CONCAT('%',#{weixin},'%')
-		</if>
-		<if test="weibo != null">
-			and `user`.WEIBO like CONCAT('%',#{weibo},'%')
-		</if>
-		<if test="name != null">
-			and `user`.`NAME` like CONCAT('%',#{name},'%')
-		</if>
-		<if test="sex != null">
-			and `user`.SEX=#{sex}
-		</if>
-		<if test="idcard != null">
-			and `user`.IDCARD like CONCAT('%',#{idcard},'%')
-		</if>
-		<if test="certification != null">
-			and `user`.CERTIFICATION=#{certification})
-		</if>
-		<if test="province != null">
-			and `user`.PROVINCE=#{province}
-		</if>
-		<if test="city != null">
-			and `user`.CITY=#{city}
-		</if>
-		<if test="area != null">
-			and `user`.AREA=#{area}
-		</if>
-		<if test="address != null">
-			and `user`.ADDRESS like CONCAT('%',#{address},'%')
+			and t0.PHONE like CONCAT('%',#{phone},'%')
 		</if>
 		<if test="status != null">
-			and `user`.STATUS=#{status}
+			and t0.STATUS=#{status}
+		</if>
+		<if test="source != null">
+			and t1.SOURCE=#{source}
+		</if>
+		<if test="nickname != null">
+			and t1.NICKNAME like CONCAT('%',#{nickname},'%')
+		</if>
+		<if test="tel != null">
+			and t1.TEL like CONCAT('%',#{tel},'%')
+		</if>
+		<if test="qq != null">
+			and t1.QQ like CONCAT('%',#{qq},'%')
+		</if>
+		<if test="weixin != null">
+			and t1.WEIXIN like CONCAT('%',#{weixin},'%')
+		</if>
+		<if test="weibo != null">
+			and t1.WEIBO like CONCAT('%',#{weibo},'%')
+		</if>
+		<if test="name != null">
+			and t1.`NAME` like CONCAT('%',#{name},'%')
+		</if>
+		<if test="sex != null">
+			and t1.SEX=#{sex}
+		</if>
+		<if test="idcard != null">
+			and t1.IDCARD like CONCAT('%',#{idcard},'%')
+		</if>
+		<if test="certification != null">
+			and t1.CERTIFICATION=#{certification})
+		</if>
+		<if test="province != null">
+			and t1.PROVINCE=#{province}
+		</if>
+		<if test="city != null">
+			and t1.CITY=#{city}
+		</if>
+		<if test="area != null">
+			and t1.AREA=#{area}
+		</if>
+		<if test="address != null">
+			and t1.ADDRESS like CONCAT('%',#{address},'%')
 		</if>
 	</select>
 

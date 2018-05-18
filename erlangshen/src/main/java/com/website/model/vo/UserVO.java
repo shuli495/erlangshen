@@ -1,11 +1,11 @@
 package com.website.model.vo;
 
-import com.website.model.bo.UserBO;
+import com.website.model.bo.UserInfoBO;
 
 /**
  * @author https://github.com/shuli495/erlangshen
  */
-public class UserVO extends UserBO {
+public class UserVO extends UserInfoBO {
 	private static final long serialVersionUID = 1L;
 
     // client创建人
