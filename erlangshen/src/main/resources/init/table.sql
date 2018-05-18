@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50718
 File Encoding         : 65001
 
-Date: 2018-05-08 00:51:26
+Date: 2018-05-18 18:10:02
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -120,7 +120,7 @@ CREATE TABLE `login_log` (
   `ip` varchar(128) DEFAULT NULL COMMENT '登录ip',
   `login_time` datetime NOT NULL COMMENT '登录时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=115 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=124 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for permission_menu
@@ -146,7 +146,7 @@ CREATE TABLE `permission_role` (
   `client_id` varchar(64) NOT NULL,
   `role` varchar(255) NOT NULL COMMENT '角色',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='角色表';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='角色表';
 
 -- ----------------------------
 -- Table structure for permission_role_menu
@@ -157,7 +157,7 @@ CREATE TABLE `permission_role_menu` (
   `role_id` int(11) NOT NULL,
   `menu_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8 COMMENT='角色功能表';
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='角色功能表';
 
 -- ----------------------------
 -- Table structure for permission_user_role
@@ -168,7 +168,7 @@ CREATE TABLE `permission_user_role` (
   `user_id` varchar(64) NOT NULL,
   `role_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8 COMMENT='用户角色表';
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8 COMMENT='用户角色表';
 
 -- ----------------------------
 -- Table structure for token
@@ -191,18 +191,32 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` varchar(64) NOT NULL,
   `client_id` varchar(64) DEFAULT NULL COMMENT '客户端id',
-  `source` varchar(255) DEFAULT NULL COMMENT '来源',
   `pwd` varchar(255) NOT NULL COMMENT '密码',
   `username` varchar(32) DEFAULT NULL COMMENT '用户名',
-  `nickname` varchar(8) DEFAULT NULL COMMENT '昵称',
   `mail` varchar(32) DEFAULT NULL COMMENT '邮箱',
+  `mail_verify` tinyint(1) DEFAULT '0' COMMENT '邮箱验证 0未验证 1验证',
   `phone` varchar(32) DEFAULT NULL COMMENT '手机号码',
+  `phone_verify` tinyint(1) DEFAULT '0' COMMENT '手机号码验证 0未验证 1验证',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_client_group_name` (`client_id`,`username`),
+  KEY `idx_user_client_group_nikname` (`client_id`),
+  KEY `idx_user_client_group_mail` (`client_id`,`mail`),
+  KEY `idx_user_client_group_phone` (`client_id`,`phone`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户表';
+
+-- ----------------------------
+-- Table structure for user_info
+-- ----------------------------
+DROP TABLE IF EXISTS `user_info`;
+CREATE TABLE `user_info` (
+  `id` varchar(64) NOT NULL,
+  `source` varchar(255) DEFAULT NULL COMMENT '来源',
+  `nickname` varchar(8) DEFAULT NULL COMMENT '昵称',
   `tel` varchar(32) DEFAULT NULL COMMENT '电话',
   `qq` varchar(32) DEFAULT NULL COMMENT 'QQ',
   `weixin` varchar(32) DEFAULT NULL COMMENT '微信',
-  `wexin_img` varchar(255) DEFAULT NULL COMMENT '微信二维码',
   `weibo` varchar(32) DEFAULT NULL COMMENT '新浪微博',
-  `head` varchar(255) DEFAULT NULL COMMENT '头像',
   `name` varchar(32) DEFAULT NULL COMMENT '姓名',
   `sex` tinyint(1) DEFAULT NULL COMMENT '性别 0女 1男',
   `idcard` varchar(18) DEFAULT NULL COMMENT '身份证号',
@@ -213,12 +227,8 @@ CREATE TABLE `user` (
   `area` varchar(64) DEFAULT NULL COMMENT '区',
   `address` varchar(255) DEFAULT NULL COMMENT '地址',
   `created_time` datetime NOT NULL COMMENT '创建时间',
-  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态 0正常 1邮箱手机未验证 2邮箱未验证 3手机未验证',
   PRIMARY KEY (`id`),
-  KEY `idx_user_client_group_name` (`client_id`,`username`),
-  KEY `idx_user_client_group_nikname` (`client_id`,`nickname`),
-  KEY `idx_user_client_group_mail` (`client_id`,`mail`),
-  KEY `idx_user_client_group_phone` (`client_id`,`phone`)
+  KEY `idx_user_client_group_nikname` (`nickname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户表';
 
 -- ----------------------------
