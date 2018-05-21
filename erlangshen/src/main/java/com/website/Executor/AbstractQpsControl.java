@@ -1,4 +1,4 @@
-package com.website.Executor;
+package com.website.executor;
 
 import com.fastjavaframework.Setting;
 import com.fastjavaframework.exception.ThrowException;
@@ -35,6 +35,7 @@ public abstract class AbstractQpsControl implements Runnable {
 
         String executor = controlName + "Executor";
         if(!map.containsKey(executor)) {
+
             map.put(executor, Executors.newCachedThreadPool());
         }
 
@@ -111,6 +112,7 @@ public abstract class AbstractQpsControl implements Runnable {
             this.sleepTime = sleepTime;
         }
 
+        @Override
         public void run() {
             if(sleepTime > 0) {
                 try {

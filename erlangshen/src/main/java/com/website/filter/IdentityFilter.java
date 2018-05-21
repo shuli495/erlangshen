@@ -35,7 +35,7 @@ public class IdentityFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            if(request.getMethod().equalsIgnoreCase("OPTIONS")) {
+            if("OPTIONS".equalsIgnoreCase(request.getMethod())) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -112,22 +112,22 @@ public class IdentityFilter extends OncePerRequestFilter {
                                     || request.getRequestURI().endsWith(Constants.URL_TOKEN+"/");
                     // 用户查询或创建
                     boolean isCreateOrSel = (request.getRequestURI().endsWith(Constants.URL_USER) || request.getRequestURI().endsWith(Constants.URL_USER+"/"))
-                            && (request.getMethod().equalsIgnoreCase("get") || request.getMethod().equalsIgnoreCase("post"));
+                            && ("get".equalsIgnoreCase(request.getMethod()) || "post".equalsIgnoreCase(request.getMethod()));
                     // 发送邮件
                     boolean isSendMail = (request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_SENDMAIL) || request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_SENDMAIL+"/"))
-                            && request.getMethod().equalsIgnoreCase("get");
+                            && "get".equalsIgnoreCase(request.getMethod());
                     // 发送短信
                     boolean isSendPhone = (request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_SENDPHONE) || request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_SENDPHONE+"/"))
-                            && request.getMethod().equalsIgnoreCase("get");
+                            && "get".equalsIgnoreCase(request.getMethod());
                     // 校验验证码
                     boolean isCheckCode = (request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_CHECKCODE) || request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_CHECKCODE+"/"))
-                            && request.getMethod().equalsIgnoreCase("get");
+                            && "get".equalsIgnoreCase(request.getMethod());
                     // 验证邮箱url
                     boolean isCheckMail = (request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_CHECKMAIL) || request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_CHECKMAIL+"/"))
-                            && request.getMethod().equalsIgnoreCase("get");
+                            && "get".equalsIgnoreCase(request.getMethod());
                     // 重置密码
                     boolean isRePwd = (request.getRequestURI().endsWith(Constants.URL_USER+"/rePwd") || request.getRequestURI().endsWith(Constants.URL_USER+"/rePwd/"))
-                            && request.getMethod().equalsIgnoreCase("post");
+                            && "get".equalsIgnoreCase(request.getMethod());
 
                     if(!isToken && !isCreateOrSel && !isSendMail && !isSendPhone && !isCheckCode && !isCheckMail && !isRePwd) {
                         this.returnError(response);

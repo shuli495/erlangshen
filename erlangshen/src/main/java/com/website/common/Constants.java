@@ -1,5 +1,8 @@
 package com.website.common;
 
+/**
+ * @author https://github.com/shuli495/erlangshen
+ */
 public class Constants {
 
 	public static final String PROJECT_NAME = "erlangshen";

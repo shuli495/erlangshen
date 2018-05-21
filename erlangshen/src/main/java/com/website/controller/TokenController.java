@@ -24,7 +24,7 @@ public class TokenController extends BaseElsController<TokenService> {
      */
 	@RequestMapping(method=RequestMethod.GET)
 	public Object code(@RequestParam(required = false) String loginIp) {
-		if(super.identity().getAuthenticationMethod().equals("KEY") && VerifyUtils.isEmpty(loginIp)) {
+		if("KEY".equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
 			throw new ThrowException("AK/SK方式loginIp参数必传！", "071001");
 		}
 
@@ -47,7 +47,7 @@ public class TokenController extends BaseElsController<TokenService> {
 		String platform = request.getParameter("platform");
 		String loginIp = request.getParameter("loginIp");
 
-		if(super.identity().getAuthenticationMethod().equals("KEY") && VerifyUtils.isEmpty(loginIp)) {
+		if("KEY".equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
 			throw new ThrowException("AK/SK方式loginIp参数必传！", "071002");
 		}
 

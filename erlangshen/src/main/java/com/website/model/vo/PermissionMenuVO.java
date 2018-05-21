@@ -11,9 +11,12 @@ import java.util.List;
 public class PermissionMenuVO extends PermissionMenuBO {
 	private static final long serialVersionUID = 1L;
 
-	private List<PermissionMenuVO> menus = new ArrayList<>();
+	private List<PermissionMenuVO> menus;
 
 	public List<PermissionMenuVO> getMenus() {
+		if(null == menus) {
+			menus = new ArrayList<>();
+		}
 		return menus;
 	}
 

@@ -1,4 +1,4 @@
-package com.website.Executor;
+package com.website.executor;
 
 import com.baidu.aip.ocr.AipOcr;
 import com.fastjavaframework.Setting;
@@ -176,7 +176,7 @@ public class Certification extends AbstractQpsControl {
      */
     private JSONObject idcardApi(AipOcr client, String userId, String imagePath, String type) throws Exception {
 
-        HashMap<String, String> options = new HashMap<String, String>();
+        HashMap<String, String> options = new HashMap<String, String>(2);
         options.put("detect_direction", "false");
         options.put("detect_risk", "true");
 

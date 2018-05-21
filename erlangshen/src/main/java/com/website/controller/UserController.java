@@ -142,7 +142,7 @@ public class UserController extends BaseElsController<UserService> {
 			throw new ThrowPrompt("无权操作此用户!", "081004");
 		}
 
-		Map<String, String> result = new HashMap<>();
+		Map<String, String> result = new HashMap<>(4);
 
 		this.setIdcardImg(result, id, "1");
 		this.setIdcardImg(result, id, "2");
@@ -164,8 +164,9 @@ public class UserController extends BaseElsController<UserService> {
 
 		String holdBackPath = imagePath + id + "_" + type + ".jpg";
 
-		String key = "font";
+		String key = "";
 		switch (type) {
+			default: key = "font";
 			case "1" : key = "font"; break;
 			case "2" : key = "back"; break;
 			case "3" : key = "holdFont"; break;

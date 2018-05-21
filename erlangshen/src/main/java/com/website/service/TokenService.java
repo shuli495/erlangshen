@@ -10,7 +10,7 @@ import com.fastjavaframework.util.SecretUtil;
 import com.fastjavaframework.util.UUID;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.common.HttpHelper;
-import com.website.Executor.LoginPlaceReport;
+import com.website.executor.LoginPlaceReport;
 import com.website.model.bo.UserBO;
 import com.website.model.vo.ClientSecurityVO;
 import com.website.model.vo.TokenVO;
@@ -91,16 +91,16 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
         validateVO.setType("login");
         List<ValidateVO> validates = validateService.baseQueryByAnd(validateVO);
 
-        for(ValidateVO Validate : validates) {
+        for(ValidateVO validate : validates) {
             try {
-                validateService.checkOvertime("login", Validate.getCreatedTime());
+                validateService.checkOvertime("login", validate.getCreatedTime());
             } catch (Exception e) {
                 return this.returnCode(response, token.getClientId(), userName, "验证码超时！", "122009");
             }
             if(VerifyUtils.isEmpty(code)) {
                 return this.returnCode(response, token.getClientId(), userName, "请输入验证码！", "122010");
             }
-            if(!Validate.getCode().equalsIgnoreCase(code)) {
+            if(!validate.getCode().equalsIgnoreCase(code)) {
                 throw new ThrowPrompt("验证码错误！", "122011");
             }
         }
@@ -261,7 +261,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
      */
     private Object returnCode(HttpServletResponse response, String tokenClientId, String userName, String data, String code) {
         response.setStatus(400);
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>(3);
         result.put("data", data);
         result.put("code", code);
         result.put("image", this.code(tokenClientId, userName));

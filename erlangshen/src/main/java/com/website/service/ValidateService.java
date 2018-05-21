@@ -117,15 +117,15 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
      * @param code      验证码
      * @return List<ValidateVO>
      */
-    public List<ValidateVO> queryAndCheck(String ObjectId, String type, String code)  {
-        if(VerifyUtils.isEmpty(ObjectId) && VerifyUtils.isEmpty(type) && VerifyUtils.isEmpty(code)) {
+    public List<ValidateVO> queryAndCheck(String objectId, String type, String code)  {
+        if(VerifyUtils.isEmpty(objectId) && VerifyUtils.isEmpty(type) && VerifyUtils.isEmpty(code)) {
             throw new ThrowException("认证信息不全！", "152002");
         }
 
         // 根据code查询认证表数据
         ValidateVO validateVO = new ValidateVO();
-        if(!VerifyUtils.isEmpty(ObjectId)) {
-            validateVO.setUserId(ObjectId);
+        if(!VerifyUtils.isEmpty(objectId)) {
+            validateVO.setUserId(objectId);
         }
         if(!VerifyUtils.isEmpty(type)) {
             validateVO.setType(type);
@@ -133,28 +133,28 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
         if(!VerifyUtils.isEmpty(code)) {
             validateVO.setCode(code);
         }
-        List<ValidateVO> Validates = super.baseQueryByAnd(validateVO);
+        List<ValidateVO> validates = super.baseQueryByAnd(validateVO);
 
         // 根据code未查到认证数据
-        if(null == Validates || Validates.size() == 0) {
+        if(null == validates || validates.size() == 0) {
             throw new ThrowPrompt("验证码不正确！", "152003");
         } else {
             // 认证信息是否过期
-            for(ValidateVO Validate : Validates) {
-                this.checkOvertime(type, Validate.getCreatedTime());
+            for(ValidateVO validate : validates) {
+                this.checkOvertime(type, validate.getCreatedTime());
             }
-            return Validates;
+            return validates;
         }
     }
 
     /**
      * 校验验证码是否在有效期内
      * @param type  验证类型
-     * @param ValidateCreateTime 验证码创建时间
+     * @param validateCreateTime 验证码创建时间
      */
-    public void checkOvertime(String type, Date ValidateCreateTime) {
+    public void checkOvertime(String type, Date validateCreateTime) {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(ValidateCreateTime);
+        cal.setTime(validateCreateTime);
 
         cal.add(Calendar.SECOND, +Integer.parseInt(Setting.getProperty("validate.code.active.time")));
 
@@ -183,16 +183,16 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
         validateVO.setOrderBy("created_time");
         validateVO.setOrderSort(OrderSort.DESC);
 
-        List<ValidateVO> Validates = super.baseQueryByAnd(validateVO);
+        List<ValidateVO> validates = super.baseQueryByAnd(validateVO);
 
-        if(Validates.size() == 0) {
+        if(validates.size() == 0) {
             return;
         }
 
-        Date createdTime = Validates.get(0).getCreatedTime();
+        Date createdTime = validates.get(0).getCreatedTime();
 
         int re = Integer.parseInt(Setting.getProperty("validate.code.reSend.time"))
-                - (int)((new Date().getTime() - createdTime.getTime()) / 1000);
+                - (int)((System.currentTimeMillis() - createdTime.getTime()) / 1000);
 
         if(re > 0) {
             throw new ThrowPrompt(re + "秒后再次操作！", "152005");

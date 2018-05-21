@@ -137,7 +137,7 @@ public class PermissionMenuService extends BaseService<PermissionMenuDao,Permiss
 			branchVO = branch.get(branchId);
 			Integer parentId = branchVO.getParentId();
 
-			if(topVO.getId() == parentId) {
+			if(topVO.getId().equals(parentId)) {
 				tmp.putAll(branch);
 				tmp.remove(branchVO);
 

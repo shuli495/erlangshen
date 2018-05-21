@@ -11,8 +11,6 @@ import javax.validation.constraints.NotNull;
 public class UserInfoBO extends UserBO {
 	private static final long serialVersionUID = 1L;
 
-	private String id;
-
 	// 来源
 	@Size(max=255, min=0, message="{user_info.source.size}")
 	private String source;
@@ -76,14 +74,6 @@ public class UserInfoBO extends UserBO {
 	@NotNull(message="{user_info.createdTime.null}")
 	private Date createdTime;
 
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	public String getSource() {
 		return source;

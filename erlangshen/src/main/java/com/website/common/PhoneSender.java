@@ -40,7 +40,7 @@ public class PhoneSender {
             request.setTemplateParam(params);
 
             SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
-            if(null == sendSmsResponse.getCode() || !sendSmsResponse.getCode().equals("OK")) {
+            if(null == sendSmsResponse.getCode() || !"OK".equals(sendSmsResponse.getCode())) {
                 throw new ThrowException(sendSmsResponse.getCode()+"("+sendSmsResponse.getMessage()+")", "911001");
             }
         } catch (Exception e) {

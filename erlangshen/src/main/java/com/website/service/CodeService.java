@@ -54,10 +54,10 @@ public class CodeService extends BaseService<CodeDao,CodeBO> {
 	 * @param id  当前结点id
 	 */
 	private void setDelIds(List<String> ids, String id) {
-		CodeBO CodeBO = new CodeBO();
-		CodeBO.setParentId(id);
+		CodeBO codeBO = new CodeBO();
+		codeBO.setParentId(id);
 		
-		List<CodeBO> codeList = super.baseQueryByAnd(CodeBO);	//当前子节点列表
+		List<CodeBO> codeList = super.baseQueryByAnd(codeBO);	//当前子节点列表
 		for(CodeBO code : codeList) {
 			ids.add(code.getId());
 			

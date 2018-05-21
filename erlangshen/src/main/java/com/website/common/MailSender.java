@@ -72,6 +72,7 @@ public class MailSender {
             this.pwd = pwd;
         }
 
+        @Override
         public void run() {
             try {
                 Properties props = new Properties();

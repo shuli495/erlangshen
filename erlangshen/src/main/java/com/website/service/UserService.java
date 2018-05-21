@@ -6,7 +6,7 @@ import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.page.PageResult;
 import com.fastjavaframework.util.*;
-import com.website.Executor.Certification;
+import com.website.executor.Certification;
 import com.website.common.Constants;
 import com.website.common.MailSender;
 import com.website.common.PhoneSender;
@@ -483,7 +483,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		ClientPhoneVO clientPhoneVO = null;
 
 		// 设置code
-		Map<String, Object> params = new HashMap<>();
+		Map<String, Object> params = new HashMap<>(8);
 		String code = CodeUtil.randomCode("num", 6);
 		params.put("code", code);
 
