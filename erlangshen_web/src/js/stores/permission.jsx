@@ -72,7 +72,7 @@ var PermissionStore = assign({}, EventEmitter.prototype, {
     $.ajax({
         type : "POST",
         contentType: "application/json; charset=utf-8",
-        url: $setting.serverUrl + "permissionRole/user/" + id,
+        url: $setting.serverUrl + "permissionRole/" + id + "/user",
         headers : {"Token": $.cookie('token')},
         data: JSON.stringify(params),
         success: function(result) {
@@ -90,7 +90,7 @@ var PermissionStore = assign({}, EventEmitter.prototype, {
     $.ajax({
         type : "DELETE",
         contentType: "application/json; charset=utf-8",
-        url: $setting.serverUrl + "permissionRole/user/" + id,
+        url: $setting.serverUrl + "permissionRole/" + id + "/user",
         headers : {"Token": $.cookie('token')},
         data: JSON.stringify(params),
         success: function(result) {

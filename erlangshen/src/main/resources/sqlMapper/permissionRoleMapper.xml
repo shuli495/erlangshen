@@ -99,4 +99,14 @@
 		</where>
 	</select>
 
+	<select id="queryByUser" parameterType="String" resultMap="permissionRoleVO">
+		SELECT
+		t1.ID,t1.ROLE
+		FROM permission_role t1, permission_user_role t2
+		WHERE t1.ID=t2.ROLE_ID AND t2.USER_ID=#{userId}
+		<if test="clientId != null">
+			AND CLIENT_ID=#{clientId}
+		</if>
+	</select>
+
 </mapper>

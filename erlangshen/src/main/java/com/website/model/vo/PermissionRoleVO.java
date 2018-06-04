@@ -10,9 +10,22 @@ import java.util.List;
 public class PermissionRoleVO extends PermissionRoleBO {
 	private static final long serialVersionUID = 1L;
 
+	// 批量关联角色用
+	List<Integer> roles;
+
 	List<String> users;
 
 	List<Integer> menus;
+
+	List<PermissionRoleMenuVO> menuInfo;
+
+	public List<Integer> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<Integer> roles) {
+		this.roles = roles;
+	}
 
 	public List<String> getUsers() {
 		return users;
@@ -28,5 +41,13 @@ public class PermissionRoleVO extends PermissionRoleBO {
 
 	public void setMenus(List<Integer> menus) {
 		this.menus = menus;
+	}
+
+	public List<PermissionRoleMenuVO> getMenuInfo() {
+		return menuInfo;
+	}
+
+	public void setMenuInfo(List<PermissionRoleMenuVO> menuInfo) {
+		this.menuInfo = menuInfo;
 	}
 }

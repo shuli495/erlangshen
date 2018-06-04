@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import com.website.model.vo.PermissionRoleVO;
 import com.website.service.PermissionRoleService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * 权限规则
  * @author https://github.com/shuli495/erlangshen
@@ -24,6 +27,10 @@ public class PermissionRoleController extends BaseElsController<PermissionRoleSe
 	 */
 	@RequestMapping(method=RequestMethod.POST)
 	public Object create(@RequestBody PermissionRoleVO vo) {
+		if(VerifyUtils.isEmpty(vo.getClientId())) {
+			vo.setClientId(super.identity().getClientId());
+		}
+
 		this.service.insert(super.identity(), vo);
 		return success(vo.getId());
 	}
@@ -45,7 +52,7 @@ public class PermissionRoleController extends BaseElsController<PermissionRoleSe
 						@RequestParam(required = false) String clientId, @RequestParam(required = false) String role) {
 		PermissionRoleVO vo = new PermissionRoleVO();
 		if(VerifyUtils.isEmpty(clientId)) {
-			throw new ThrowPrompt("应用不能为空！", "061001");
+			clientId = super.identity().getClientId();
 		}
 
 		vo.setClientId(clientId);
@@ -66,29 +73,67 @@ public class PermissionRoleController extends BaseElsController<PermissionRoleSe
 	}
 
 	/**
-	 * 关联用户
-	 * @param id
+	 * 查询用户权限
+	 * @param id userId
+	 * @return
+	 */
+	@RequestMapping(value="/user/{id}",method=RequestMethod.GET)
+	public Object queryByUser(@PathVariable String id) {
+		return success(this.service.queryByUser(super.identity(), id));
+	}
+
+	/**
+	 * 用户关联角色
+	 * @param id userId
 	 * @param vo
-     * @return
-     */
+	 * @return
+	 */
 	@RequestMapping(value="/user/{id}",method=RequestMethod.POST)
-	public Object userInsert(@PathVariable Integer id, @RequestBody PermissionRoleVO vo) {
-		if(vo.getUsers().size() > 0) {
-			this.service.userInsert(super.identity(), id, vo.getUsers());
+	public Object insertByUser(@PathVariable String id, @RequestBody PermissionRoleVO vo) {
+		if(vo.getRoles().size() > 0) {
+			this.service.userInsert(super.identity(), vo.getRoles(), Arrays.asList(id));
 		}
 		return success();
 	}
 
 	/**
-	 * 取消用户关联
-	 * @param id
+	 * 用户取消关联角色
+	 * @param id userId
+	 * @param vo
+	 * @return
+	 */
+	@RequestMapping(value="/user/{id}",method=RequestMethod.DELETE)
+	public Object deleteByUser(@PathVariable String id, @RequestBody PermissionRoleVO vo) {
+		if(vo.getRoles().size() > 0) {
+			this.service.userDelete(super.identity(), vo.getRoles(), Arrays.asList(id));
+		}
+		return success();
+	}
+
+	/**
+	 * 角色关联用户
+	 * @param id roleId
 	 * @param vo
      * @return
      */
-	@RequestMapping(value="/user/{id}",method=RequestMethod.DELETE)
+	@RequestMapping(value="/{id}/user",method=RequestMethod.POST)
+	public Object userInsert(@PathVariable Integer id, @RequestBody PermissionRoleVO vo) {
+		if(vo.getUsers().size() > 0) {
+			this.service.userInsert(super.identity(), Arrays.asList(id), vo.getUsers());
+		}
+		return success();
+	}
+
+	/**
+	 * 角色取消用户关联
+	 * @param id roleId
+	 * @param vo
+     * @return
+     */
+	@RequestMapping(value="/{id}/user",method=RequestMethod.DELETE)
 	public Object userDelete(@PathVariable Integer id, @RequestBody PermissionRoleVO vo) {
 		if(vo.getUsers().size() > 0) {
-			this.service.userDelete(super.identity(), id, vo.getUsers());
+			this.service.userDelete(super.identity(), Arrays.asList(id), vo.getUsers());
 		}
 		return success();
 	}

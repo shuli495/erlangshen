@@ -22,6 +22,9 @@ import java.util.List;
 public class PermissionRoleService extends BaseService<PermissionRoleDao,PermissionRoleVO> {
 
 	@Autowired
+	private UserService userService;
+
+	@Autowired
 	private ClientService clientService;
 
 	@Autowired
@@ -89,10 +92,10 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
 
 			// 关联菜单
 			permissionRoleMenuVO.setRoleId(permissionRoleVO.getId());
-			List<PermissionRoleMenuVO> functions = permissionRoleMenuService.baseQueryByAnd(permissionRoleMenuVO);
+			List<PermissionRoleMenuVO> menus = permissionRoleMenuService.baseQueryByAnd(permissionRoleMenuVO);
 
 			List<Integer> menuIds = new LinkedList<>();
-			for(PermissionRoleMenuVO menuVOTmpVo : functions) {
+			for(PermissionRoleMenuVO menuVOTmpVo : menus) {
 				menuIds.add(menuVOTmpVo.getMenuId());
 			}
 			permissionRoleVO.setMenus(menuIds);
@@ -102,36 +105,65 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
 	}
 
 	/**
-	 * 关联用户
+	 * 查询用户权限
 	 * @param token
-	 * @param id
-	 * @param users
-     */
-	public void userInsert(TokenVO token, Integer id, List<String> users) {
-		PermissionRoleVO vo = super.baseFind(id);
-		if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
-			throw new ThrowPrompt("无权操作此应用！", "102004");
+	 * @param userId
+	 * @return
+	 */
+	public List<PermissionRoleVO> queryByUser(TokenVO token, String userId) {
+		if(!userService.isMyUser(token.getUserId(), userId)) {
+			throw new ThrowPrompt("无权操作此用户!", "102008");
 		}
 
-		// 去除已关联的用户
-		PermissionUserRoleVO permissionUserRoleVO = new PermissionUserRoleVO();
-		permissionUserRoleVO.setRoleId(id);
-		List<PermissionUserRoleVO> usersVO = permissionUserRoleService.baseQueryByAnd(permissionUserRoleVO);
-		for(PermissionUserRoleVO user : usersVO) {
-			if(users.indexOf(user.getUserId()) != -1) {
-				users.remove(user.getUserId());
+		List<PermissionRoleVO> userRoles = this.dao.queryByUser(userId);
+
+		PermissionRoleMenuVO permissionRoleMenuVO = new PermissionRoleMenuVO();
+		for(PermissionRoleVO userRole : userRoles) {
+			// 关联菜单
+			permissionRoleMenuVO.setRoleId(userRole.getId());
+			List<PermissionRoleMenuVO> menus = permissionRoleMenuService.baseQueryByAnd(permissionRoleMenuVO);
+
+			userRole.setMenuInfo(menus);
+		}
+		return null;
+	}
+
+	/**
+	 * 关联用户
+	 * @param token
+	 * @param ids
+	 * @param users
+     */
+	@Transactional
+	public void userInsert(TokenVO token, List<Integer> ids, List<String> users) {
+		List<PermissionUserRoleVO> insertUsers = new LinkedList<>();
+
+		for(Integer id : ids) {
+			PermissionRoleVO vo = super.baseFind(id);
+			if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
+				throw new ThrowPrompt("无权操作此应用！", "102004");
+			}
+
+			// 去除已关联的用户
+			PermissionUserRoleVO permissionUserRoleVO = new PermissionUserRoleVO();
+			permissionUserRoleVO.setRoleId(id);
+			List<PermissionUserRoleVO> usersVO = permissionUserRoleService.baseQueryByAnd(permissionUserRoleVO);
+			for(PermissionUserRoleVO user : usersVO) {
+				if(users.indexOf(user.getUserId()) != -1) {
+					users.remove(user.getUserId());
+				}
+			}
+
+			// 批量关联用户
+			PermissionUserRoleVO insertUserVO = null;
+			for(String userId : users) {
+				insertUserVO = new PermissionUserRoleVO();
+				insertUserVO.setRoleId(id);
+				insertUserVO.setUserId(userId);
+				insertUsers.add(insertUserVO);
 			}
 		}
 
-		// 批量关联用户
-		List<PermissionUserRoleVO> insertUsers = new LinkedList<>();
-		PermissionUserRoleVO insertUserVO = null;
-		for(String userId : users) {
-			insertUserVO = new PermissionUserRoleVO();
-			insertUserVO.setRoleId(id);
-			insertUserVO.setUserId(userId);
-			insertUsers.add(insertUserVO);
-		}
 		permissionUserRoleService.baseInsertBatch(insertUsers);
 	}
 
@@ -141,20 +173,24 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
 	 * @param id
 	 * @param users
      */
-	public void userDelete(TokenVO token, Integer id, List<String> users) {
-		PermissionRoleVO vo = super.baseFind(id);
-		if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
-			throw new ThrowPrompt("无权操作此应用！", "102005");
-		}
-
-		// 批量取消关联
+	@Transactional
+	public void userDelete(TokenVO token, List<Integer> ids, List<String> users) {
 		List<PermissionUserRoleVO> deleteUsers = new LinkedList<>();
-		PermissionUserRoleVO deleteUserVO = null;
-		for(String userId : users) {
-			deleteUserVO = new PermissionUserRoleVO();
-			deleteUserVO.setRoleId(id);
-			deleteUserVO.setUserId(userId);
-			deleteUsers.add(deleteUserVO);
+
+		for(Integer id : ids) {
+			PermissionRoleVO vo = super.baseFind(id);
+			if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
+				throw new ThrowPrompt("无权操作此应用！", "102005");
+			}
+
+			// 批量取消关联
+			PermissionUserRoleVO deleteUserVO = null;
+			for(String userId : users) {
+				deleteUserVO = new PermissionUserRoleVO();
+				deleteUserVO.setRoleId(id);
+				deleteUserVO.setUserId(userId);
+				deleteUsers.add(deleteUserVO);
+			}
 		}
 
 		permissionUserRoleService.baseDeleteBatch(deleteUsers);
