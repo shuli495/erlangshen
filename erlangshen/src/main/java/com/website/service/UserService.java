@@ -216,10 +216,6 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	 * @param isCheckUserExist	检查用户是否存在 null不检查 true存在抛异常 false不存在抛异常
 	 */
 	public void sendMail(TokenVO token, String type, String userId, String mail, String callback, Boolean isCheckUserExist) {
-		if(VerifyUtils.isEmpty(type)) {
-			type = "mail";
-		}
-
 		if(null == token && VerifyUtils.isEmpty(userId)) {
 			throw new ThrowException("token或userId必传一个！", "072004");
 		}
