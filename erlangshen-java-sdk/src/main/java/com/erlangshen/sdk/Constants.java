@@ -1,4 +1,4 @@
-package com.erlangshen;
+package com.erlangshen.sdk;
 
 /**
  * Created by wsl on 1/26 0026.

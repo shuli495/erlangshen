@@ -1,4 +1,4 @@
-package com.erlangshen;
+package com.erlangshen.sdk;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
