@@ -1,7 +1,6 @@
 package com.website.filter;
 
 import com.fastjavaframework.Setting;
-import com.fastjavaframework.common.SecretBase64Enum;
 import com.fastjavaframework.util.CommonUtil;
 import com.fastjavaframework.util.SecretUtil;
 import com.fastjavaframework.util.VerifyUtils;
@@ -56,7 +55,7 @@ public class IdentityFilter extends OncePerRequestFilter {
             // ak/sk认证
             if(VerifyUtils.isNotEmpty(signature)) {
                 // 解密后的签名
-                String signatureData = SecretUtil.base64Decrypt(SecretBase64Enum.URL, signature);
+                String signatureData = SecretUtil.base64Decrypt(signature);
 
                 KeyService keyService = (KeyService) cxt.getBean("keyService");
 
@@ -164,10 +163,9 @@ public class IdentityFilter extends OncePerRequestFilter {
      * @throws IOException
      */
     private String sign(HttpServletRequest request, String body, String sk) throws IOException {
-        String url = request.getMethod() + ":" + request.getRequestURI();
-        String params = request.getQueryString();
-        if(VerifyUtils.isNotEmpty(params)) {
-            url += "?" + params;
+        String url = request.getMethod() + ":" + request.getPathInfo();
+        if("GET".equals(request.getMethod())) {
+            body = request.getQueryString();
         }
 
         return SecretUtil.hmacsha1(sk, url + "@" + SecretUtil.md5(body));

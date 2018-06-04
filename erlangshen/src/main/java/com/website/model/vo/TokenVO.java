@@ -10,7 +10,7 @@ public class TokenVO extends TokenBO {
 
 	private String clientId;
 	private String from;
-	private String authenticationMethod;
+	private String authenticationMethod;	//认证方式AK/SK、TOKEN
 
 	public String getClientId() {
 		return clientId;
