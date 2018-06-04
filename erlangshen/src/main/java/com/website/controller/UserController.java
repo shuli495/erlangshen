@@ -70,6 +70,14 @@ public class UserController extends BaseElsController<UserService> {
 						   @RequestParam(required = false) String userId,
 						   @RequestParam(required = false) String callback,
 						   @RequestParam(required = false) Boolean isCheckUserExist) {
+		if(VerifyUtils.isEmpty(type)) {
+			throw new ThrowPrompt("type必传!", "081016");
+		}
+
+		if(VerifyUtils.isEmpty(mail) && VerifyUtils.isEmpty(userId)) {
+			throw new ThrowPrompt("mail喝userId二选一!", "081017");
+		}
+
 		this.service.sendMail(super.identity(), type, userId, mail, callback, isCheckUserExist);
 		return success();
 	}
