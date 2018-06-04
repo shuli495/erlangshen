@@ -203,7 +203,7 @@ class KeyApp extends BaseComponents {
         // 选中已关联的菜单
         var nowMenus = this.menus[id];
         for(var i=0; i<nowMenus.length; i++) {
-            var id = "chkMenu" + nowMenus[i];
+            var id = "chkMenu" + nowMenus[i].id;
             this.refs.menusApp.checked(id);
         }
         // 设置菜单全选按钮状态

@@ -94,11 +94,7 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
 			permissionRoleMenuVO.setRoleId(permissionRoleVO.getId());
 			List<PermissionRoleMenuVO> menus = permissionRoleMenuService.baseQueryByAnd(permissionRoleMenuVO);
 
-			List<Integer> menuIds = new LinkedList<>();
-			for(PermissionRoleMenuVO menuVOTmpVo : menus) {
-				menuIds.add(menuVOTmpVo.getMenuId());
-			}
-			permissionRoleVO.setMenus(menuIds);
+			permissionRoleVO.setMenuInfo(menus);
 		}
 
 		return roles;
@@ -170,7 +166,7 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
 	/**
 	 * 取消用户关联
 	 * @param token
-	 * @param id
+	 * @param ids
 	 * @param users
      */
 	@Transactional
