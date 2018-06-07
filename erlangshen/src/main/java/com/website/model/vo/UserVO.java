@@ -20,6 +20,9 @@ public class UserVO extends UserInfoBO {
     // 新密码
     private String oldPwd;
 
+    // 登录成功后获得的token
+    private TokenVO token;
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -50,5 +53,13 @@ public class UserVO extends UserInfoBO {
 
     public void setOldPwd(String oldPwd) {
         this.oldPwd = oldPwd;
+    }
+
+    public TokenVO getToken() {
+        return token;
+    }
+
+    public void setToken(TokenVO token) {
+        this.token = token;
     }
 }

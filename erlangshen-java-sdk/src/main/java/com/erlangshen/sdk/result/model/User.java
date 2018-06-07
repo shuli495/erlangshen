@@ -4,6 +4,9 @@ import java.util.Date;
 
 public class User {
 
+    // 登录成功后获得的token
+    private Token token;
+
     private String id;
 
     //客户端id
@@ -76,6 +79,14 @@ public class User {
 
     // 创建时间
     private Date createdTime;
+
+    public Token getToken() {
+        return token;
+    }
+
+    public void setToken(Token token) {
+        this.token = token;
+    }
 
     public String getId() {
         return id;

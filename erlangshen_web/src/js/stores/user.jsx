@@ -49,9 +49,10 @@ var UserStore = assign({}, EventEmitter.prototype, {
         headers : {"Token": $setting.token},
         success: function(result) {
           this.data.codeImage = "";
+          var resultToken = result.data.token;
           var date = new Date();
-          date.setTime(result.data.activeTime);
-          $.cookie('token', result.data.id, { expires: date });
+          date.setTime(resultToken.activeTime);
+          $.cookie('token', resultToken.id, { expires: date });
           location.href="/src/page/dashboard.html";
         }.bind(this),
         error: function(xhr, type, exception) {

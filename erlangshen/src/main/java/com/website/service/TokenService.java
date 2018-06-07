@@ -137,7 +137,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
             }
         }
 
-        UserBO user = users.get(0);
+        UserVO user = users.get(0);
 
         // 校验密码
         if(!user.getPwd().equals(SecretUtil.md5(pwd))) {
@@ -246,7 +246,8 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
             validateService.delete(validateId, "login", null);
 
             // 返回token
-            return (new ReturnJson()).success(reToken);
+            user.setToken(reToken);
+            return (new ReturnJson()).success(user);
         }
     }
 

@@ -250,7 +250,7 @@ public class ElsClient {
      * @return
      * @throws Exception
      */
-    public TokenDetail login(String username, String pwd, String code, String platform, String loginIp) throws Exception {
+    public UserDetail login(String username, String pwd, String code, String platform, String loginIp) throws Exception {
         if(null == username || "".equals(username)) {
             throw new Exception("用户名不能为空");
         }
@@ -274,7 +274,7 @@ public class ElsClient {
         }
 
         String result = new Http(host, "/token", null, params, ak, sk).post();
-        return JSONObject.parseObject(result, TokenDetail.class);
+        return JSONObject.parseObject(result, UserDetail.class);
     }
 
     /**
