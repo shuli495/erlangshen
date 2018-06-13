@@ -5,9 +5,18 @@ import com.fastjavaframework.util.CommonUtil;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.common.BaseElsController;
 import com.website.common.Constants;
+import com.website.model.vo.TokenVO;
+import com.website.model.vo.UserVO;
+import com.website.service.ClientService;
+import com.website.service.UserService;
+import org.apache.shiro.crypto.hash.Hash;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.website.service.TokenService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -17,6 +26,11 @@ import com.website.service.TokenService;
 @RestController
 @RequestMapping(value= Constants.URL_TOKEN)
 public class TokenController extends BaseElsController<TokenService> {
+
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private ClientService clientService;
 
 	/**
 	 * 获取登录验证码
@@ -56,6 +70,29 @@ public class TokenController extends BaseElsController<TokenService> {
 		}
 
 		return this.service.inster(response, super.identity(), isCheckStatus, loginIp, userName, pwd, platform, code);
+	}
+
+	/**
+	 * 查询token是否有效
+	 * @param token
+	 * @return
+	 */
+	@RequestMapping(value = "/{token}", method=RequestMethod.POST)
+	public Object check(@PathVariable String token) {
+		String loginIp = request.getParameter("loginIp");
+
+		// 检查token
+		TokenVO tokenVO = this.service.check(token, loginIp);
+
+		Map<String, Object> result = new HashMap<>();
+		if(userService.isMyUser(super.identity().getUserId(), tokenVO.getUserId())) {
+			result.put("valid", true);
+			result.put("token", tokenVO);
+		} else {
+			result.put("valid", false);
+		}
+
+		return success(result);
 	}
 
 }

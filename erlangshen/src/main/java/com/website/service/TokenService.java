@@ -318,10 +318,10 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
     /**
      * 校验token是否有效，有效返回token信息，无效抛异常
      * @param token
-     * @param clientIp
+     * @param loginIp
      * @return token信息
      */
-    public TokenVO check(String token, String clientIp) {
+    public TokenVO check(String token, String loginIp) {
         if(VerifyUtils.isEmpty(token)) {
             throw new ThrowPrompt("token无效！", "122005");
         }
@@ -331,7 +331,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
             throw new ThrowPrompt("token无效！", "122006");
         }
 
-        if(VerifyUtils.isNotEmpty(clientIp) && !clientIp.equals(tokenVO.getIp())) {
+        if(VerifyUtils.isNotEmpty(loginIp) && !loginIp.equals(tokenVO.getIp())) {
             throw new ThrowPrompt("token无效！", "122007");
         }
 
