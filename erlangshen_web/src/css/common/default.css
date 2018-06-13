@@ -1,5 +1,5 @@
-body {
-    font-family: Microsoft Yahei,'微软雅黑',Helvetica Neue,PingFang SC,STXihei,'华文细黑',sans-serif;
+body, input, a {
+    font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", "Hiragino Sans GB", "Heiti SC", "WenQuanYi Micro Hei", sans-serif !important;
 }
 
 input::-webkit-input-placeholder,textarea::-webkit-input-placeholder { /* WebKit browsers*/
