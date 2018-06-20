@@ -6,10 +6,7 @@ import com.fastjavaframework.util.VerifyUtils;
 import com.website.common.BaseElsController;
 import com.website.common.Constants;
 import com.website.model.vo.TokenVO;
-import com.website.model.vo.UserVO;
-import com.website.service.ClientService;
 import com.website.service.UserService;
-import org.apache.shiro.crypto.hash.Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +26,6 @@ public class TokenController extends BaseElsController<TokenService> {
 
 	@Autowired
 	private UserService userService;
-	@Autowired
-	private ClientService clientService;
 
 	/**
 	 * 获取登录验证码

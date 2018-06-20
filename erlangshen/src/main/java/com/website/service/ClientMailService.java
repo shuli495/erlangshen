@@ -5,7 +5,6 @@ import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.util.SecretUtil;
 import com.fastjavaframework.util.VerifyUtils;
-import com.website.common.Constants;
 import com.website.model.vo.ClientSecurityVO;
 import com.website.model.vo.TokenVO;
 import org.springframework.beans.factory.annotation.Autowired;

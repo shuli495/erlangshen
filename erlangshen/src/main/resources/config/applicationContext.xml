@@ -32,18 +32,6 @@
 	<!-- 数据库 -->
 	<import resource="classpath:config/dataSource.xml" />
 
-	<!-- log4j -->
-	<bean id="log4jInitialization"
-		  class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-		<property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
-		<property name="targetMethod" value="initLogging" />
-		<property name="arguments">
-			<list>
-				<value>classpath:config/log4j.xml</value>
-			</list>
-		</property>
-	</bean>
-
 	<!-- 封装异常 -->
 	<bean id="exceptionHandler" class="com.fastjavaframework.exception.ExceptionHandler">
 	</bean>
