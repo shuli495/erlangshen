@@ -1,10 +1,16 @@
-import BaseComponents from 'components/common/baseComponents.jsx';
+class ApiApp extends React.Component {
 
-class ApiApp {
+	setHeight() {
+		var ifm= document.getElementById("iframepage");
+		ifm.height =document.body.scrollHeight;
+	}
+
     render(){
+        { }
+
         return (
-            <div id="self" className="login_content login_input_content login_button_content">
-                稍后更新
+        	<div>
+	            <iframe id="iframepage" src="api_doc.html" onLoad={this.setHeight}></iframe>
             </div>
         );
     }
