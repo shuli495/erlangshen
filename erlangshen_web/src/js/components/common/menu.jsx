@@ -77,10 +77,11 @@ class CommonMenuApp extends React.Component {
 
             // 是否显示删除 按钮
             if(showDel && menuType == 1) {
+                var delIcon = React.createElement("i", {className:"fa fa-times"}, null);
                 menuChild.push(
                     React.createElement("a",
-                        {href:"javascript:void(0);", className:"fa fa-times errorBut", title:"删除"+menuName, onClick:this.props.delMenu.bind(this, 1, menuId)},
-                        null)
+                        {href:"javascript:void(0);", className:"errorBut", title:"删除"+menuName, onClick:this.props.delMenu.bind(this, 1, menuId)},
+                        delIcon)
                     );
             }
 

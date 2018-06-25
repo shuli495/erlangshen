@@ -348,7 +348,7 @@ class KeyApp extends BaseComponents {
                 roleDoms.push(
                     <div id={domId} onClick={this.clickRole.bind(this, roles[i].id)}>{roles[i].role}
                         &nbsp;
-                        <a href="javascript:void(0);" className="fa fa-times errorBut" title="删除" onClick={this.delRole.bind(this,roles[i].id,roles[i].role)} />
+                        <a href="javascript:void(0);" className="errorBut" title="删除" onClick={this.delRole.bind(this,roles[i].id,roles[i].role)} ><i className="fa fa-times"/></a>
                     </div>
                     );
             }
@@ -363,7 +363,7 @@ class KeyApp extends BaseComponents {
 
                 <div className="cell-content">
                     <div className="modal-content cell3">
-                        <div className="modal-header">角色&nbsp;<a href="javascript:void(0);" className="fa fa-plus" title="添加角色" onClick={this.addRoleBut}/></div>
+                        <div className="modal-header">角色&nbsp;<a href="javascript:void(0);" title="添加角色" onClick={this.addRoleBut}><i className="fa fa-plus"/></a></div>
                         <div className="modal-body search_content add_content show_body line_but_content" ref="roleContent">
                             {roleDoms}
                         </div>

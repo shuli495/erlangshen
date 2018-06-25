@@ -168,11 +168,11 @@ class ClientApp extends BaseComponents {
                 clientsDOM.push(
                                         <tr>
                                             <td>
-                                                <a href="javascript:void(0);" className="fa fa-pencil-square-o" data-toggle="modal" data-target="#client_info" title="修改" onClick={this.handleInfo.bind(this,id,name)}></a>&nbsp;
-                                                <a href="javascript:void(0);" className="fa fa-envelope" data-toggle="modal" data-target="#mail_info" title="设置邮件信息" onClick={this.mailList.bind(this,id)}></a>&nbsp;
-                                                <a href="javascript:void(0);" className="fa fa-comments" data-toggle="modal" data-target="#phone_info" title="设置短信发送平台" onClick={this.phoneList.bind(this,id)}></a>&nbsp;
-                                                <a href="javascript:void(0);" className="fa fa-shield" data-toggle="modal" data-target="#security_info" title="安全设置" onClick={this.securityInfo.bind(this,id)}></a>&nbsp;
-                                                <a href="javascript:void(0);" className="fa fa-times errorBut" title="删除" onClick={this.handleDel.bind(this,id)}></a>
+                                                <a href="javascript:void(0);" data-toggle="modal" data-target="#client_info" title="修改" onClick={this.handleInfo.bind(this,id,name)}><i className="fa fa-pencil-square-o"/></a>&nbsp;
+                                                <a href="javascript:void(0);" data-toggle="modal" data-target="#mail_info" title="设置邮件信息" onClick={this.mailList.bind(this,id)}><i className="fa fa-envelope"/></a>&nbsp;
+                                                <a href="javascript:void(0);" data-toggle="modal" data-target="#phone_info" title="设置短信发送平台" onClick={this.phoneList.bind(this,id)}><i className="fa fa-comments"/></a>&nbsp;
+                                                <a href="javascript:void(0);" data-toggle="modal" data-target="#security_info" title="安全设置" onClick={this.securityInfo.bind(this,id)}><i className="fa fa-shield"/></a>&nbsp;
+                                                <a href="javascript:void(0);" className="errorBut" title="删除" onClick={this.handleDel.bind(this,id)}><i className="fa fa-times"/></a>
                                             </td>
                                             <td>{id}</td>
                                             <td>{name}</td>
@@ -190,7 +190,7 @@ class ClientApp extends BaseComponents {
                 mailsDom.push(
                     <tr>
                         <td>
-                            <a href="javascript:void(0);" className="fa fa-times errorBut" title="删除" onClick={this.mailDel.bind(this,mailData.clientId,mailData.id)}></a>
+                            <a href="javascript:void(0);" className="errorBut" title="删除" onClick={this.mailDel.bind(this,mailData.clientId,mailData.id)}><i className="fa fa-times"/></a>
                         </td>
                         <td >{mailData.mail}</td>
                         <td>{mailData.username}</td>
@@ -212,7 +212,7 @@ class ClientApp extends BaseComponents {
                 phonesDom.push(
                     <tr>
                         <td>
-                            <a href="javascript:void(0);" className="fa fa-times errorBut" title="删除" onClick={this.phoneDel.bind(this,phoneData.clientId,phoneData.id)}></a>
+                            <a href="javascript:void(0);" className="errorBut" title="删除" onClick={this.phoneDel.bind(this,phoneData.clientId,phoneData.id)}><i className="fa fa-times"/></a>
                         </td>
                         <td >{phoneData.platform}</td>
                         <td >{phoneData.ak}</td>
@@ -268,7 +268,7 @@ class ClientApp extends BaseComponents {
                 <table className="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th className="width105"><a href="javascript:void(0);" className="fa fa-plus" data-toggle="modal" data-target="#client_info" onClick={this.handleInfo} title="添加"></a></th>
+                            <th className="width105"><a href="javascript:void(0);" data-toggle="modal" data-target="#client_info" onClick={this.handleInfo} title="添加"><i className="fa fa-plus"></i></a></th>
                             <th>ID</th>
                             <th>名称</th>
                             <th>是否设置邮箱</th>

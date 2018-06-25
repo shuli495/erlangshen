@@ -85,8 +85,8 @@ class KeyApp extends BaseComponents {
                 keysDOM.push(
                                         <tr>
                                             <td>
-                                                <a href="javascript:void(0);" className="fa fa-times errorBut" title="删除" onClick={this.handleDel.bind(this, access, status)}/>&nbsp;&nbsp;
-                                                <a href="javascript:void(0);" className="fa fa-retweet" title="启用/停用" onClick={this.handleUpStatus.bind(this, access, status)}/>
+                                                <a href="javascript:void(0);" className="errorBut" title="删除" onClick={this.handleDel.bind(this, access, status)}><i className="fa fa-times"/></a>&nbsp;&nbsp;
+                                                <a href="javascript:void(0);" title="启用/停用" onClick={this.handleUpStatus.bind(this, access, status)}><i className="fa fa-retweet"/></a>
                                             </td>
                                             <td>{access}</td>
                                             <td>{secret}</td>
@@ -106,7 +106,7 @@ class KeyApp extends BaseComponents {
                 <table className="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th className="width55"><a href="javascript:void(0);" className="fa fa-plus" data-toggle="modal" data-target="#key_info" title="添加"></a></th>
+                            <th className="width55"><a href="javascript:void(0);" data-toggle="modal" data-target="#key_info" title="添加"><i className="fa fa-plus"/></a></th>
                             <th>access key</th>
                             <th>secret key</th>
                             <th>应用</th>

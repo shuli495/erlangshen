@@ -163,7 +163,7 @@ class MenuApp extends BaseComponents {
 
                 <div className="cell-content">
                     <div className="modal-content cell2">
-                        <div className="modal-header">菜单&nbsp;<a href="javascript:void(0);" className="fa fa-plus" data-toggle="modal" data-target="#key_info" title="添加菜单" onClick={this.addBut}/></div>
+                        <div className="modal-header">菜单&nbsp;<a href="javascript:void(0);" data-toggle="modal" data-target="#key_info" title="添加菜单" onClick={this.addBut}><i className="fa fa-plus"/></a></div>
                         <div className="modal-body search_content add_content show_body tree">
                             {meunDom}
                         </div>

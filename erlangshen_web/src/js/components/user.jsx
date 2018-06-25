@@ -287,11 +287,11 @@ class UserApp extends BaseComponents {
                 usersDOM.push(
                                         <tr>
                                             <td>
-                                                <a href="javascript:void(0);" className="fa fa-pencil-square-o" data-toggle="modal" data-target="#user_info" title="修改"
-                                                onClick={this.handleInfo.bind(this,id,status,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,clientId,province,city,area,addresses[addresses.length-1])}></a>&nbsp;
-                                                <a href="javascript:void(0);" className="fa fa-id-card" data-toggle="modal" data-target="#user_certification" title="实名认证"
-                                                onClick={this.queryCertification.bind(this,id,name,idcard,certificationStr, certificationFailMsg)}></a>&nbsp;
-                                                <a href="javascript:void(0);" className="fa fa-times errorBut" title="删除" onClick={this.handleDel.bind(this,id)}></a>
+                                                <a href="javascript:void(0);" data-toggle="modal" data-target="#user_info" title="修改"
+                                                onClick={this.handleInfo.bind(this,id,status,source,username,nickname,mail,phone,tel,qq,weixin,weibo,name,idcard,clientId,province,city,area,addresses[addresses.length-1])}><i className="fa fa-pencil-square-o"/></a>&nbsp;
+                                                <a href="javascript:void(0);" data-toggle="modal" data-target="#user_certification" title="实名认证"
+                                                onClick={this.queryCertification.bind(this,id,name,idcard,certificationStr, certificationFailMsg)}><i className="fa fa-id-card"/></a>&nbsp;
+                                                <a href="javascript:void(0);" className="errorBut" title="删除" onClick={this.handleDel.bind(this,id)}><i className="fa fa-times"/></a>
                                             </td>
                                             <td>{id}</td>
                                             <td>{username}</td>
@@ -434,7 +434,7 @@ class UserApp extends BaseComponents {
                 <table className="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th className="width70"><a href="javascript:void(0);" className="fa fa-plus" data-toggle="modal" data-target="#user_info" onClick={this.handleInfo} title="添加"></a></th>
+                            <th className="width70"><a href="javascript:void(0);" data-toggle="modal" data-target="#user_info" onClick={this.handleInfo} title="添加"><i className="fa fa-plus"/></a></th>
                             <th>ID</th>
                             <th>用户名</th>
                             <th>昵称</th>
