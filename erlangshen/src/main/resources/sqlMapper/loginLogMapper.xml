@@ -30,10 +30,10 @@
 
 	<select id="queryByOr" parameterType="com.website.model.vo.LoginLogVO" resultMap="loginLogVO">
 		SELECT
-		t1.USER_ID,t1.IP,t1.LOGIN_TIME,t2.USERNAME,t2.NICKNAME,t2.MAIL,t2.PHONE,t3.NAME AS clientName
-		FROM login_log t1,`user` t2,client t3
+		t1.USER_ID,t1.IP,t1.LOGIN_TIME,t2.USERNAME,t4.NICKNAME,t2.MAIL,t2.PHONE,t3.NAME AS clientName
+		FROM login_log t1,`user` t2,client t3,user_info t4
 		<where>
-			t1.USER_ID=t2.ID and t2.CLIENT_ID=t3.ID and t3.CREATED_BY=#{createdBy}
+			t1.USER_ID=t2.ID and t2.CLIENT_ID=t3.ID and t2.ID=t4.ID and t3.CREATED_BY=#{createdBy}
 			<if test="userId != null">
 				OR USER_ID=#{userId}
 			</if>
@@ -63,10 +63,10 @@
 
 	<select id="queryByAnd" parameterType="com.website.model.vo.LoginLogVO" resultMap="loginLogVO">
 		SELECT
-		t1.USER_ID,t1.IP,t1.LOGIN_TIME,t2.USERNAME,t2.NICKNAME,t2.MAIL,t2.PHONE,t3.NAME AS clientName
-		FROM login_log t1,`user` t2,client t3
+		t1.USER_ID,t1.IP,t1.LOGIN_TIME,t2.USERNAME,t4.NICKNAME,t2.MAIL,t2.PHONE,t3.NAME AS clientName
+		FROM login_log t1,`user` t2,client t3,user_info t4
 		<where>
-			t1.USER_ID=t2.ID and t2.CLIENT_ID=t3.ID and t3.CREATED_BY=#{createdBy}
+			t1.USER_ID=t2.ID and t2.CLIENT_ID=t3.ID and t2.ID=t4.ID and t3.CREATED_BY=#{createdBy}
 			<if test="userId != null">
 				AND t1.USER_ID=#{userId}
 			</if>
