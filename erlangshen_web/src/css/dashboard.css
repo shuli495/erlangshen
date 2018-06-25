@@ -87,7 +87,7 @@ iframe {
 }
 
 #main {
-	overflow:hidden;
+	overflow: hidden;
 	height: 100%;
 	background-color: #EEE;
 }
@@ -308,4 +308,9 @@ select {
 	border-left: 1px solid #ddd;
 	border-right: 1px solid #ddd;
 	border-bottom: 1px solid #ddd;
+}
+
+.sdk_content {
+	height: 100%;
+	overflow: auto;
 }

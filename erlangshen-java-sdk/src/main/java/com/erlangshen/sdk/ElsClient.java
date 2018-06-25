@@ -111,6 +111,7 @@ public class ElsClient {
      * @param userId    与邮件二选一
      * @param callback  如果是url注册链接，此参数发送邮件后跳转到此参数的url
      * @param isCheckUserExist 检查用户是否存在 null不检查 true存在抛异常 false不存在抛异常
+     * @return Result
      * @throws Exception
      */
     public Result sendMail(String type, String mail, String userId, String callback, Boolean isCheckUserExist) throws Exception {
@@ -149,6 +150,7 @@ public class ElsClient {
      * @param userId    与邮件二选一
      * @param callback  如果是url注册链接，此参数发送邮件后跳转到此参数的url
      * @param isCheckUserExist 检查用户是否存在 null不检查 true存在抛异常 false不存在抛异常
+     * @return Result
      * @throws Exception
      */
     public Result sendPhone(String type, String phone, String userId, String callback, Boolean isCheckUserExist) throws Exception {
@@ -187,7 +189,7 @@ public class ElsClient {
      * @param userId    与mail、phone三选一
      * @param mail      与userId、phone三选一
      * @param phone     与userId、mail三选一
-     * @return
+     * @return Result
      * @throws Exception
      */
     public Result checkCode(String code, String type, String userId, String mail, String phone) throws Exception {
@@ -223,7 +225,7 @@ public class ElsClient {
     /**
      * 用户注册
      * @param user
-     * @return
+     * @return Result
      * @throws Exception
      */
     public Result register(User user) throws Exception {
@@ -247,7 +249,7 @@ public class ElsClient {
      * @param code      登录验证码
      * @param platform  登录平台
      * @param loginIp   登录客户端IP
-     * @return
+     * @return UserDetail
      * @throws Exception
      */
     public UserDetail login(String username, String pwd, String code, String platform, String loginIp) throws Exception {
@@ -280,7 +282,7 @@ public class ElsClient {
     /**
      * 获取登录验证码
      * @param loginIp
-     * @return
+     * @return Result
      * @throws Exception
      */
     public Result getLoginCode(String loginIp) throws Exception {
@@ -298,7 +300,7 @@ public class ElsClient {
     /**
      * 用户详细信息
      * @param userId
-     * @return
+     * @return UserDetail
      * @throws Exception
      */
     public UserDetail detail(String userId) throws Exception {
@@ -313,7 +315,7 @@ public class ElsClient {
     /**
      * 修改用户信息
      * @param user
-     * @return
+     * @return Result
      * @throws Exception
      */
     public Result updateDetail(User user) throws Exception {
@@ -331,7 +333,7 @@ public class ElsClient {
      * @param phone     手机号码
      * @param username  用户名
      * @param nikename  昵称
-     * @return
+     * @return UserList
      */
     public UserList userList(String mail, String phone, String username, String nikename) throws Exception {
         Map<String, Object> params = new HashMap<>();
@@ -358,7 +360,14 @@ public class ElsClient {
 
     /**
      * 实名认证
-     * @param userId
+     * @param userId    用户id
+     * @param name      姓名
+     * @param idcard    身份证号
+     * @param forntFile 身份证正面照片
+     * @param backFile  身份证反面照片
+     * @param holdForntFile 手持身份证正面照片
+     * @param holdBackFile  手持身份证反面照片
+     * @return Result
      * @throws Exception
      */
     public Result certification(String userId, String name, String idcard,
@@ -394,7 +403,7 @@ public class ElsClient {
     /**
      * 实名认证详情
      * @param userId
-     * @return
+     * @return CertificationDetail
      * @throws Exception
      */
     public CertificationDetail certificationDetail(String userId) throws Exception {
@@ -422,6 +431,9 @@ public class ElsClient {
 
     /**
      * 当前应用已配置的权限列表
+     * @param role
+     * @return PermissionList
+     * @throws Exception
      */
     public PermissionList permissionListByClient(String role) throws Exception {
         Map<String, Object> params = new HashMap<>();
@@ -437,6 +449,7 @@ public class ElsClient {
     /**
      * 查询用户权限
      * @param userId
+     * @return PermissionList
      * @throws Exception
      */
     public PermissionList permissionList(String userId) throws Exception {
@@ -452,6 +465,7 @@ public class ElsClient {
      * 关联用户权限
      * @param userId
      * @param roleIds
+     * @return Result
      * @throws Exception
      */
     public Result createPermission(String userId, String[] roleIds) throws Exception {
@@ -473,6 +487,7 @@ public class ElsClient {
      * 取消关联用户权限
      * @param userId
      * @param roleIds
+     * @return Result
      * @throws Exception
      */
     public Result delPermission(String userId, String[] roleIds) throws Exception {
@@ -494,7 +509,7 @@ public class ElsClient {
      * 获取字典表
      * @param groupId
      * @param parentId
-     * @return
+     * @return Result
      * @throws Exception
      */
     public Result sysCode(String groupId, String parentId) throws Exception {

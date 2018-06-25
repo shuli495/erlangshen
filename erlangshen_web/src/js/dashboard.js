@@ -6,6 +6,7 @@ import PermissionApp from 'components/permission.jsx';
 import LogApp from 'components/log.jsx';
 import KeyApp from 'components/key.jsx';
 import ApiApp from 'components/api.jsx';
+import SDKApp from 'components/sdk.jsx';
 
 window.onload=function(){
 	if(typeof($.cookie('token')) == "undefined") {
@@ -68,5 +69,7 @@ $(".navigation").find('a').on('click',function() {
 		ReactDOM.render(<KeyApp />, document.getElementById('main'));
 	} else if(type == 'api') {
 		ReactDOM.render(<ApiApp />, document.getElementById('main'));
+	} else if(type == 'sdk') {
+		ReactDOM.render(<SDKApp />, document.getElementById('main'));
 	}
 })
