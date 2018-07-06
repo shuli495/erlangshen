@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.erlangshen.sdk.result.*;
 import com.erlangshen.sdk.result.model.CertificationDetail;
 import com.erlangshen.sdk.result.model.User;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -371,8 +371,8 @@ public class ElsClient {
      * @throws Exception
      */
     public Result certification(String userId, String name, String idcard,
-                                MultipartFile forntFile, MultipartFile backFile,
-                                MultipartFile holdForntFile, MultipartFile holdBackFile) throws Exception {
+                                FileInputStream forntFile, FileInputStream backFile,
+                                FileInputStream holdForntFile, FileInputStream holdBackFile) throws Exception {
         if(null == userId || "".equals(userId)) {
             throw new Exception("用户ID不能为空");
         }
@@ -386,10 +386,10 @@ public class ElsClient {
             params.put("idcard", idcard);
         }
 
-        if(!holdForntFile.isEmpty() && !holdBackFile.isEmpty()) {
+        if(forntFile.available() > 0 && holdBackFile.available() > 0) {
             params.put("holdForntFile", holdForntFile);
             params.put("holdBackFile", holdBackFile);
-        } else if(!forntFile.isEmpty() && !backFile.isEmpty()) {
+        } else if(forntFile.available() > 0 && backFile.available() > 0) {
             params.put("forntFile", forntFile);
             params.put("backFile", backFile);
         } else {
