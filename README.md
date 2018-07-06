@@ -3,7 +3,7 @@
 
 erlangshen java后台服务\
 erlangshen_web 前端控制台\
-erlangshen-java-sdk java版sdk，很快竣工。
+erlangshen-java-sdk java版sdk。
 
 **包含以下功能：**
 1. 可同时管理多个系统（应用），按系统管理用户，安全设置。
@@ -48,6 +48,32 @@ https://github.com/shuli495/fastFlux
     aes.secret：加密密码的密钥\
     bdmap.\*：百度地图API（根据ip查询城市），用于检测异地登录
     bdyun.\*：百度云API，用于识别身份证图片
+
+## erlangshen-java-sdk
+**使用方法一：**
+使用maven
+```
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>com.github.shuli495</groupId>
+        <artifactId>erlangshen.erlangshenJavaSDK</artifactId>
+    </dependency>
+</dependencies>
+```
+**使用方法二：**
+下载源码，运行一下命令，生成target/jar包，加入项目。
+
+```
+mvn clean install
+```
+
 
 
 **开发参考：**

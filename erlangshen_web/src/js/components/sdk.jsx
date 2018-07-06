@@ -12,7 +12,21 @@ class SDKApp extends React.Component {
                     <h4>Git：</h4>
                     <pre>https://github.com/shuli495/erlangshen/tree/master/erlangshen-java-sdk</pre>
                     <h4>Maven：</h4>
-                    <pre>https://github.com/shuli495/erlangshen/tree/master/erlangshen-java-sdk</pre>
+                    <pre>
+                        <repositories>
+                              <repository>
+                                    <id>jitpack.io</id>
+                                    <url>https://jitpack.io</url>
+                              </repository>
+                        </repositories>
+
+                        <dependencies>
+                              <dependency>
+                                    <groupId>com.github.shuli495</groupId>
+                                    <artifactId>erlangshen.erlangshenJavaSDK</artifactId>
+                              </dependency>
+                        </dependencies>
+                    </pre>
                     <h4>调用：</h4>
                     <pre>
                         <b>ElsClient elsClient = new ElsClient(String ak, String sk);</b>
