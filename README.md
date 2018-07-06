@@ -31,9 +31,6 @@ erlangshen-java-sdk java版sdk。
     或\
     直接拷贝build和src文件夹以静态文件形式运行
 
-**开发参考：**
-https://github.com/shuli495/fastFlux
-
 
 ## erlangshen
 使用springMVC框架。
@@ -48,6 +45,9 @@ https://github.com/shuli495/fastFlux
     aes.secret：加密密码的密钥\
     bdmap.\*：百度地图API（根据ip查询城市），用于检测异地登录
     bdyun.\*：百度云API，用于识别身份证图片
+
+**开发参考：**
+https://github.com/shuli495/fastFlux
 
 ## erlangshen-java-sdk
 **使用方法一：**
