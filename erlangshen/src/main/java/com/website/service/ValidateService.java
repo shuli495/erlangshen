@@ -4,6 +4,7 @@ import com.fastjavaframework.Setting;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.page.OrderSort;
+import com.fastjavaframework.util.CodeUtil;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.model.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,15 @@ import org.springframework.stereotype.Service;
 import com.fastjavaframework.base.BaseService;
 import com.website.dao.ValidateDao;
 import com.website.model.vo.ValidateVO;
+import sun.misc.BASE64Encoder;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 邮件、短信等验证码验证
@@ -25,6 +31,31 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
 
     @Autowired
     private UserService userService;
+
+    /**
+     * 获取防机器人验证码
+     * @param type lgoin register
+     * @param tokenClientId
+     * @param loginIp
+     * @return base64图片
+     */
+    public String verifyCode(String type, String tokenClientId, String loginIp) {
+        Map<String, Object> map = CodeUtil.codeImg();
+
+        // code入库
+        this.insert(tokenClientId + "_" + loginIp, type, map.get("code").toString());
+
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write((BufferedImage)map.get("image"), "jpg", baos);
+            byte[] bytes = baos.toByteArray();
+
+            BASE64Encoder encoder = new sun.misc.BASE64Encoder();
+            return encoder.encodeBuffer(bytes).trim();
+        } catch (Exception e) {
+            throw new ThrowException("验证码转base64错误：" + e.getMessage(), "122009");
+        }
+    }
 
     /**
      * 不存在则新增，存在修改

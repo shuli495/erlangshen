@@ -1,13 +1,16 @@
 package com.website.controller;
 
 import com.fastjavaframework.Setting;
+import com.fastjavaframework.util.CommonUtil;
 import com.website.common.Constants;
+import com.website.service.TokenService;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -45,6 +48,16 @@ public class UserController extends BaseElsController<UserService> {
 	 */
 	@RequestMapping(method=RequestMethod.POST)
 	public Object create(@RequestBody UserVO vo) {
+		String loginIp = "";
+		if("KEY".equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
+			throw new ThrowException("AK/SK方式loginIp参数必传！", "071002");
+		}
+
+		if(VerifyUtils.isEmpty(loginIp)) {
+			loginIp = CommonUtil.getIp(super.request);
+		}
+
+		vo.setLoginIp(loginIp);
 		vo.setId(UUID.uuid());
 		vo.setCreatedTime(new Date());
 
@@ -52,8 +65,40 @@ public class UserController extends BaseElsController<UserService> {
 			vo.setClientId(super.identity().getClientId());
 		}
 
-		this.service.insert(super.identity(), vo);
-		return success(vo.getId());
+		String name = "";
+		if(VerifyUtils.isNotEmpty(vo.getUsername())) {
+			name = vo.getUsername();
+		} else if(VerifyUtils.isNotEmpty(vo.getMail())) {
+			name = vo.getMail();
+		} else if(VerifyUtils.isNotEmpty(vo.getPhone())) {
+			name = vo.getPhone();
+		}
+
+		try {
+			this.service.insert(super.identity(), vo);
+		} catch (ThrowException e) {
+			response.setStatus(500);
+
+			Map<String, String> result = new HashMap<>(3);
+			result.put("data", e.getMessage());
+			result.put("code", e.getCode());
+			result.put("image", validateService.verifyCode("register", super.identity().getClientId(), loginIp));
+			return result;
+		} catch (ThrowPrompt e) {
+			response.setStatus(400);
+
+			Map<String, String> result = new HashMap<>(3);
+			result.put("data", e.getMessage());
+			result.put("code", e.getCode());
+			result.put("image", validateService.verifyCode("register", super.identity().getClientId(), loginIp));
+			return result;
+		}
+
+		Map<String, String> map = new HashMap<>(2);
+		map.put("id", vo.getId());
+		map.put("token", vo.getToken().getId());
+
+		return success(map);
 	}
 
 	/**
@@ -137,6 +182,22 @@ public class UserController extends BaseElsController<UserService> {
 	@RequestMapping(value=Constants.URL_USER_CHECKMAIL, method=RequestMethod.GET)
 	public String checkMail(@RequestParam String info) {
 		return "redirect:" + this.service.checkMail(info);
+	}
+
+	/**
+	 * 用户名或邮箱或手机是否已存在
+	 * @param name
+	 * @return
+	 */
+	@RequestMapping(value="/checkUser/{name}", method=RequestMethod.GET)
+	public Object checkUser(@PathVariable String name) {
+		List<UserVO> users = this.service.checkExist(super.identity().getClientId(), name, null);
+
+		if(users.size() == 0) {
+			return success(true);
+		} else {
+			return success(false);
+		}
 	}
 
 	/**

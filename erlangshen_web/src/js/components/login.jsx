@@ -13,9 +13,9 @@ class LoginApp extends BaseComponents {
     handleClick() {
         var userName = this.refs.userName.value;
         var pwd = this.refs.pwd.value;
-        var code = "";
-        if(this.refs.code) {
-            code = this.refs.code.value;
+        var verifyCode = "";
+        if(this.refs.verifyCode) {
+            verifyCode = this.refs.verifyCode.value;
         }
 
         if(!$util_validateValue("login")) {
@@ -29,7 +29,7 @@ class LoginApp extends BaseComponents {
         loginDiv.classList.add("loading_circle");
         this.refs.loginBut.disabled = true;
 
-        UserStore.login(userName, pwd, code);
+        UserStore.login(userName, pwd, verifyCode);
     }
 
     componentDidUpdate() {
@@ -42,19 +42,19 @@ class LoginApp extends BaseComponents {
     }
 
     getCodeImg() {
-        UserStore.code();
+        UserStore.code("login");
     }
 
     render(){
         {
             var info = this.state.info;
-            var codeImage = this.state.codeImage;
-            var codeDom;
-            if(codeImage != "") {
-                codeImage = "data:image/jpg;base64," + codeImage;
-                codeDom = <div className="login_line_content code_container">
-                                            <input type="text" ref="code" placeholder="验证码" data-errMsgId="errorMsg" data-empty="true" data-emptyText="验证码不能为空！"/>
-                                            <img src={codeImage} onClick={this.getCodeImg} />
+            var verifyCodeImage = this.state.codeImage;
+            var verifyCode;
+            if(verifyCodeImage != "") {
+                verifyCodeImage = "data:image/jpg;base64," + verifyCodeImage;
+                verifyCode = <div className="login_line_content code_container">
+                                            <input type="text" ref="verifyCode" placeholder="验证码" data-errMsgId="errorMsg" data-empty="true" data-emptyText="验证码不能为空！"/>
+                                            <img src={verifyCodeImage} onClick={this.getCodeImg} />
                                         </div>
             }
         }
@@ -68,7 +68,7 @@ class LoginApp extends BaseComponents {
                 <div className="login_line_content">
                     <input type="password" ref="pwd" placeholder="密码" data-errMsgId="errorMsg" data-empty="true" data-emptyText="密码不能为空！"/>
                 </div>
-                {codeDom}
+                {verifyCode}
                 <div id="errorMsg" className="errorMsg">{info}</div>
                 <div className="login_line_content">
                     <button  ref="loginBut" className="button button-primary button-rounded button-small" onClick={this.handleClick}><div ref="loginDiv">登&nbsp;录</div></button>

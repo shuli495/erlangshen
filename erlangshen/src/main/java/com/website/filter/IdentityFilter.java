@@ -109,6 +109,9 @@ public class IdentityFilter extends OncePerRequestFilter {
                     // 获取token
                     boolean isToken = request.getRequestURI().endsWith(Constants.URL_TOKEN)
                                     || request.getRequestURI().endsWith(Constants.URL_TOKEN+"/");
+                    // 获取验证码
+                    boolean isCode = (request.getRequestURI().endsWith(Constants.URL_CODE+"verify") || request.getRequestURI().endsWith(Constants.URL_CODE+"verify/"))
+                            && "get".equalsIgnoreCase(request.getMethod());
                     // 用户查询或创建
                     boolean isCreateOrSel = (request.getRequestURI().endsWith(Constants.URL_USER) || request.getRequestURI().endsWith(Constants.URL_USER+"/"))
                             && ("get".equalsIgnoreCase(request.getMethod()) || "post".equalsIgnoreCase(request.getMethod()));
@@ -118,7 +121,7 @@ public class IdentityFilter extends OncePerRequestFilter {
                     // 发送短信
                     boolean isSendPhone = (request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_SENDPHONE) || request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_SENDPHONE+"/"))
                             && "get".equalsIgnoreCase(request.getMethod());
-                    // 校验验证码
+                    // 校验手机、邮件验证码
                     boolean isCheckCode = (request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_CHECKCODE) || request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_CHECKCODE+"/"))
                             && "get".equalsIgnoreCase(request.getMethod());
                     // 验证邮箱url
@@ -128,7 +131,7 @@ public class IdentityFilter extends OncePerRequestFilter {
                     boolean isRePwd = (request.getRequestURI().endsWith(Constants.URL_USER+"/rePwd") || request.getRequestURI().endsWith(Constants.URL_USER+"/rePwd/"))
                             && "get".equalsIgnoreCase(request.getMethod());
 
-                    if(!isToken && !isCreateOrSel && !isSendMail && !isSendPhone && !isCheckCode && !isCheckMail && !isRePwd) {
+                    if(!isToken && !isCode && !isCreateOrSel && !isSendMail && !isSendPhone && !isCheckCode && !isCheckMail && !isRePwd) {
                         this.returnError(response);
                         return;
                     }

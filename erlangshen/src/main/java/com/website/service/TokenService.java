@@ -45,30 +45,6 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
     private ValidateService validateService;
 
     /**
-     * 获取登录验证码
-     * @param tokenClientId
-     * @param userName
-     * @return base64图片
-     */
-    public String code(String tokenClientId, String userName) {
-        Map<String, Object> map = CodeUtil.codeImg();
-
-        // code入库
-        validateService.insert(tokenClientId + "_" + userName, "login", map.get("code").toString());
-
-		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ImageIO.write((BufferedImage)map.get("image"), "jpg", baos);
-			byte[] bytes = baos.toByteArray();
-
-			BASE64Encoder encoder = new sun.misc.BASE64Encoder();
-			return encoder.encodeBuffer(bytes).trim();
-		} catch (Exception e) {
-			throw new ThrowException("验证码转base64错误：" + e.getMessage(), "122009");
-		}
-    }
-
-    /**
      * 生成token
      * 查询出所有有效token；当前ip如果有token，判断是否过期，过期重新生成；
      * 可以重复登录不操作其他ip的token，不可以重复登录则把其他ip的token全部注销。
@@ -78,13 +54,13 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
      * @param userName
      * @param pwd
      * @param platform 登录端，区分不同平台的登录，用于校验不同平台是否可以同事登录；入安卓登录、网页能同时登录，其他手机不能登录。空值全局校验
-     * @param code
+     * @param verifyCode
      * @return
      */
     public Object inster(HttpServletResponse response, TokenVO token, boolean isCheckStatus,
-                          String loginIp, String userName, String pwd, String platform, String code) {
+                          String loginIp, String userName, String pwd, String platform, String verifyCode) {
         // 校验验证码
-        String validateId = token.getClientId() + "_" + (VerifyUtils.isEmpty(loginIp)?userName:loginIp);
+        String validateId = token.getClientId() + "_" + loginIp;
 
         ValidateVO validateVO = new ValidateVO();
         validateVO.setUserId(validateId);
@@ -95,13 +71,13 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
             try {
                 validateService.checkOvertime("login", validate.getCreatedTime());
             } catch (Exception e) {
-                return this.returnCode(response, token.getClientId(), userName, "验证码超时！", "122009");
+                return this.returnCode(response, token.getClientId(), loginIp, "验证码超时！", "122009");
             }
-            if(VerifyUtils.isEmpty(code)) {
-                return this.returnCode(response, token.getClientId(), userName, "请输入验证码！", "122010");
+            if(VerifyUtils.isEmpty(verifyCode)) {
+                return this.returnCode(response, token.getClientId(), loginIp, "请输入验证码！", "122010");
             }
-            if(!validate.getCode().equalsIgnoreCase(code)) {
-                throw new ThrowPrompt("验证码错误！", "122011");
+            if(!validate.getCode().equalsIgnoreCase(verifyCode)) {
+                return this.returnCode(response, token.getClientId(), loginIp, "验证码错误！", "122011");
             }
         }
 
@@ -114,7 +90,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
             if(validates.size() != 0) {
                 validateService.delete(validateId, "login", null);
             }
-            return this.returnCode(response, token.getClientId(), userName, "用户名或密码错误！", "122012");
+            return this.returnCode(response, token.getClientId(), loginIp, "用户名或密码错误！", "122012");
         }
 
         if(users.size() == 0) {
@@ -122,7 +98,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
             if(validates.size() != 0) {
                 validateService.delete(validateId, "login", null);
             }
-            return this.returnCode(response, token.getClientId(), userName, "用户名或密码错误！", "122013");
+            return this.returnCode(response, token.getClientId(), loginIp, "用户名或密码错误！", "122013");
         }
 
         // 验证状态
@@ -141,7 +117,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
 
         // 校验密码
         if(!user.getPwd().equals(SecretUtil.md5(pwd))) {
-            return this.returnCode(response, token.getClientId(), userName, "用户名或密码错误！", "122014");
+            return this.returnCode(response, token.getClientId(), loginIp, "用户名或密码错误！", "122014");
         }
 
         // 查询已存在token
@@ -171,8 +147,6 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
 
         // 没有token，新生成
         if (null == userTokens || userTokens.size() == 0) {
-            // 登录日志
-            loginLogService.insert(user.getId(), loginIp);
             // 删除登录验证码
             validateService.delete(validateId, "login", null);
             // 返回token
@@ -240,8 +214,6 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
                 reToken = this.newToken(user.getId(), loginIp, platform);
             }
 
-            loginLogService.insert(user.getId(), loginIp);
-
             // 删除登录验证码
             validateService.delete(validateId, "login", null);
 
@@ -255,17 +227,17 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
      * 返回code
      * @param response
      * @param tokenClientId
-     * @param userName
+     * @param loginIp
      * @param data
      * @param code
      * @return
      */
-    private Object returnCode(HttpServletResponse response, String tokenClientId, String userName, String data, String code) {
+    private Object returnCode(HttpServletResponse response, String tokenClientId, String loginIp, String data, String code) {
         response.setStatus(400);
         Map<String, String> result = new HashMap<>(3);
         result.put("data", data);
         result.put("code", code);
-        result.put("image", this.code(tokenClientId, userName));
+        result.put("image", validateService.verifyCode("login", tokenClientId, loginIp));
         return result;
     }
 
@@ -296,7 +268,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
      * @param platform
      * @return
      */
-    private TokenVO newToken(String userId, String clientIp, String platform) {
+    public TokenVO newToken(String userId, String clientIp, String platform) {
         TokenVO tokenVO = new TokenVO();
 
         // token有效时间
@@ -311,6 +283,9 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
         tokenVO.setIp(clientIp);
         tokenVO.setPlatform(platform);
         super.baseInsert(tokenVO);
+
+        // 登录日志
+        loginLogService.insert(userId, clientIp);
 
         return tokenVO;
     }

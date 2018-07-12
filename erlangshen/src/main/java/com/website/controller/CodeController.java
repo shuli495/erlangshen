@@ -1,12 +1,17 @@
 package com.website.controller;
 
+import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
+import com.fastjavaframework.util.CommonUtil;
 import com.fastjavaframework.util.UUID;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.common.BaseElsController;
 import com.website.common.Constants;
 import com.website.model.bo.CodeBO;
 import com.website.service.CodeService;
+import com.website.service.TokenService;
+import com.website.service.ValidateService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +24,30 @@ import java.util.List;
 @RestController
 @RequestMapping(value= Constants.URL_CODE)
 public class CodeController extends BaseElsController<CodeService> {
+
+	@Autowired
+	private ValidateService validateService;
+
+	/**
+	 * 获取验证码
+	 * @return
+	 */
+	@RequestMapping(value="/verify", method=RequestMethod.GET)
+	public Object code(@RequestParam(required = false) String loginIp, @RequestParam(required = true) String type) {
+		if("KEY".equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
+			throw new ThrowException("AK/SK方式loginIp参数必传！", "071001");
+		}
+
+		if(VerifyUtils.isEmpty(loginIp)) {
+			loginIp = CommonUtil.getIp(super.request);
+		}
+
+		if(!"login".equals(type) && !"register".equals(type)) {
+			throw new ThrowException("类型只能是login或register！", "071003");
+		}
+
+		return success(validateService.verifyCode(type, super.identity().getClientId(), loginIp));
+	}
 
 	/**
 	 * 创建

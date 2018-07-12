@@ -64,7 +64,12 @@ class RegisterApp extends BaseComponents {
         registerDiv.classList.add("loading_circle");
         this.refs.loginBut.disabled = true;
 
-        UserStore.register(userName, pwd, code);
+        var verifyCode = "";
+        if(this.refs.verifyCode) {
+            verifyCode = this.refs.verifyCode.value;
+        }
+
+        UserStore.register(userName, pwd, code, verifyCode);
     }
 
     componentDidUpdate() {
@@ -77,8 +82,17 @@ class RegisterApp extends BaseComponents {
     }
 
     render(){
-        var info = this.state.info;
-        if(info == "" && this.refs.registerDiv) {
+        {
+            var info = this.state.info;
+            var verifyCodeImage = this.state.codeImage;
+            var verifyCodeDom;
+            if(verifyCodeImage != "") {
+                verifyCodeImage = "data:image/jpg;base64," + verifyCodeImage;
+                verifyCodeDom = <div className="login_line_content code_container">
+                                            <input type="text" ref="verifyCode" placeholder="验证码" data-errMsgId="errorMsg" data-empty="true" data-emptyText="验证码不能为空！"/>
+                                            <img src={verifyCodeImage} onClick={this.getCodeImg} />
+                                        </div>
+            }
         }
 
         return (
@@ -97,6 +111,7 @@ class RegisterApp extends BaseComponents {
                 <div className="login_line_content">
                     <input type="password" ref="rePwd" placeholder="确认密码" data-errMsgId="errorMsg" data-empty="true" data-emptyText="确认密码不能为空！" data-min="6" data-minText="确认密码6-16个字符！"  data-max="16" data-maxText="确认密码6-16个字符！" data-same="pwd" data-sameText="与密码不同，请重新输入！"/>
                 </div>
+                {verifyCodeDom}
                 <div id="errorMsg" className="errorMsg">{info}</div>
                 <div className="login_line_content">
                     <button ref="loginBut" className="button button-primary button-rounded button-small" onClick={this.handleRegister}><div ref="registerDiv">注&nbsp;册</div></button>

@@ -14,14 +14,34 @@ public class UserVO extends UserInfoBO {
     // 客户端名称
     private String clientName;
 
-    // 验证码
+    // 邮箱、手机验证码
     private String code;
+
+    // 防机器人校验验证码
+    private String verifyCode;
 
     // 新密码
     private String oldPwd;
 
     // 登录成功后获得的token
     private TokenVO token;
+
+    // 创建成功后获取token
+    private Boolean autoLogin;
+
+    // 登录客户端ip
+    private String loginIp;
+
+    // 登录客户端平台
+    private String platform;
+
+    public String getVerifyCode() {
+        return verifyCode;
+    }
+
+    public void setVerifyCode(String verifyCode) {
+        this.verifyCode = verifyCode;
+    }
 
     public String getCreatedBy() {
         return createdBy;
@@ -61,5 +81,29 @@ public class UserVO extends UserInfoBO {
 
     public void setToken(TokenVO token) {
         this.token = token;
+    }
+
+    public Boolean getAutoLogin() {
+        return autoLogin;
+    }
+
+    public void setAutoLogin(Boolean autoLogin) {
+        this.autoLogin = autoLogin;
+    }
+
+    public String getLoginIp() {
+        return loginIp;
+    }
+
+    public void setLoginIp(String loginIp) {
+        this.loginIp = loginIp;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
     }
 }

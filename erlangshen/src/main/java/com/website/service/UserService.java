@@ -13,6 +13,8 @@ import com.website.common.PhoneSender;
 import com.website.model.bo.ClientBO;
 import com.website.model.bo.CodeBO;
 import com.website.model.vo.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import java.util.*;
  */
 @Service
 public class UserService extends BaseService<UserDao,UserVO> {
+	private static final Log logger=LogFactory.getLog(UserService.class);
 
 	@Autowired
 	public ClientService clientService;
@@ -43,6 +46,8 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	public UserInfoService userInfoService;
 	@Autowired
 	public UserRecycleService userRecycleService;
+	@Autowired
+	public TokenService tokenService;
 
 	/**
 	 * 该用户是否为登陆用户的子用户
@@ -60,28 +65,22 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	}
 
 	/**
-	 * 校验用户是否存在
+	 * 根据用户名、邮箱或手机校验用户是否存在
 	 * @param clientId
-	 * @param userName
+	 * @param userName 用户名或邮箱或手机
 	 * @param pwd
 	 * @return
 	 */
 	public List<UserVO> checkExist(String clientId, String userName, String pwd) {
+		if(VerifyUtils.isEmpty(userName)) {
+			throw new ThrowPrompt("请填写用户名、邮箱或手机！", "081015");
+		}
+
 		if(VerifyUtils.isNotEmpty(pwd)) {
 			pwd = SecretUtil.md5(pwd);
 		}
 
-		List<UserVO> users = this.dao.check(clientId, userName, pwd);
-
-		if(null == users || users.size() == 0) {
-			if(VerifyUtils.isEmpty(pwd)) {
-				throw new ThrowPrompt("账号不存在！", "072001");
-			} else {
-				throw new ThrowPrompt("账号或密码错误！", "072001");
-			}
-		}
-
-		return users;
+		return this.dao.check(clientId, userName, pwd);
 	}
 
 	/**
@@ -130,7 +129,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	 * @param vo
 	 */
 	@Transactional
-	public void  insert(TokenVO tokenVO, UserVO vo) {
+	public void insert(TokenVO tokenVO, UserVO vo) {
 		String clientId = vo.getClientId();
 		String userName = vo.getUsername();
 		String mail = vo.getMail();
@@ -142,6 +141,28 @@ public class UserService extends BaseService<UserDao,UserVO> {
 
 		if(VerifyUtils.isEmpty(userName) && VerifyUtils.isEmpty(mail) && VerifyUtils.isEmpty(phone)) {
 			throw new ThrowPrompt("用户名、邮箱、手机必填一个！", "072003");
+		}
+
+		// 校验验机器人证码
+		String validateId = tokenVO.getClientId() + "_" + vo.getLoginIp();
+
+		ValidateVO validateVO = new ValidateVO();
+		validateVO.setUserId(validateId);
+		validateVO.setType("register");
+		List<ValidateVO> validates = validateService.baseQueryByAnd(validateVO);
+
+		for(ValidateVO validate : validates) {
+			try {
+				validateService.checkOvertime("login", validate.getCreatedTime());
+			} catch (Exception e) {
+				throw new ThrowPrompt("验证码超时！", "142015");
+			}
+			if(VerifyUtils.isEmpty(vo.getVerifyCode())) {
+				throw new ThrowPrompt("请输入验证码！", "142016");
+			}
+			if(!validate.getCode().equalsIgnoreCase(vo.getVerifyCode())) {
+				throw new ThrowPrompt("验证码错误！", "142017");
+			}
 		}
 
 		// 校验修改的信息是否已存在
@@ -172,7 +193,6 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		vo.setPwd(SecretUtil.md5(vo.getPwd()));
 
 		// 验证验证码
-		ValidateVO validateVO = null;
 		if(VerifyUtils.isNotEmpty(vo.getCode())) {
 			validateVO = validateService.checkByMailOrPhone(clientId, mail, phone, vo.getCode(), null);
 
@@ -202,7 +222,18 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		if(VerifyUtils.isNotEmpty(vo.getCode()) && null != validateVO) {
 			try {
 				validateService.delete(validateVO.getUserId(), validateVO.getType(), null);
-			} catch (Exception e){}
+			} catch (Exception e){
+				logger.error(e.getMessage());
+			}
+		}
+
+		try {
+			if(vo.getAutoLogin()) {
+				TokenVO token = tokenService.newToken(vo.getId(), vo.getLoginIp(), vo.getPlatform());
+				vo.setToken(token);
+			}
+		} catch (Exception e){
+			logger.error(e.getMessage());
 		}
 	}
 
@@ -989,7 +1020,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			List<UserVO> users = this.dao.check(clientId, mail, null);
 			for(UserVO user : users) {
 				if((VerifyUtils.isEmpty(nowUserId) && user.getMail().equals(mail)) || (!VerifyUtils.isEmpty(nowUserId) && !user.getId().equals(nowUserId))) {
-					if(user.getMailVerify() == 0) {
+					if(null ==  user.getMailVerify() || user.getMailVerify() == 0) {
 						throw new ThrowPrompt("该邮箱已注册，但未验证！", "142011");
 					} else {
 						throw new ThrowPrompt("该邮箱已注册，请更换后再试！", "142012");
@@ -1001,7 +1032,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			List<UserVO> users = this.dao.check(clientId, phone, null);
 			for(UserVO user : users) {
 				if((VerifyUtils.isEmpty(nowUserId) && user.getPhone().equals(phone)) || (!VerifyUtils.isEmpty(nowUserId) && !user.getId().equals(nowUserId))) {
-					if(user.getPhoneVerify() == 0) {
+					if(null == user.getPhoneVerify() || user.getPhoneVerify() == 0) {
 						throw new ThrowPrompt("该手机号码已注册，但未验证！", "142013");
 					} else {
 						throw new ThrowPrompt("该手机号码已注册，请更换后再试！", "142014");

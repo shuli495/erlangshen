@@ -13,11 +13,11 @@ var UserStore = assign({}, EventEmitter.prototype, {
        idcardImage: ""
   },
 
-  code: function () {
+  code: function (type) {
     $.ajax({
         type : "GET",
         dataType: "json",
-        url: $setting.serverUrl + "token",
+        url: $setting.serverUrl + "code?type="+type,
         headers : {"Token": $setting.token},
         success: function(result) {
           this.data.codeImage = result.data;
@@ -31,14 +31,14 @@ var UserStore = assign({}, EventEmitter.prototype, {
     });
   },
 
-  login: function (userName, pwd, code) {
+  login: function (userName, pwd, verifyCode) {
       var data = {
           "userName" : userName,
           "pwd" : pwd
       };
 
-    if(typeof(code) != "undefined" && code != "undefined" && code != "") {
-      data["code"] = code;
+    if(typeof(verifyCode) != "undefined" && verifyCode != "undefined" && verifyCode != "") {
+      data["verifyCode"] = verifyCode;
     }
 
     $.ajax({
@@ -61,16 +61,14 @@ var UserStore = assign({}, EventEmitter.prototype, {
           if(eval('('+xhr.responseText+')').image) {
             this.data.codeImage = eval('('+xhr.responseText+')').image;
           }
-          if((typeof(code) != "undefined" && code != "undefined" && code != "")
-              && (eval('('+xhr.responseText+')').code && eval('('+xhr.responseText+')').code != "122009" && eval('('+xhr.responseText+')').code != "122010")) {
-            this.data.info = errMsg;
-          }
+
+          this.data.info = errMsg;
           this.emit('change');
         }.bind(this)
     });
   },
 
-  register: function(userName, pwd, code) {
+  register: function(userName, pwd, code, verifyCode) {
     var params = {"checkMail" : true};
 
     if(typeof(userName) != "undefined" && userName != "undefined" && userName != "") {
@@ -82,6 +80,9 @@ var UserStore = assign({}, EventEmitter.prototype, {
     if(typeof(code) != "undefined" && code != "undefined" && code != "") {
       params["code"] = code;
     }
+    if(typeof(verifyCode) != "undefined" && verifyCode != "undefined" && verifyCode != "") {
+      params["verifyCode"] = verifyCode;
+    }
 
     $.ajax({
         type : "POST",
@@ -91,6 +92,7 @@ var UserStore = assign({}, EventEmitter.prototype, {
         url: $setting.serverUrl + "user",
         headers : {"Token": $setting.token},
         success: function(result) {
+            this.data.codeImage = "";
             $util_alertMsg('', '注册成功！',
               function() {
                 window.setTimeout("location.href='/src/page/login.html';",2000);
@@ -98,7 +100,13 @@ var UserStore = assign({}, EventEmitter.prototype, {
             );
         }.bind(this),
         error: function(xhr, type, exception) {
-          this.data.info = $util_getMsg(xhr);
+          var errMsg = $util_getMsg(xhr);
+
+          if(eval('('+xhr.responseText+')').image) {
+            this.data.codeImage = eval('('+xhr.responseText+')').image;
+          }
+
+          this.data.info = errMsg;
           this.emit('change');
         }.bind(this)
     });
