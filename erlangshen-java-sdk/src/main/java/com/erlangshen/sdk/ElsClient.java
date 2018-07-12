@@ -25,6 +25,28 @@ public class ElsClient {
     }
 
     /**
+     * 用户是否已存在
+     * @param name
+     * @return true存在 false不存在
+     * @throws Exception
+     */
+    public boolean isUserExit(String name) throws Exception {
+        if(null == name || "".equals(name)) {
+            throw new Exception("请填写用户名、邮箱或手机");
+        }
+
+        String result = new Http(host, "/user/checkUser/" + name, null, null, ak, sk).get();
+
+        BooleanResult booleanResult =  JSONObject.parseObject(result, BooleanResult.class);
+
+        if("success".equals(booleanResult.getStatus())) {
+            return booleanResult.getData();
+        } else {
+            throw new Exception(booleanResult.getMessage());
+        }
+    }
+
+    /**
      * 邮箱是否已存在
      * @param mail
      * @return true存在 false不存在
@@ -228,7 +250,7 @@ public class ElsClient {
      * @return Result
      * @throws Exception
      */
-    public Result register(User user) throws Exception {
+    public RegisterResult register(User user) throws Exception {
         if((null == user.getUsername() || "".equals(user.getUsername()))
                 && (null == user.getPhone() || "".equals(user.getPhone()))
                 && (null == user.getMail() || "".equals(user.getMail()))) {
@@ -239,7 +261,7 @@ public class ElsClient {
         }
 
         String result = new Http(host, "/user", null, user, ak, sk).post();
-        return JSONObject.parseObject(result, Result.class);
+        return JSONObject.parseObject(result, RegisterResult.class);
     }
 
     /**

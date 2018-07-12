@@ -80,6 +80,9 @@ public class User {
     // 创建时间
     private Date createdTime;
 
+    // 创建成后后自动登录
+    private Boolean autoLogin;
+
     public Token getToken() {
         return token;
     }
@@ -286,5 +289,13 @@ public class User {
 
     public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
+    }
+
+    public Boolean getAutoLogin() {
+        return autoLogin;
+    }
+
+    public void setAutoLogin(Boolean autoLogin) {
+        this.autoLogin = autoLogin;
     }
 }
