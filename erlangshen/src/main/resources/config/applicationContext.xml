@@ -29,6 +29,10 @@
 		<property name="properties" ref="configProperties" />
 	</bean>
 
+	<!-- 系统信息设置 -->
+	<bean class="com.fastjavaframework.listener.SystemSet">
+	</bean>
+
 	<!-- 数据库 -->
 	<import resource="classpath:config/dataSource.xml" />
 

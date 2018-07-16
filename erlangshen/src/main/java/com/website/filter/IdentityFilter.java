@@ -1,11 +1,11 @@
 package com.website.filter;
 
 import com.fastjavaframework.Setting;
+import com.fastjavaframework.listener.SystemSet;
 import com.fastjavaframework.util.CommonUtil;
 import com.fastjavaframework.util.SecretUtil;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.common.BodyReaderHttpServletRequestWrapper;
-import com.website.common.Constants;
 import com.website.common.HttpHelper;
 import com.website.model.vo.ClientVO;
 import com.website.model.vo.KeyVO;
@@ -106,32 +106,11 @@ public class IdentityFilter extends OncePerRequestFilter {
                 String clientIp = "";
                 // admin token只能用于以下操作
                 if(token.equals(Setting.getProperty("admin.token"))) {
-                    // 获取token
-                    boolean isToken = request.getRequestURI().endsWith(Constants.URL_TOKEN)
-                                    || request.getRequestURI().endsWith(Constants.URL_TOKEN+"/");
-                    // 获取验证码
-                    boolean isCode = (request.getRequestURI().endsWith(Constants.URL_CODE+"verify") || request.getRequestURI().endsWith(Constants.URL_CODE+"verify/"))
-                            && "get".equalsIgnoreCase(request.getMethod());
-                    // 用户查询或创建
-                    boolean isCreateOrSel = (request.getRequestURI().endsWith(Constants.URL_USER) || request.getRequestURI().endsWith(Constants.URL_USER+"/"))
-                            && ("get".equalsIgnoreCase(request.getMethod()) || "post".equalsIgnoreCase(request.getMethod()));
-                    // 发送邮件
-                    boolean isSendMail = (request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_SENDMAIL) || request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_SENDMAIL+"/"))
-                            && "get".equalsIgnoreCase(request.getMethod());
-                    // 发送短信
-                    boolean isSendPhone = (request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_SENDPHONE) || request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_SENDPHONE+"/"))
-                            && "get".equalsIgnoreCase(request.getMethod());
-                    // 校验手机、邮件验证码
-                    boolean isCheckCode = (request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_CHECKCODE) || request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_CHECKCODE+"/"))
-                            && "get".equalsIgnoreCase(request.getMethod());
-                    // 验证邮箱url
-                    boolean isCheckMail = (request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_CHECKMAIL) || request.getRequestURI().endsWith(Constants.URL_USER+Constants.URL_USER_CHECKMAIL+"/"))
-                            && "get".equalsIgnoreCase(request.getMethod());
-                    // 重置密码
-                    boolean isRePwd = (request.getRequestURI().endsWith(Constants.URL_USER+"/rePwd") || request.getRequestURI().endsWith(Constants.URL_USER+"/rePwd/"))
-                            && "get".equalsIgnoreCase(request.getMethod());
+                    String requestUri = request.getMethod() + ":"
+                            + request.getRequestURI().replace("/"+SystemSet.projectName(), "");
 
-                    if(!isToken && !isCode && !isCreateOrSel && !isSendMail && !isSendPhone && !isCheckCode && !isCheckMail && !isRePwd) {
+                    if(!SystemSet.authorityByRole().get("adminToken").contains(requestUri) &&
+                            !SystemSet.authorityByRole().get("").contains(requestUri + "/")) {
                         this.returnError(response);
                         return;
                     }
