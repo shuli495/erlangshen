@@ -14,7 +14,7 @@ class SelfApp extends BaseComponents {
             return;
         }
 
-        UserStore.repwd($.cookie('userId'), this.refs.pwd.value, this.refs.newPwd.value);
+        UserStore.repwd($.cookie('userId'), "", this.refs.pwd.value, this.refs.newPwd.value);
     }
 
     handleLoginOut() {

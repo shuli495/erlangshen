@@ -63,7 +63,12 @@ class RetrieveApp extends BaseComponents {
         retrieveDiv.classList.add("loading_circle");
         this.refs.retrieveBut.disabled = true;
 
-        UserStore.retrieve(this.state.retrieveId, code, pwd);
+        if(this.state.retrieveId == "") {
+            this.setData({"info":"请发送验证码！"});
+            return;
+        }
+
+        UserStore.repwd(this.state.retrieveId, code, "", pwd);
     }
 
     componentDidUpdate() {

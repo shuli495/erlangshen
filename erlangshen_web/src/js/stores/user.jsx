@@ -159,8 +159,14 @@ var UserStore = assign({}, EventEmitter.prototype, {
     });
   },
 
-  retrieve(id, code, pwd) {
-    var params = {"id" : id, "code" : code, "pwd": pwd};
+  repwd(id, code, oldPwd, pwd) {
+    var params = {"id" : id, "pwd": pwd};
+    if(typeof(code) != "undefined" && code != "undefined" && code != "") {
+      params["code"] = code;
+    }
+    if(typeof(oldPwd) != "undefined" && oldPwd != "undefined" && oldPwd != "") {
+      params["oldPwd"] = oldPwd;
+    }
 
     $.ajax({
         type : "POST",
@@ -168,30 +174,6 @@ var UserStore = assign({}, EventEmitter.prototype, {
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(params),
         url: $setting.serverUrl + "user/rePwd",
-        headers : {"Token": $setting.token},
-        success: function(result) {
-              $util_alertMsg('', '修改成功，请登录！',
-                function() {
-                  $util_removeCookie(2000);
-                }
-              );
-        }.bind(this),
-        error: function(xhr, type, exception) {
-              this.data.info = $util_getMsg(xhr);
-              this.emit('change');
-        }.bind(this)
-    });
-  },
-
-  repwd(id, oldPwd, pwd) {
-    var params = {"oldPwd" : oldPwd, "pwd": pwd};
-
-    $.ajax({
-        type : "POST",
-        dataType: "json",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(params),
-        url: $setting.serverUrl + "user/" + id + "/rePwd",
         headers : {"Token": $.cookie('token')},
         success: function(result) {
               $util_alertMsg('', '修改成功，请重新登录！',
@@ -201,6 +183,8 @@ var UserStore = assign({}, EventEmitter.prototype, {
               );
         }.bind(this),
         error: function(xhr, type, exception) {
+              this.data.info = $util_getMsg(xhr);
+              this.emit('change');
                 $util_alertMsg(xhr);
         }.bind(this)
     });

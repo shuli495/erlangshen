@@ -1,6 +1,7 @@
 package com.website.controller;
 
 import com.fastjavaframework.Setting;
+import com.fastjavaframework.annotation.Authority;
 import com.fastjavaframework.util.CommonUtil;
 import com.website.common.Constants;
 import com.website.service.TokenService;
@@ -46,9 +47,10 @@ public class UserController extends BaseElsController<UserService> {
 	/**
 	 * 创建
 	 */
+	@Authority(role = "adminToken")
 	@RequestMapping(method=RequestMethod.POST)
 	public Object create(@RequestBody UserVO vo) {
-		String loginIp = "";
+		String loginIp = vo.getLoginIp();
 		if("KEY".equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
 			throw new ThrowException("AK/SK方式loginIp参数必传！", "071002");
 		}
@@ -63,15 +65,6 @@ public class UserController extends BaseElsController<UserService> {
 
 		if(VerifyUtils.isEmpty(vo.getClientId())) {
 			vo.setClientId(super.identity().getClientId());
-		}
-
-		String name = "";
-		if(VerifyUtils.isNotEmpty(vo.getUsername())) {
-			name = vo.getUsername();
-		} else if(VerifyUtils.isNotEmpty(vo.getMail())) {
-			name = vo.getMail();
-		} else if(VerifyUtils.isNotEmpty(vo.getPhone())) {
-			name = vo.getPhone();
 		}
 
 		try {
@@ -109,11 +102,14 @@ public class UserController extends BaseElsController<UserService> {
 	 * @param callback	如果是url注册链接，此参数发送邮件后跳转到此参数的url
 	 * @param isCheckUserExist	检查用户是否存在 null不检查 true存在抛异常 false不存在抛异常
 	 */
+	@Authority(role = "adminToken")
 	@RequestMapping(value=Constants.URL_USER_SENDMAIL, method=RequestMethod.GET)
 	public Object sendMail(@RequestParam String type,
 						   @RequestParam(required = false) String mail,
 						   @RequestParam(required = false) String userId,
-						   @RequestParam(required = false) String callback,
+						    @RequestParam(required = false) String callback,
+						   @RequestParam(required = false) String loginIp,
+						   @RequestParam(required = false) String verifyCode,
 						   @RequestParam(required = false) Boolean isCheckUserExist) {
 		if(VerifyUtils.isEmpty(type)) {
 			throw new ThrowPrompt("type必传!", "081016");
@@ -123,8 +119,15 @@ public class UserController extends BaseElsController<UserService> {
 			throw new ThrowPrompt("mail喝userId二选一!", "081017");
 		}
 
-		this.service.sendMail(super.identity(), type, userId, mail, callback, isCheckUserExist);
-		return success();
+		if("KEY".equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
+			throw new ThrowException("AK/SK方式loginIp参数必传！", "081018");
+		}
+
+		if(VerifyUtils.isEmpty(loginIp)) {
+			loginIp = CommonUtil.getIp(super.request);
+		}
+
+		return this.service.sendMail(super.identity(), type, userId, mail, callback, loginIp, verifyCode, isCheckUserExist);
 	}
 
 	/**
@@ -135,13 +138,24 @@ public class UserController extends BaseElsController<UserService> {
 	 * @param isCheckUserExist	检查用户是否存在 null不检查 true存在抛异常 false不存在抛异常
      * @return
      */
+	@Authority(role = "adminToken")
 	@RequestMapping(value=Constants.URL_USER_SENDPHONE, method=RequestMethod.GET)
 	public Object sendPhone(@RequestParam String type,
 						   @RequestParam(required = false) String userId,
 							@RequestParam(required = false) String phone,
+							@RequestParam(required = false) String loginIp,
+							@RequestParam(required = false) String verifyCode,
 							@RequestParam(required = false) Boolean isCheckUserExist) {
-		this.service.sendPhone(super.identity(), type, userId, phone, isCheckUserExist);
-		return success();
+
+		if("KEY".equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
+			throw new ThrowException("AK/SK方式loginIp参数必传！", "081018");
+		}
+
+		if(VerifyUtils.isEmpty(loginIp)) {
+			loginIp = CommonUtil.getIp(super.request);
+		}
+
+		return this.service.sendPhone(super.identity(), type, userId, phone, loginIp, verifyCode, isCheckUserExist);
 	}
 
 	/**
@@ -151,6 +165,7 @@ public class UserController extends BaseElsController<UserService> {
 	 * @param mail	与phone、userId三选一
 	 * @param phone 与mail、userId三选一
      */
+	@Authority(role = "adminToken")
 	@RequestMapping(value=Constants.URL_USER_CHECKCODE, method=RequestMethod.GET)
 	public Object checkCode(@RequestParam(required = false) String code,@RequestParam(required = false) String type,
 							@RequestParam(required = false) String userId,
@@ -179,6 +194,7 @@ public class UserController extends BaseElsController<UserService> {
 	 * @param info
 	 * @return
 	 */
+	@Authority(role = "adminToken")
 	@RequestMapping(value=Constants.URL_USER_CHECKMAIL, method=RequestMethod.GET)
 	public String checkMail(@RequestParam String info) {
 		return "redirect:" + this.service.checkMail(info);
@@ -357,9 +373,10 @@ public class UserController extends BaseElsController<UserService> {
 	/**
 	 * 修改密码
 	 */
-	@RequestMapping(value="/{id}/rePwd", method=RequestMethod.POST)
-	public Object rePwd(@PathVariable String id, @RequestBody UserVO vo) {
-		if(VerifyUtils.isEmpty(id)) {
+	@Authority(role = "adminToken")
+	@RequestMapping(value="/rePwd", method=RequestMethod.POST)
+	public Object rePwd(@RequestBody UserVO vo) {
+		if(VerifyUtils.isEmpty(vo.getId())) {
 			throw new ThrowPrompt("id必传!", "081013");
 		}
 		if(VerifyUtils.isEmpty(vo.getPwd())) {
@@ -369,7 +386,7 @@ public class UserController extends BaseElsController<UserService> {
 			throw new ThrowPrompt("code或oldPwd必传一个!", "081015");
 		}
 
-		vo.setId(id);
+		vo.setId(vo.getId());
 		this.service.rePwd(super.identity(), vo.getId(), vo.getCode(), vo.getOldPwd(), vo.getPwd());
 		return success();
 	}
@@ -395,6 +412,7 @@ public class UserController extends BaseElsController<UserService> {
 	/**
 	 * 列表查询 and条件
 	 */
+	@Authority(role = "adminToken")
 	@RequestMapping(method=RequestMethod.GET)
 	public Object query(@RequestParam(required = false) Integer pageSize, @RequestParam(required = false) Integer pageNum,
 						@RequestParam(required = false) String sort, @RequestParam(required = false) String order,

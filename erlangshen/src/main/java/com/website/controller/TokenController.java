@@ -1,5 +1,6 @@
 package com.website.controller;
 
+import com.fastjavaframework.annotation.Authority;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.util.CommonUtil;
 import com.fastjavaframework.util.VerifyUtils;
@@ -32,6 +33,7 @@ public class TokenController extends BaseElsController<TokenService> {
 	 * @param isCheckStatus 是否校验用户激活状态
      * @return
      */
+	@Authority(role = "adminToken")
 	@RequestMapping(method=RequestMethod.POST)
 	public Object token(@RequestHeader(value="Is-Check-Status",required=false) boolean isCheckStatus) {
 		String userName = request.getParameter("userName");

@@ -58,6 +58,33 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
     }
 
     /**
+     * 校验防机器人验证码
+     * @param validateId
+     * @param type
+     * @param verifyCode
+     */
+    public void checkVerifyCode(String validateId, String type, String verifyCode) {
+        ValidateVO validateVO = new ValidateVO();
+        validateVO.setUserId(validateId);
+        validateVO.setType(type);
+        List<ValidateVO> validates = this.baseQueryByAnd(validateVO);
+
+        for(ValidateVO validate : validates) {
+            try {
+                this.checkOvertime(type, validate.getCreatedTime());
+            } catch (Exception e) {
+                throw new ThrowPrompt("验证码超时！", "152007");
+            }
+            if(VerifyUtils.isEmpty(verifyCode)) {
+                throw new ThrowPrompt("请输入验证码！", "152008");
+            }
+            if(!validate.getCode().equalsIgnoreCase(verifyCode)) {
+                throw new ThrowPrompt("验证码错误！", "152009");
+            }
+        }
+    }
+
+    /**
      * 不存在则新增，存在修改
      * @param userId
      * @param type

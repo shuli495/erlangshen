@@ -59,45 +59,19 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
      */
     public Object inster(HttpServletResponse response, TokenVO token, boolean isCheckStatus,
                           String loginIp, String userName, String pwd, String platform, String verifyCode) {
-        // 校验验证码
+        // 校验防机器人验证码
         String validateId = token.getClientId() + "_" + loginIp;
-
-        ValidateVO validateVO = new ValidateVO();
-        validateVO.setUserId(validateId);
-        validateVO.setType("login");
-        List<ValidateVO> validates = validateService.baseQueryByAnd(validateVO);
-
-        for(ValidateVO validate : validates) {
-            try {
-                validateService.checkOvertime("login", validate.getCreatedTime());
-            } catch (Exception e) {
-                return this.returnCode(response, token.getClientId(), loginIp, "验证码超时！", "122009");
-            }
-            if(VerifyUtils.isEmpty(verifyCode)) {
-                return this.returnCode(response, token.getClientId(), loginIp, "请输入验证码！", "122010");
-            }
-            if(!validate.getCode().equalsIgnoreCase(verifyCode)) {
-                return this.returnCode(response, token.getClientId(), loginIp, "验证码错误！", "122011");
-            }
-        }
+        validateService.checkVerifyCode(validateId, "login", verifyCode);
 
         // 根据用户名查询用户
         List<UserVO> users = new ArrayList<>();
         try {
             users = userService.checkExist(token.getClientId(), userName, null);
         } catch (Exception e) {
-            // 删除登录验证码
-            if(validates.size() != 0) {
-                validateService.delete(validateId, "login", null);
-            }
             return this.returnCode(response, token.getClientId(), loginIp, "用户名或密码错误！", "122012");
         }
 
         if(users.size() == 0) {
-            // 删除登录验证码
-            if(validates.size() != 0) {
-                validateService.delete(validateId, "login", null);
-            }
             return this.returnCode(response, token.getClientId(), loginIp, "用户名或密码错误！", "122013");
         }
 
@@ -214,7 +188,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
                 reToken = this.newToken(user.getId(), loginIp, platform);
             }
 
-            // 删除登录验证码
+            // 删除登录防机器人验证码
             validateService.delete(validateId, "login", null);
 
             // 返回token

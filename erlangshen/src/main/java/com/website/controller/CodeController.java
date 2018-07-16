@@ -1,5 +1,6 @@
 package com.website.controller;
 
+import com.fastjavaframework.annotation.Authority;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.util.CommonUtil;
@@ -32,6 +33,7 @@ public class CodeController extends BaseElsController<CodeService> {
 	 * 获取验证码
 	 * @return
 	 */
+	@Authority(role = "adminToken")
 	@RequestMapping(value="/verify", method=RequestMethod.GET)
 	public Object code(@RequestParam(required = false) String loginIp, @RequestParam(required = true) String type) {
 		if("KEY".equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
