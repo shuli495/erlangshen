@@ -1,7 +1,6 @@
 package com.website.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.fastjavaframework.Setting;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.page.PageResult;
@@ -19,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.fastjavaframework.base.BaseService;
 import com.website.dao.UserDao;
@@ -50,6 +50,16 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	public UserRecycleService userRecycleService;
 	@Autowired
 	public TokenService tokenService;
+
+	@Value("${aes.secret}")
+	private String aesSecret;
+
+	@Value("${check.mail}")
+	private String checkMail;
+
+	@Value("${default.redirect}")
+	private String defaultRedirect;
+
 
 	/**
 	 * 该用户是否为登陆用户的子用户
@@ -333,7 +343,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 					clientMailUsername = clientMail.split("@")[0];
 				}
 				// 解密邮箱密码
-				clientMailPwd = SecretUtil.aes128Decrypt(clientMailPwd, Setting.getProperty("aes.secret"));
+				clientMailPwd = SecretUtil.aes128Decrypt(clientMailPwd, aesSecret);
 
 				mailSender.send(clientMail, clientBO.getName(), clientMailSmtp, clientMailSubject, clientMailText, mail, clientMailUsername, clientMailPwd);
 
@@ -393,8 +403,8 @@ public class UserService extends BaseService<UserDao,UserVO> {
 				url += "&callback=" + callback;
 			}
 
-			String secuetUrl = SecretUtil.aes128Encrypt(url, Setting.getProperty("aes.secret"));
-			String checkMailUrl = Setting.getProperty("check.mail") + "?info=" + secuetUrl;
+			String secuetUrl = SecretUtil.aes128Encrypt(url, aesSecret);
+			String checkMailUrl = checkMail + "?info=" + secuetUrl;
 
 			text = text.replace("${url}", checkMailUrl);
 
@@ -467,7 +477,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			throw new ThrowPrompt("无认证信息，请重新认证！", "072013");
 		}
 
-		String url = SecretUtil.aes128Decrypt(info, Setting.getProperty("aes.secret"));
+		String url = SecretUtil.aes128Decrypt(info, aesSecret);
 
 		if(url.indexOf("userId=") == -1 || url.indexOf("code=") == -1) {
 			throw new ThrowPrompt("认证信息错误，请重新认证！", "072014");
@@ -479,7 +489,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		String code = urls[2];
 
 
-		String callback = Setting.getProperty("default.redirect");
+		String callback = defaultRedirect;
 		if(url.indexOf("callback=") != -1) {
 			callback = urls[3];
 		}
@@ -605,7 +615,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		params.put("datetime", DateUtil.format("yyyyMMDDHHssmm", new Date()));
 
 		// 解密sk
-		String sk = SecretUtil.aes128Decrypt(clientPhoneVO.getSk(), Setting.getProperty("aes.secret"));
+		String sk = SecretUtil.aes128Decrypt(clientPhoneVO.getSk(), aesSecret);
 
 		// 发送短信
 		new PhoneSender().send(clientPhoneVO.getAk(), sk, phone, clientPhoneVO.getSign(), clientPhoneVO.getTmplate(), JSONObject.toJSONString(params));

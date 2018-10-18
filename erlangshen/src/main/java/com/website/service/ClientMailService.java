@@ -1,6 +1,5 @@
 package com.website.service;
 
-import com.fastjavaframework.Setting;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.util.SecretUtil;
@@ -8,6 +7,7 @@ import com.fastjavaframework.util.VerifyUtils;
 import com.website.model.vo.ClientSecurityVO;
 import com.website.model.vo.TokenVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.fastjavaframework.base.BaseService;
 import com.website.dao.ClientMailDao;
@@ -26,6 +26,9 @@ public class ClientMailService extends BaseService<ClientMailDao,ClientMailVO> {
 	private ClientService clientService;
 	@Autowired
 	private ClientSecurityService clientSecurityService;
+
+	@Value("${aes.secret}")
+	private String aesSecret;
 
 	/**
 	 * 根据clidentId、type查询
@@ -75,7 +78,7 @@ public class ClientMailService extends BaseService<ClientMailDao,ClientMailVO> {
 
 		// 加密密码
 		if(VerifyUtils.isNotEmpty(clientMailVO.getPwd())) {
-			clientMailVO.setPwd(SecretUtil.aes128Encrypt(clientMailVO.getPwd(), Setting.getProperty("aes.secret")));
+			clientMailVO.setPwd(SecretUtil.aes128Encrypt(clientMailVO.getPwd(), aesSecret));
 		}
 
 		super.baseInsert(clientMailVO);

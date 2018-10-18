@@ -1,8 +1,8 @@
 package com.website.executor;
 
-import com.fastjavaframework.Setting;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.util.VerifyUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +18,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author https://github.com/shuli495/erlangshen
  */
 public abstract class AbstractQpsControl implements Runnable {
+
+    @Value("${bdyun.idcard.qps.max}")
+    private Integer bdyunIdcardQpsMax;
+
+    @Value("${bdmap.qps.max}")
+    private Integer bdmapQpsMax;
 
     private static Map<String, Object> map = new ConcurrentHashMap<>();
     private String controlName;
@@ -55,11 +61,16 @@ public abstract class AbstractQpsControl implements Runnable {
         ExecutorService executor = (ExecutorService)map.get(controlName + "Executor");
 
         // 最大调用数
-        String qpsMaxStr = Setting.getProperty(controlName + ".qps.max");
+        Integer qpsMax = 0;
+        if(controlName.startsWith("bdyun")) {
+            qpsMax = bdyunIdcardQpsMax;
+        } else if(controlName.startsWith("bdmap")) {
+            qpsMax = bdmapQpsMax;
+        }
         double qpsMaxNum = 0;
-        if(VerifyUtils.isNotEmpty(qpsMaxStr)) {
+        if(VerifyUtils.isNotEmpty(qpsMax)) {
             // 0.05%做缓存，防止24点边界数据溢出
-            qpsMaxNum = Integer.valueOf(qpsMaxStr) * 0.95;
+            qpsMaxNum = qpsMax * 0.95;
         }
 
         // 未超过接口每日最大调用限制，直接放入线程池
