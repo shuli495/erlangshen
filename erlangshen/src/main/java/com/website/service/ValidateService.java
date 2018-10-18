@@ -1,6 +1,5 @@
 package com.website.service;
 
-import com.fastjavaframework.Setting;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.page.OrderSort;
@@ -8,6 +7,7 @@ import com.fastjavaframework.util.CodeUtil;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.model.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.fastjavaframework.base.BaseService;
 import com.website.dao.ValidateDao;
@@ -31,6 +31,12 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
 
     @Autowired
     private UserService userService;
+
+    @Value("${validate.code.active}")
+    private Integer validateCodeActive;
+
+    @Value("${validate.code.reSend}")
+    private Integer validateCodeResend;
 
     /**
      * 获取防机器人验证码
@@ -170,7 +176,7 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
 
     /**
      * 查询验证码并验证是否有效
-     * @param ObjectId  验证码所属对象
+     * @param objectId  验证码所属对象
      * @param type      验证类型
      * @param code      验证码
      * @return List<ValidateVO>
@@ -214,7 +220,7 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
         Calendar cal = Calendar.getInstance();
         cal.setTime(validateCreateTime);
 
-        cal.add(Calendar.SECOND, +Integer.parseInt(Setting.getProperty("validate.code.active.time")));
+        cal.add(Calendar.SECOND, +validateCodeActive);
 
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
@@ -249,8 +255,7 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
 
         Date createdTime = validates.get(0).getCreatedTime();
 
-        int re = Integer.parseInt(Setting.getProperty("validate.code.reSend.time"))
-                - (int)((System.currentTimeMillis() - createdTime.getTime()) / 1000);
+        int re = validateCodeResend - (int)((System.currentTimeMillis() - createdTime.getTime()) / 1000);
 
         if(re > 0) {
             throw new ThrowPrompt(re + "秒后再次操作！", "152005");
