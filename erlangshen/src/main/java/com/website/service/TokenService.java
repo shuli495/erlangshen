@@ -1,23 +1,31 @@
 package com.website.service;
 
+import com.fastjavaframework.Setting;
+import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.page.OrderSort;
 import com.fastjavaframework.response.ReturnJson;
+import com.fastjavaframework.util.CodeUtil;
 import com.fastjavaframework.util.SecretUtil;
 import com.fastjavaframework.util.UUID;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.common.HttpHelper;
 import com.website.executor.LoginPlaceReport;
+import com.website.model.bo.UserBO;
 import com.website.model.vo.ClientSecurityVO;
 import com.website.model.vo.TokenVO;
 import com.website.model.vo.UserVO;
+import com.website.model.vo.ValidateVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.fastjavaframework.base.BaseService;
 import com.website.dao.TokenDao;
+import sun.misc.BASE64Encoder;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.*;
 
 /**
@@ -35,12 +43,6 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
     private ClientSecurityService clientSecurityService;
     @Autowired
     private ValidateService validateService;
-
-    @Value("${token.active.time}")
-    private Integer tokenActiveTime;
-
-    @Value("${token.active.new}")
-    private Integer tokenActiveNew;
 
     /**
      * 生成token
@@ -127,7 +129,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
             // token有效期剩余多少分钟后，生成新token
             Calendar cal = Calendar.getInstance();
             cal.setTime(new Date());
-            cal.add(Calendar.MINUTE, tokenActiveNew);
+            cal.add(Calendar.MINUTE, Integer.parseInt(Setting.getProperty("token.active.new")));
 
             TokenVO reToken = null;
 
@@ -246,7 +248,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
         // token有效时间
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
-        cal.add(Calendar.MINUTE, tokenActiveTime);
+        cal.add(Calendar.MINUTE, Integer.parseInt(Setting.getProperty("token.active.time")));
 
         tokenVO.setId(UUID.uuid());
         tokenVO.setUserId(userId);
@@ -278,7 +280,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
             throw new ThrowPrompt("token无效！", "122006");
         }
 
-        if(VerifyUtils.isNotEmpty(tokenVO.getIp()) && VerifyUtils.isNotEmpty(loginIp) && !loginIp.equals(tokenVO.getIp())) {
+        if(VerifyUtils.isNotEmpty(loginIp) && !loginIp.equals(tokenVO.getIp())) {
             throw new ThrowPrompt("token无效！", "122007");
         }
 

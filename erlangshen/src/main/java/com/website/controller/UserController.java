@@ -1,9 +1,10 @@
 package com.website.controller;
 
+import com.fastjavaframework.Setting;
 import com.fastjavaframework.annotation.Authority;
 import com.fastjavaframework.util.CommonUtil;
 import com.website.common.Constants;
-import org.springframework.beans.factory.annotation.Value;
+import com.website.service.TokenService;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.File;
@@ -42,9 +43,6 @@ public class UserController extends BaseElsController<UserService> {
 	public ClientService clientService;
 	@Autowired
 	public ValidateService validateService;
-
-	@Value("${path.idcard}")
-	private String pathIdcard;
 
 	/**
 	 * 创建
@@ -246,9 +244,10 @@ public class UserController extends BaseElsController<UserService> {
 	 * @param type
      */
 	private void setIdcardImg(Map<String, String> result, String id, String type) {
+		String imagePath = Setting.getProperty("idcard.image.path");
 		String realPath = request.getSession().getServletContext().getRealPath("");
 
-		String holdBackPath = pathIdcard + id + "_" + type + ".jpg";
+		String holdBackPath = imagePath + id + "_" + type + ".jpg";
 
 		String key = "";
 		switch (type) {
@@ -332,7 +331,7 @@ public class UserController extends BaseElsController<UserService> {
 		try {
 			String pathRoot = request.getSession().getServletContext().getRealPath("");
 			String filePath = new StringBuilder(pathRoot)
-					.append(pathIdcard.replaceAll("\\\\", Matcher.quoteReplacement(File.separator)))
+					.append(Setting.getProperty("idcard.image.path").replaceAll("\\\\", Matcher.quoteReplacement(File.separator)))
 					.append(id)
 					.append("_").append(type).append(".jpg").toString();
 			file.transferTo(new File(filePath));

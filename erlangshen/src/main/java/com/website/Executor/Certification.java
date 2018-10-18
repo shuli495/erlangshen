@@ -1,12 +1,12 @@
 package com.website.executor;
 
 import com.baidu.aip.ocr.AipOcr;
+import com.fastjavaframework.Setting;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.model.vo.UserVO;
 import com.website.service.UserInfoService;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -24,21 +24,6 @@ public class Certification extends AbstractQpsControl {
     private String userId;
     private String name;    // 姓名 不传取user表中的name
     private String idcard;  // 身份证号 不传取user表中的idcard
-
-    @Value("${path.idcard}")
-    private String pathIdcard;
-
-    @Value("${bdyun.ak}")
-    private String bdyunAk;
-
-    @Value("${bdyun.sk}")
-    private String bdyunSk;
-
-    @Value("${bdyun.appid}")
-    private String bdyunAppid;
-
-    @Value("${bdyun.idcard.qps.value}")
-    private Integer bdyunIdcardQps;
 
     public Certification(String userId, String name, String idcard) {
         super("bdyun");
@@ -93,7 +78,7 @@ public class Certification extends AbstractQpsControl {
                         .replaceAll("/", Matcher.quoteReplacement(File.separator))
                         .replace("WEB-INF"+File.separator+"classes"+File.separator, "")
                     )
-                    .append(pathIdcard.replaceAll("\\\\", Matcher.quoteReplacement(File.separator)))
+                    .append(Setting.getProperty("idcard.image.path").replaceAll("\\\\", Matcher.quoteReplacement(File.separator)))
                     .append(userId);
             File front = new File(path.toString() + "_0.jpg");
             File back = new File(path.toString() + "_1.jpg");
@@ -108,14 +93,18 @@ public class Certification extends AbstractQpsControl {
             }
 
             // 百度云client
-            AipOcr client = new AipOcr(bdyunAppid, bdyunAk, bdyunSk);
+            AipOcr client = new AipOcr(Setting.getProperty("bdyun.appid"),
+                    Setting.getProperty("bdyun.ak"),
+                    Setting.getProperty("bdyun.sk"));
 
             // 根据qps间隔调用
-            if(VerifyUtils.isNotEmpty(bdyunIdcardQps)) {
-                bdyunIdcardQps = 0;
+            String qps = Setting.getProperty("bdyun.qps");
+            int qpsNum = 0;
+            if(VerifyUtils.isNotEmpty(qps)) {
+                qpsNum = Integer.valueOf(qps);
             }
-            while (bdyunIdcardQps > 0 && super.getQpsSwitch().compareAndSet(true, true)) {
-                Thread.sleep(1000/bdyunIdcardQps/2);
+            while (qpsNum > 0 && super.getQpsSwitch().compareAndSet(true, true)) {
+                Thread.sleep(1000/qpsNum/2);
             }
 
             // 识别身份证反正面数据

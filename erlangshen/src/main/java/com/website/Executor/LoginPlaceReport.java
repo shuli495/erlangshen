@@ -1,6 +1,7 @@
 package com.website.executor;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fastjavaframework.Setting;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.model.vo.ClientMailVO;
@@ -8,7 +9,6 @@ import com.website.model.vo.ClientPhoneVO;
 import com.website.model.vo.ClientSecurityVO;
 import com.website.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -34,18 +34,6 @@ public class LoginPlaceReport extends AbstractQpsControl {
     @Autowired
     private ClientMailService clientMailService;
 
-    @Value("${bdmap.api.ip}")
-    private static String bdmapApiIp;
-
-    @Value("${bdmap.ak}")
-    private static String bdmapAk;
-
-    @Value("${bdmap.qps.value}")
-    private String bdmapQpsValue;
-
-    @Value("${bdmap.qps.max}")
-    private String bdmapQpsMax;
-
     public LoginPlaceReport(String userId, String clientId, String beforeIp, String loginIp) {
         super("bdmap");
 
@@ -63,9 +51,10 @@ public class LoginPlaceReport extends AbstractQpsControl {
 
         try {
             // 根据qps间隔调用
+            String qps = Setting.getProperty("bdmap.qps");
             int qpsNum = 0;
-            if(VerifyUtils.isNotEmpty(bdmapQpsValue)) {
-                qpsNum = Integer.valueOf(bdmapQpsValue);
+            if(VerifyUtils.isNotEmpty(qps)) {
+                qpsNum = Integer.valueOf(qps);
             }
             while (qpsNum > 0 && super.getQpsSwitch().compareAndSet(true, true)) {
                 Thread.sleep(1000/qpsNum/2);
@@ -131,7 +120,7 @@ public class LoginPlaceReport extends AbstractQpsControl {
         if(VerifyUtils.isNotEmpty(clientPhoneId)) {
             ClientPhoneVO clientPhoneVO = clientPhoneService.baseFind(clientPhoneId);
             if(null != clientPhoneVO) {
-                userService.sendPhone(null, clientPhoneVO.getType(), userId, null, "", null, null);
+                userService.sendPhone(null, clientPhoneVO.getType(), userId, null, null);
             }
         }
     }
@@ -144,7 +133,7 @@ public class LoginPlaceReport extends AbstractQpsControl {
         if(VerifyUtils.isNotEmpty(clientMailId)) {
             ClientMailVO clientMailVO = clientMailService.baseFind(clientMailId);
             if(null != clientMailVO) {
-                userService.sendMail(null, clientMailVO.getType(), userId, null, null, "", null, null);
+                userService.sendMail(null, clientMailVO.getType(), userId, null, null, null);
             }
         }
     }
@@ -157,7 +146,7 @@ public class LoginPlaceReport extends AbstractQpsControl {
      */
     public static JSONObject getAddress(String ip) throws Exception {
         try {
-            String url = String.format(bdmapApiIp, ip, bdmapAk);
+            String url = String.format(Setting.getProperty("bdmap.api.ip"), ip, String.format(Setting.getProperty("bdmap.ak")));
             URL realUrl = new URL(url);
 
             HttpURLConnection conn = (HttpURLConnection) realUrl.openConnection();

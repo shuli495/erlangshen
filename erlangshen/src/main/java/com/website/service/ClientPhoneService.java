@@ -1,5 +1,6 @@
 package com.website.service;
 
+import com.fastjavaframework.Setting;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.util.SecretUtil;
@@ -7,7 +8,6 @@ import com.fastjavaframework.util.VerifyUtils;
 import com.website.model.vo.ClientSecurityVO;
 import com.website.model.vo.TokenVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.fastjavaframework.base.BaseService;
 import com.website.dao.ClientPhoneDao;
@@ -26,9 +26,6 @@ public class ClientPhoneService extends BaseService<ClientPhoneDao,ClientPhoneVO
 	private ClientService clientService;
 	@Autowired
 	private ClientSecurityService clientSecurityService;
-
-	@Value("${aes.secret}")
-	private String aesSecret;
 
 	/**
 	 * 根据clidentId、type查询
@@ -80,7 +77,7 @@ public class ClientPhoneService extends BaseService<ClientPhoneDao,ClientPhoneVO
 
 		// 加密sk
 		if(VerifyUtils.isNotEmpty(clientPhoneVO.getSk())) {
-			clientPhoneVO.setSk(SecretUtil.aes128Encrypt(clientPhoneVO.getSk(), aesSecret));
+			clientPhoneVO.setSk(SecretUtil.aes128Encrypt(clientPhoneVO.getSk(), Setting.getProperty("aes.secret")));
 		}
 
 		super.baseInsert(clientPhoneVO);

@@ -1,6 +1,7 @@
 package com.website.filter;
 
-import com.fastjavaframework.listener.SystemSetting;
+import com.fastjavaframework.Setting;
+import com.fastjavaframework.listener.SystemSet;
 import com.fastjavaframework.util.CommonUtil;
 import com.fastjavaframework.util.SecretUtil;
 import com.fastjavaframework.util.VerifyUtils;
@@ -12,11 +13,14 @@ import com.website.model.vo.TokenVO;
 import com.website.service.ClientService;
 import com.website.service.KeyService;
 import com.website.service.TokenService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.context.support.XmlWebApplicationContext;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.*;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,18 +29,11 @@ import java.io.IOException;
  * 登录权限过滤器 token/aksk
  * @author https://github.com/shuli495/erlangshen
  */
-public class IdentityFilter implements Filter {
-
-    @Value("${token.admin}")
-    private String tokenAdmin;
+public class IdentityFilter extends OncePerRequestFilter {
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        HttpServletRequest request = (HttpServletRequest)servletRequest;
-        HttpServletResponse response = (HttpServletResponse)servletResponse;
-
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-
             if("OPTIONS".equalsIgnoreCase(request.getMethod())) {
                 filterChain.doFilter(request, response);
                 return;
@@ -53,7 +50,7 @@ public class IdentityFilter implements Filter {
             }
 
             ServletContext sc = request.getSession().getServletContext();
-            WebApplicationContext cxt = WebApplicationContextUtils.getWebApplicationContext(sc);
+            XmlWebApplicationContext cxt = (XmlWebApplicationContext) WebApplicationContextUtils.getWebApplicationContext(sc);
 
             // ak/sk认证
             if(VerifyUtils.isNotEmpty(signature)) {
@@ -108,11 +105,12 @@ public class IdentityFilter implements Filter {
             } else {    //token认证
                 String clientIp = "";
                 // admin token只能用于以下操作
-                if(token.equals(tokenAdmin)) {
-                    String requestUri = request.getMethod() + ":" + request.getRequestURI();
+                if(token.equals(Setting.getProperty("admin.token"))) {
+                    String requestUri = request.getMethod() + ":"
+                            + request.getRequestURI().replace("/"+SystemSet.projectName(), "");
 
-                    if(!SystemSetting.authorityByRole().get("adminToken").contains(requestUri) &&
-                            !SystemSetting.authorityByRole().get("").contains(requestUri + "/")) {
+                    if(!SystemSet.authorityByRole().get("adminToken").contains(requestUri) &&
+                            !SystemSet.authorityByRole().get("").contains(requestUri + "/")) {
                         this.returnError(response);
                         return;
                     }
@@ -161,15 +159,5 @@ public class IdentityFilter implements Filter {
      */
     private void returnError(HttpServletResponse response) {
         CommonUtil.setResponseReturnValue(response, 401, "{\"data\":\"身份认证错误！\"}");
-    }
-
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-
-    }
-
-    @Override
-    public void destroy() {
-
     }
 }
