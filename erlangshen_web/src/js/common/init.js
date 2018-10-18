@@ -1,19 +1,19 @@
 // cdn
 var cs = [
-	'https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css',
-	'https://cdn.bootcss.com/Buttons/2.0.0/css/buttons.min.css',
-	'https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css',
+	'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css',
+	'https://cdnjs.cloudflare.com/ajax/libs/Buttons/2.0.0/css/buttons.min.css',
+	'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
 	'/src/css/common/default.css'
 	]
 var js = [
 	'/build/common.js',
 	'/src/js/common/setting.js',
 	'/src/js/common/util.js',
-	'https://cdn.bootcss.com/react/15.4.1/react.min.js',
-	'https://cdn.bootcss.com/react/15.4.1/react-dom.min.js',
-	'https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js',
-	'https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js',
-	'https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js'
+	'https://cdnjs.cloudflare.com/ajax/libs/react/15.4.1/react.min.js',
+	'https://cdnjs.cloudflare.com/ajax/libs/react/15.4.1/react-dom.min.js',
+	'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js',
+	'https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js',
+	'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js'
 	]
 
 loadCs();
