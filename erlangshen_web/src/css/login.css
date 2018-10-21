@@ -9,3 +9,8 @@
 	border-radius: 4px;
 	cursor: pointer;
 }
+
+.login_lint {
+	color: #878787;
+	padding-top: 5px;
+}

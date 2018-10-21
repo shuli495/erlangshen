@@ -73,6 +73,9 @@ class LoginApp extends BaseComponents {
                 <div className="login_line_content">
                     <button  ref="loginBut" className="button button-primary button-rounded button-small" onClick={this.handleClick}><div ref="loginDiv">登&nbsp;录</div></button>
                 </div>
+                <div className="login_lint">
+                    * 测试账号 guest/guest
+                </div>
                 <div className="login_line_content">
                     <div className="login_a_content login_a_content_left"><a href="/src/page/retrieve.html">忘记密码</a></div>
                     <div className="login_a_content login_a_content_right"><a href="/src/page/register.html">注册新账号</a></div>
