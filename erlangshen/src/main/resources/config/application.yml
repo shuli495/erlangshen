@@ -3,15 +3,15 @@ spring:
     active: pro
 
 server:
-  port: 9090
+  port: ${ERLANGSHEN_PORT:9091}
 
 ---
 spring:
   profiles: pro
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/erlangshen?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
-    username: root
-    password: 123456
+    url: jdbc:mysql://${ERLANGSHEN_DB:127.0.0.1}:3306/erlangshen?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+    username: ${ERLANGSHEN_DB_USER:root}
+    password: ${ERLANGSHEN_DB_PWD:123456}
 ---
 
 spring:
@@ -27,7 +27,7 @@ spring:
         url-pattern: /druid/*
         reset-enable: true
         login-username: admin
-        login-password: 123456
+        login-password: ${ERLANGSHEN_DRUID_PWD:123456}
       filter:
         slf4j:
           enabled: true
@@ -50,7 +50,7 @@ fastjava:
 
 
 aes:
-  secret: "123qwe"  #数据加密秘钥
+  secret: ${ERLANGSHEN_SECRET:123QWE}  #数据加密秘钥
 
 token:
   admin: XXXX #管理员token
@@ -76,16 +76,16 @@ path:
 bdmap:
   api:
     ip: http://api.map.baidu.com/location/ip?ip=%s&ak=%s&coor=bd09ll #查询ip地址接口
-  ak: XXXX
+  ak: ${ERLANGSHEN_BDMAP_AK:xxx}
   qps:
     value: 100  #qps
     max: 100000 #最大访问量
 
 # 百度云（身份证识别）
 bdyun:
-  appid: XXXX
-  ak: XXXX
-  sk: XXXX
+  appid: ${ERLANGSHEN_BDYUN_ID:xxx}
+  ak: ${ERLANGSHEN_BDYUN_AK:xxx}
+  sk: ${ERLANGSHEN_BDYUN_SK:xxx}
   idcard:
     qps:
       value: 10
