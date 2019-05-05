@@ -18,7 +18,6 @@ var UserStore = assign({}, EventEmitter.prototype, {
         type : "GET",
         dataType: "json",
         url: $setting.serverUrl + "code?type="+type,
-        headers : {"Token": $setting.token},
         success: function(result) {
           this.data.codeImage = result.data;
           this.emit('change');
@@ -46,7 +45,6 @@ var UserStore = assign({}, EventEmitter.prototype, {
         type : "POST",
         dataType: "json",
         url: $setting.serverUrl + "token",
-        headers : {"Token": $setting.token},
         success: function(result) {
           this.data.codeImage = "";
           var resultToken = result.data;
@@ -90,7 +88,6 @@ var UserStore = assign({}, EventEmitter.prototype, {
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(params),
         url: $setting.serverUrl + "user",
-        headers : {"Token": $setting.token},
         success: function(result) {
             this.data.codeImage = "";
             $util_alertMsg('', '注册成功！',
@@ -126,7 +123,6 @@ var UserStore = assign({}, EventEmitter.prototype, {
         type : "GET",
         dataType: "json",
         url: url,
-        headers : {"Token": $setting.token},
         success: function(result) {
               var users = result.data;
 
@@ -192,7 +188,7 @@ var UserStore = assign({}, EventEmitter.prototype, {
 
   // 发送验证码
   sendMail(type, mail, userId, isCheckUserExist) {
-    var token = $setting.token;
+    var token = '';
     if(typeof($.cookie('token')) != 'undefined') {
       token = $.cookie('token');
     }
@@ -223,7 +219,7 @@ var UserStore = assign({}, EventEmitter.prototype, {
 
   // 发送验证码
   sendPhone(type, phone, userId, isCheckUserExist) {
-    var token = $setting.token;
+    var token = '';
     if(typeof($.cookie('token')) != 'undefined') {
       token = $.cookie('token');
     }
