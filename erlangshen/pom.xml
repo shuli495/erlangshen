@@ -56,6 +56,9 @@
 		<aliyun.dysmsapi.version>1.1.0</aliyun.dysmsapi.version>
 
 		<baiduyun.version>4.2.0</baiduyun.version>
+
+		<jjwt.version>0.6.0</jjwt.version>
+		<jbcrypt.version>0.4</jbcrypt.version>
 	</properties>
 
 	<dependencies>
@@ -89,6 +92,17 @@
 			<artifactId>java-sdk</artifactId>
 			<version>${baiduyun.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>${jjwt.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mindrot</groupId>
+			<artifactId>jbcrypt</artifactId>
+			<version>${jbcrypt.version}</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

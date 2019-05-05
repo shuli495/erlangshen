@@ -1,22 +1,28 @@
 package com.website.service;
 
+import com.fastjavaframework.base.BaseService;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.page.OrderSort;
 import com.fastjavaframework.response.ReturnJson;
-import com.fastjavaframework.util.SecretUtil;
-import com.fastjavaframework.util.UUID;
 import com.fastjavaframework.util.VerifyUtils;
 import com.website.common.HttpHelper;
+import com.website.dao.TokenDao;
 import com.website.executor.LoginPlaceReport;
 import com.website.model.vo.ClientSecurityVO;
 import com.website.model.vo.TokenVO;
 import com.website.model.vo.UserVO;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.tomcat.util.codec.binary.Base64;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.fastjavaframework.base.BaseService;
-import com.website.dao.TokenDao;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
@@ -35,6 +41,9 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
     private ClientSecurityService clientSecurityService;
     @Autowired
     private ValidateService validateService;
+
+    @Value("${aes.secret}")
+    private String aesSecret;
 
     @Value("${token.active.time}")
     private Integer tokenActiveTime;
@@ -88,7 +97,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
         UserVO user = users.get(0);
 
         // 校验密码
-        if(!user.getPwd().equals(SecretUtil.md5(pwd))) {
+        if(!BCrypt.checkpw(pwd, user.getPwd())) {
             return this.returnCode(response, token.getClientId(), loginIp, "用户名或密码错误！", "122014");
         }
 
@@ -241,16 +250,30 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
      * @return
      */
     public TokenVO newToken(String userId, String clientIp, String platform) {
+        Date now = new Date(System.currentTimeMillis());
         TokenVO tokenVO = new TokenVO();
 
         // token有效时间
         Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
+        cal.setTime(now);
         cal.add(Calendar.MINUTE, tokenActiveTime);
 
-        tokenVO.setId(UUID.uuid());
+        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+        byte[] encodedKey = Base64.decodeBase64(aesSecret);
+        SecretKey key = new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
+        JwtBuilder builder = Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setHeaderParam("alg", "HS256")
+                .setIssuedAt(now)
+                .setExpiration(cal.getTime())
+                .claim("id", userId)
+                .setIssuer("erlangshen")
+                .signWith(signatureAlgorithm, key);
+        String jwt = builder.compact();
+
+        tokenVO.setId(jwt);
         tokenVO.setUserId(userId);
-        tokenVO.setCreatedTime(new Date());
+        tokenVO.setCreatedTime(now);
         tokenVO.setActiveTime(cal.getTime());
         tokenVO.setIp(clientIp);
         tokenVO.setPlatform(platform);
@@ -272,9 +295,15 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
         if(VerifyUtils.isEmpty(token)) {
             throw new ThrowPrompt("token无效！", "122005");
         }
+
+        Claims claims = Jwts.parser()
+                .setSigningKey(aesSecret)
+                .parseClaimsJws(token)
+                .getBody();
+
         TokenVO tokenVO = super.baseFind(token);
 
-        if(null == tokenVO) {
+        if(null == tokenVO || null == claims) {
             throw new ThrowPrompt("token无效！", "122006");
         }
 

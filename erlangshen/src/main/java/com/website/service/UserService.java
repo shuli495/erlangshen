@@ -1,27 +1,30 @@
 package com.website.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fastjavaframework.base.BaseService;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.page.PageResult;
-import com.fastjavaframework.response.Result;
 import com.fastjavaframework.response.ReturnJson;
-import com.fastjavaframework.util.*;
-import com.website.executor.Certification;
+import com.fastjavaframework.util.CodeUtil;
+import com.fastjavaframework.util.DateUtil;
+import com.fastjavaframework.util.SecretUtil;
+import com.fastjavaframework.util.VerifyUtils;
 import com.website.common.Constants;
 import com.website.common.MailSender;
 import com.website.common.PhoneSender;
+import com.website.dao.UserDao;
+import com.website.executor.Certification;
 import com.website.model.bo.ClientBO;
 import com.website.model.bo.CodeBO;
 import com.website.model.vo.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.fastjavaframework.base.BaseService;
-import com.website.dao.UserDao;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -184,7 +187,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		}
 		vo.setAddress(address);
 
-		vo.setPwd(SecretUtil.md5(vo.getPwd()));
+		vo.setPwd(BCrypt.hashpw(vo.getPwd(), BCrypt.gensalt()));
 
 		// 验证验证码
 		ValidateVO validateVO = null;
