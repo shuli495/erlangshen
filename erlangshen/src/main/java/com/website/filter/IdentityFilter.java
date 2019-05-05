@@ -107,8 +107,10 @@ public class IdentityFilter implements Filter {
                 }
             } else {    //token认证
                 String clientIp = "";
-                // admin token只能用于以下操作
-                if(token.equals(tokenAdmin)) {
+                TokenVO tokenVO = null;
+
+                if(VerifyUtils.isEmpty(token)) {
+                    // admin token只能用于以下操作
                     String requestUri = request.getMethod() + ":" + request.getRequestURI();
 
                     if(!SystemSetting.authorityByRole().get("adminToken").contains(requestUri) &&
@@ -116,14 +118,19 @@ public class IdentityFilter implements Filter {
                         this.returnError(response);
                         return;
                     }
+
+                    tokenVO = new TokenVO();
+                    tokenVO.setId("erlangshen");
+                    tokenVO.setUserId("erlangshen");
+                    tokenVO.setClientId("erlangshen");
                 } else {
                     clientIp = CommonUtil.getIp(request);
+
+                    TokenService tokenService = (TokenService) cxt.getBean("tokenService");
+
+                    // 检查token
+                    tokenVO = tokenService.check(token, clientIp);
                 }
-
-                TokenService tokenService = (TokenService) cxt.getBean("tokenService");
-
-                // 检查token
-                TokenVO tokenVO = tokenService.check(token, clientIp);
 
                 // 设置身份认证信息
                 tokenVO.setAuthenticationMethod("TOKEN");

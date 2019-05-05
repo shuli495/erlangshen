@@ -34,7 +34,7 @@ CREATE TABLE `client`  (
 -- ----------------------------
 -- Records of client
 -- ----------------------------
-INSERT INTO `client` VALUES ('erlangshen', '二郎神', 'cea83a483bcb414cafa9db38420157e9', 0, NULL);
+INSERT INTO `client` VALUES ('erlangshen', '二郎神', 'erlangshen', 0, NULL);
 
 -- ----------------------------
 -- Table structure for client_mail
@@ -3806,7 +3806,7 @@ CREATE TABLE `permission_user_role`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `token`;
 CREATE TABLE `token`  (
-  `id` varbinary(64) NOT NULL,
+  `id` varbinary(500) NOT NULL,
   `user_id` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `created_time` datetime(0) NULL DEFAULT NULL,
   `active_time` datetime(0) NOT NULL COMMENT '有效时间',
@@ -3818,7 +3818,7 @@ CREATE TABLE `token`  (
 -- ----------------------------
 -- Records of token
 -- ----------------------------
-INSERT INTO `token` VALUES ('dda949f941e24cddb133569f1e6a46a3', 'cea83a483bcb414cafa9db38420157e9', '1989-11-03 18:56:17', '9999-12-31 23:59:59', NULL, NULL);
+INSERT INTO `token` VALUES ('dda949f941e24cddb133569f1e6a46a3', 'erlangshen', '1989-11-03 18:56:17', '9999-12-31 23:59:59', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for user
@@ -3844,7 +3844,7 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('cea83a483bcb414cafa9db38420157e9', 'erlangshen', '21232F297A57A5A743894A0E4A801FC3', 'admin', 'admin', 1, NULL, NULL, 0);
+INSERT INTO `user` VALUES ('erlangshen', 'erlangshen', '21232F297A57A5A743894A0E4A801FC3', 'admin', 'admin', 1, NULL, NULL, 0);
 INSERT INTO `user` VALUES ('guest', 'erlangshen', '84E0343A0486FF05530DF6C705C8BB4', 'guest', 'guest', 1, NULL, 0, 0);
 
 -- ----------------------------
@@ -3876,7 +3876,7 @@ CREATE TABLE `user_info`  (
 -- ----------------------------
 -- Records of user_info
 -- ----------------------------
-INSERT INTO `user_info` VALUES ('cea83a483bcb414cafa9db38420157e9', NULL, '管理员', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1989-11-03 18:56:17');
+INSERT INTO `user_info` VALUES ('erlangshen', NULL, '管理员', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1989-11-03 18:56:17');
 INSERT INTO `user_info` VALUES ('guest', NULL, '测试账号', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1989-11-03 18:56:17');
 
 -- ----------------------------

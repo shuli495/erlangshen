@@ -131,7 +131,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
             // 删除登录验证码
             validateService.delete(validateId, "login", null);
             // 返回token
-            return (new ReturnJson()).success(this.newToken(user.getId(), loginIp, platform));
+            return (new ReturnJson()).success(this.newToken(user, loginIp, platform));
         } else {
             // token有效期剩余多少分钟后，生成新token
             Calendar cal = Calendar.getInstance();
@@ -155,7 +155,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
                         this.baseDelete(userToken.getId());
 
                         // 生成新token
-                        reToken = this.newToken(user.getId(), loginIp, platform);
+                        reToken = this.newToken(user, loginIp, platform);
                     } else {
                         // 未过期返回当前token
                         reToken = userToken;
@@ -192,7 +192,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
 
             // 当前ip没token，重新生成
             if(null == reToken) {
-                reToken = this.newToken(user.getId(), loginIp, platform);
+                reToken = this.newToken(user, loginIp, platform);
             }
 
             // 删除登录防机器人验证码
@@ -244,12 +244,12 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
 
     /**
      * 生成新token
-     * @param userId
+     * @param userVO
      * @param clientIp
      * @param platform
      * @return
      */
-    public TokenVO newToken(String userId, String clientIp, String platform) {
+    public TokenVO newToken(UserVO userVO, String clientIp, String platform) {
         Date now = new Date(System.currentTimeMillis());
         TokenVO tokenVO = new TokenVO();
 
@@ -266,13 +266,14 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
                 .setHeaderParam("alg", "HS256")
                 .setIssuedAt(now)
                 .setExpiration(cal.getTime())
-                .claim("id", userId)
+                .claim("id", userVO.getId())
+                .claim("cilentId", userVO.getClientId())
                 .setIssuer("erlangshen")
                 .signWith(signatureAlgorithm, key);
         String jwt = builder.compact();
 
         tokenVO.setId(jwt);
-        tokenVO.setUserId(userId);
+        tokenVO.setUserId(userVO.getId());
         tokenVO.setCreatedTime(now);
         tokenVO.setActiveTime(cal.getTime());
         tokenVO.setIp(clientIp);
@@ -280,7 +281,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
         super.baseInsert(tokenVO);
 
         // 登录日志
-        loginLogService.insert(userId, clientIp);
+        loginLogService.insert(userVO.getId(), clientIp);
 
         return tokenVO;
     }
@@ -317,6 +318,7 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
             throw new ThrowPrompt("token失效，请重新获取！", "122008");
         }
 
+        tokenVO.setClientId((String)claims.get("cilentId"));
         return tokenVO;
     }
 }
