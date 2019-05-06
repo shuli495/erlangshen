@@ -1,11 +1,11 @@
 package com.website.model.bo;
 
+import com.fastjavaframework.base.BaseBean;
+
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.validation.constraints.Max;
 import java.util.Date;
-
-import com.fastjavaframework.base.BaseBean;
 
 /**
  * @author https://github.com/shuli495/erlangshen
@@ -25,7 +25,10 @@ public class KeyBO extends BaseBean {
 	@Size(max=64, min=0, message="{key.clientId.size}")
 	private String clientId;
 
-	// 状态 1启用 0停用
+	/**
+	 * 状态
+	 * 1启用 0停用
+	 */
 	@NotNull(message="{key.status.null}")
 	@Max(value=10, message="{key.status.max}")
 	private Integer status;
@@ -74,4 +77,10 @@ public class KeyBO extends BaseBean {
 		this.createdTime = createdTime;
 	}
 
+
+	@Override
+	public String toString() {
+		return super.toString() + " KeyBO{\"access\": \""+access+"\", \"secret\": \""+secret+"\", "
+				+ "\"clientId\": \""+clientId+"\", \"status\": \""+status+"\", \"createdTime\": \""+createdTime+"\"}";
+	}
 }

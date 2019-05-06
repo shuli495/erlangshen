@@ -1,15 +1,15 @@
 package com.website.service;
 
-import java.util.*;
-
+import com.fastjavaframework.base.BaseService;
 import com.fastjavaframework.exception.ThrowPrompt;
+import com.website.dao.PermissionMenuDao;
+import com.website.model.vo.PermissionMenuVO;
 import com.website.model.vo.TokenVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.fastjavaframework.base.BaseService;
-import com.website.dao.PermissionMenuDao;
-import com.website.model.vo.PermissionMenuVO;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 /**
  * 菜单
@@ -26,7 +26,7 @@ public class PermissionMenuService extends BaseService<PermissionMenuDao,Permiss
 	 * @param token
 	 * @param vo
      */
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void insert(TokenVO token, PermissionMenuVO vo) {
 		if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
 			throw new ThrowPrompt("无权操作此应用！", "082001");
@@ -46,7 +46,7 @@ public class PermissionMenuService extends BaseService<PermissionMenuDao,Permiss
 	 * 删除菜单，其子菜单和功能点
 	 * @param id
      */
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void delete(TokenVO token, Integer id) {
 		PermissionMenuVO permissionMenuVO = super.baseFind(id);
 		if(null == permissionMenuVO) {

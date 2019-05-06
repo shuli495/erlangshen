@@ -8,31 +8,49 @@ import com.website.model.bo.UserInfoBO;
 public class UserVO extends UserInfoBO {
 	private static final long serialVersionUID = 1L;
 
-    // client创建人
+    /**
+     * client创建人
+     */
 	private String createdBy;
 
-    // 客户端名称
+    /**
+     * 客户端名称
+     */
     private String clientName;
 
-    // 邮箱、手机验证码
+    /**
+     * 邮箱、手机验证码
+     */
     private String code;
 
-    // 防机器人校验验证码
+    /**
+     * 防机器人校验验证码
+     */
     private String verifyCode;
 
-    // 新密码
+    /**
+     * 新密码
+     */
     private String oldPwd;
 
-    // 登录成功后获得的token
+    /**
+     * 登录成功后获得的token
+     */
     private TokenVO token;
 
-    // 创建成功后获取token
+    /**
+     * 创建成功后获取token
+     */
     private Boolean autoLogin;
 
-    // 登录客户端ip
+    /**
+     * 登录客户端ip
+     */
     private String loginIp;
 
-    // 登录客户端平台
+    /**
+     * 登录客户端平台
+     */
     private String platform;
 
     public String getVerifyCode() {
@@ -105,5 +123,13 @@ public class UserVO extends UserInfoBO {
 
     public void setPlatform(String platform) {
         this.platform = platform;
+    }
+
+
+    @Override
+    public String toString() {
+        return super.toString() + " UserVO{\"createdBy\": \""+createdBy+"\", \"clientName\": \""+clientName+"\", "
+                + "\"code\": \""+code+"\", \"oldPwd\": \""+oldPwd+"\", \"token\": \""+token+"\", "
+                + "\"autoLogin\": \""+autoLogin+"\", \"loginIp\": \""+loginIp+"\", \"platform\": \""+platform+"\"}";
     }
 }

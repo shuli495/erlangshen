@@ -1,10 +1,10 @@
 package com.website.model.bo;
 
+import com.fastjavaframework.base.BaseBean;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
-
-import com.fastjavaframework.base.BaseBean;
 
 /**
  * @author https://github.com/shuli495/erlangshen
@@ -14,11 +14,14 @@ public class ValidateBO extends BaseBean {
 
 	@NotNull(message="{validate.userId.null}")
 	@Size(max=64, min=0, message="{validate.userId.size}")
-	private String userId;	
+	private String userId;
 
+	/**
+	 * 类型 email phone
+	 */
 	@NotNull(message="{validate.type.null}")
 	@Size(max=10, min=0, message="{validate.type.size}")
-	private String type;	//类型 email phone
+	private String type;
 
 	@Size(max=255, min=0, message="{validate.code.size}")
 	private String code;	
@@ -57,4 +60,9 @@ public class ValidateBO extends BaseBean {
 		this.createdTime = createdTime;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + " ValidateBO{\"userId\": \""+userId+"\", \"type\": \""+type+"\", "
+				+ "\"code\": \""+code+"\", \"createdTime\": \""+createdTime+"\"}";
+	}
 }

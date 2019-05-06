@@ -1,10 +1,10 @@
 package com.website.model.bo;
 
+import com.fastjavaframework.base.BaseBean;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
-
-import com.fastjavaframework.base.BaseBean;
 
 /**
  * @author https://github.com/shuli495/erlangshen
@@ -12,20 +12,28 @@ import com.fastjavaframework.base.BaseBean;
 public class ClientBO extends BaseBean {
 	private static final long serialVersionUID = 1L;
 
-	//client key
+	/**
+	 * client key
+	 */
 	private String id;
 
-	//client名称
+	/**
+	 * client名称
+	 */
 	@NotNull(message="{client.name.null}")
 	@Size(max=64, min=0, message="{client.name.size}")
 	private String name;
 
-	// 创建人
+	/**
+	 * 创建人
+	 */
 	@NotNull(message="{client.createdBy.null}")
 	@Size(max=64, min=0, message="{client.createdBy.size}")
 	private String createdBy;
 
-	//是否删除 0未删除 1删除
+	/**
+	 * 是否删除 0未删除 1删除
+	 */
 	@NotNull(message="{client.deleted.null}")
 	private Boolean deleted;
 
@@ -70,5 +78,11 @@ public class ClientBO extends BaseBean {
 
 	public void setDeletedTime(Date deletedTime) {
 		this.deletedTime = deletedTime;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " ClientBO{\"id\": \""+id+"\", \"name\": \""+name+"\", \"createdBy\": \""+createdBy+"\", "
+				+ "\"deleted\": \""+deleted+"\", \"deletedTime\": \""+deletedTime+"\"}";
 	}
 }

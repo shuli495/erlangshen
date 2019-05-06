@@ -2,12 +2,15 @@ package com.website.executor;
 
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.util.VerifyUtils;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.website.common.Constants;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,7 +45,13 @@ public abstract class AbstractQpsControl implements Runnable {
         String executor = controlName + "Executor";
         if(!map.containsKey(executor)) {
 
-            map.put(executor, Executors.newCachedThreadPool());
+            ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("qps-pool-%d").build();
+
+            ExecutorService pool = new ThreadPoolExecutor(5, 200,
+                    0L, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<Runnable>(1024), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
+
+            map.put(executor, pool);
         }
 
         String index = controlName + "Index";
@@ -62,9 +71,9 @@ public abstract class AbstractQpsControl implements Runnable {
 
         // 最大调用数
         Integer qpsMax = 0;
-        if(controlName.startsWith("bdyun")) {
+        if(controlName.startsWith(Constants.QPS_BAIDU_YUN)) {
             qpsMax = bdyunIdcardQpsMax;
-        } else if(controlName.startsWith("bdmap")) {
+        } else if(controlName.startsWith(Constants.QPS_BAIDU_MAP)) {
             qpsMax = bdmapQpsMax;
         }
         double qpsMaxNum = 0;
@@ -74,8 +83,8 @@ public abstract class AbstractQpsControl implements Runnable {
         }
 
         // 未超过接口每日最大调用限制，直接放入线程池
-        if(qpsMaxNum < 2 || index.get() <= qpsMaxNum) {
-            index.addAndGet(2);
+        if(qpsMaxNum < Constants.QPS_MAX_NUM || index.get() <= qpsMaxNum) {
+            index.addAndGet(Constants.QPS_MAX_NUM);
             executor.execute(this);
         } else {
             List list = null;
@@ -117,7 +126,10 @@ public abstract class AbstractQpsControl implements Runnable {
      */
     class AddToThread extends Thread {
 
-        private long sleepTime; // 休眠时间，当前时间到24点的毫秒数；到达接口最大限制，等待24点后执行
+        /**
+         * 休眠时间，当前时间到24点的毫秒数；到达接口最大限制，等待24点后执行
+         */
+        private long sleepTime;
 
         public AddToThread(long sleepTime) {
             this.sleepTime = sleepTime;

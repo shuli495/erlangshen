@@ -1,10 +1,10 @@
 package com.website.model.bo;
 
+import com.fastjavaframework.base.BaseBean;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
-
-import com.fastjavaframework.base.BaseBean;
 
 /**
  * @author https://github.com/shuli495/erlangshen
@@ -18,11 +18,15 @@ public class LoginLogBO extends BaseBean {
 	@Size(max=64, min=0, message="{login_log.userId.size}")
 	private String userId;
 
-	// 登录ip
+	/**
+	 * 登录ip
+	 */
 	@Size(max=128, min=0, message="{login_log.ip.size}")
 	private String ip;
 
-	// 登录时间
+	/**
+	 * 登录时间
+	 */
 	@NotNull(message="{login_log.loginTime.null}")
 	private Date loginTime;
 
@@ -59,4 +63,10 @@ public class LoginLogBO extends BaseBean {
 		this.loginTime = loginTime;
 	}
 
+
+	@Override
+	public String toString() {
+		return super.toString() + " LoginLogBO{\"id\": \""+id+"\", \"userId\": \""+userId+"\", "
+				+ "\"ip\": \""+ip+"\", \"loginTime\": \""+loginTime+"\"}";
+	}
 }

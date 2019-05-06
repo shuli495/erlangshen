@@ -1,9 +1,9 @@
 package com.website.model.bo;
 
-import javax.validation.constraints.Size;
-import javax.validation.constraints.NotNull;
-
 import com.fastjavaframework.base.BaseBean;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * @author https://github.com/shuli495/erlangshen
@@ -11,27 +11,49 @@ import com.fastjavaframework.base.BaseBean;
 public class UserBO extends BaseBean {
 	private static final long serialVersionUID = 1L;
 
-	private String id;	
+	private String id;
 
+	/**
+	 * 客户端id
+	 */
 	@Size(max=64, min=0, message="{user.clientGroup.size}")
-	private String clientId;	//客户端id
+	private String clientId;
 
+	/**
+	 * 密码
+	 */
 	@NotNull(message="{user.pwd.null}")
 	@Size(max=255, min=0, message="{user.pwd.size}")
-	private String pwd;	//密码
+	private String pwd;
 
+	/**
+	 * 用户名
+	 */
 	@Size(max=32, min=0, message="{user.username.size}")
-	private String username;	//用户名
+	private String username;
 
+	/**
+	 * 邮箱
+	 */
 	@Size(max=32, min=0, message="{user.mail.size}")
-	private String mail;	//邮箱
+	private String mail;
 
-	private Integer mailVerify;	//邮箱是否验证 0未验证 1已验证
+	/**
+	 * 邮箱是否验证
+	 * 0未验证 1已验证
+	 */
+	private Integer mailVerify;
 
+	/**
+	 * 手机号码
+	 */
 	@Size(max=32, min=0, message="{user.phone.size}")
-	private String phone;	//手机号码
+	private String phone;
 
-	private Integer phoneVerify;	//手机号码是否验证 0未验证 1已验证
+	/**
+	 * 手机号码是否验证 0未验证 1已验证
+	 */
+	private Integer phoneVerify;
 
 	@NotNull(message="{user.status.null}")
 	private Integer status;
@@ -109,4 +131,11 @@ public class UserBO extends BaseBean {
 		this.status = status;
 	}
 
+
+	@Override
+	public String toString() {
+		return super.toString() + " UserBO{\"id\": \""+id+"\", \"clientId\": \""+clientId+"\", \"pwd\": \""+pwd+"\", "
+				+ "\"username\": \""+username+"\", \"mail\": \""+mail+"\", \"mailVerify\": \""+mailVerify+"\", "
+				+ "\"phone\": \""+phone+"\", \"phoneVerify\": \""+phoneVerify+"\", \"status\": \""+status+"\"}";
+	}
 }

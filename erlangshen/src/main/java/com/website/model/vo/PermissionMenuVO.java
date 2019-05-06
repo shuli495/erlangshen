@@ -1,5 +1,6 @@
 package com.website.model.vo;
 
+import com.alibaba.fastjson.JSONArray;
 import com.website.model.bo.PermissionMenuBO;
 
 import java.util.ArrayList;
@@ -22,5 +23,11 @@ public class PermissionMenuVO extends PermissionMenuBO {
 
 	public void setMenus(List<PermissionMenuVO> menus) {
 		this.menus = menus;
+	}
+
+
+	@Override
+	public String toString() {
+		return super.toString() + " PermissionMenuVO{\"menus\": \""+ JSONArray.toJSONString(menus) +"\"}";
 	}
 }

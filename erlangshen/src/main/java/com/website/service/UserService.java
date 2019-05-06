@@ -106,9 +106,11 @@ public class UserService extends BaseService<UserDao,UserVO> {
      */
 	public UserVO find(TokenVO token, String userId) {
 		UserVO user = super.baseFind(userId);
-		if(null == user
+
+		boolean isExit = null == user
 				|| (Constants.PROJECT_NAME.equals(token.getClientId())
-				&& !clientService.isMyClient(token.getUserId(), user.getClientId()))) {
+					&& !clientService.isMyClient(token.getUserId(), user.getClientId()));
+		if(isExit) {
 			throw new ThrowPrompt("无此用户！", "081016");
 		}
 
@@ -143,7 +145,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	 * @param tokenVO
 	 * @param vo
 	 */
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void insert(TokenVO tokenVO, UserVO vo) {
 		String clientId = vo.getClientId();
 		String userName = vo.getUsername();
@@ -166,25 +168,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		this.checkUserInfo(clientId, "", vo.getUsername(), vo.getMail(), vo.getPhone());
 
 		// 拼接详细地址
-		String address = null==vo.getAddress()?"":vo.getAddress();
-		if(!VerifyUtils.isEmpty(vo.getArea())) {
-			CodeBO codeBO = codeService.baseFind(vo.getArea());
-			if(null != codeBO && !VerifyUtils.isEmpty(codeBO.getValue())) {
-				address = codeBO.getValue() + "_" + address;
-			}
-		}
-		if(!VerifyUtils.isEmpty(vo.getCity())) {
-			CodeBO codeBO = codeService.baseFind(vo.getCity());
-			if(null != codeBO && !VerifyUtils.isEmpty(codeBO.getValue())) {
-				address = codeBO.getValue() + "_" + address;
-			}
-		}
-		if(!VerifyUtils.isEmpty(vo.getProvince())) {
-			CodeBO codeBO = codeService.baseFind(vo.getProvince());
-			if(null != codeBO && !VerifyUtils.isEmpty(codeBO.getValue())) {
-				address = codeBO.getValue() + "_" + address;
-			}
-		}
+		String address = this.joinAddress(vo);
 		vo.setAddress(address);
 
 		vo.setPwd(BCrypt.hashpw(vo.getPwd(), BCrypt.gensalt()));
@@ -236,7 +220,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 
 		try {
 			if(vo.getAutoLogin()) {
-				TokenVO token = tokenService.newToken(vo.getId(), vo.getLoginIp(), vo.getPlatform());
+				TokenVO token = tokenService.newToken(vo, vo.getLoginIp(), vo.getPlatform());
 				vo.setToken(token);
 			}
 		} catch (Exception e){
@@ -253,7 +237,8 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	 * @param callback	url注册链接中，回调地址
 	 * @param isCheckUserExist	检查用户是否存在 null不检查 true存在抛异常 false不存在抛异常
 	 */
-	public Object sendMail(TokenVO token, String type, String userId, String mail, String callback, String loginIp, String verifyCode, Boolean isCheckUserExist) {
+	public Object sendMail(TokenVO token, String type, String userId, String mail, String callback, String loginIp,
+						   String verifyCode, Boolean isCheckUserExist) {
 		if(null == token && VerifyUtils.isEmpty(userId)) {
 			throw new ThrowException("token或userId必传一个！", "072004");
 		}
@@ -276,12 +261,14 @@ public class UserService extends BaseService<UserDao,UserVO> {
 				result.put("image", validateService.verifyCode("sendMail", token.getClientId(), loginIp));
 				return result;
 			}
-			if(user.getMailVerify() == 1 && type.startsWith("mail")) {
+			if(user.getMailVerify() == Constants.USER_MAIL_VERIFY_SUCCESS && type.startsWith(Constants.SEND_MAIL_TYPE_MAIL)) {
 				throw new ThrowPrompt("邮箱已验证！", "072007");
 			}
-			if(null != token
-					&& ((!Constants.PROJECT_NAME.equals(token.getClientId()) && !userId.equals(token.getUserId()))
-						|| (Constants.PROJECT_NAME.equals(token.getClientId()) && !clientService.isMyClient(token.getUserId(), user.getClientId())))) {
+
+			boolean isPermission = null != token
+									&& ((!Constants.PROJECT_NAME.equals(token.getClientId()) && !userId.equals(token.getUserId()))
+										|| (Constants.PROJECT_NAME.equals(token.getClientId()) && !clientService.isMyClient(token.getUserId(), user.getClientId())));
+			if(isPermission) {
 				throw new ThrowPrompt( "无权发送此用户邮件！", "072007");
 			}
 
@@ -382,8 +369,8 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		}
 
 		// 替换code
-		if(text.indexOf("${code") != -1) {
-			String strTmp = text.substring(text.indexOf("${code")+6);
+		if(text.indexOf(Constants.TEMPLATE_MAIL_CODE) != -1) {
+			String strTmp = text.substring(text.indexOf(Constants.TEMPLATE_MAIL_CODE)+6);
 			String codeNumStr = strTmp.substring(0, strTmp.indexOf("}"));
 
 			int codeNum = 8;
@@ -399,7 +386,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		}
 
 		// 替换url
-		if(text.indexOf("${url}") != -1) {
+		if(text.indexOf(Constants.TEMPLATE_MAIL_URL) != -1) {
 			String code = CodeUtil.randomCode("strAndNum", 16);
 			String url = "userId=" + user.getId() + "&type=" + type + "&code=" + code;
 			if(VerifyUtils.isNotEmpty(callback)) {
@@ -409,40 +396,42 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			String secuetUrl = SecretUtil.aes128Encrypt(url, aesSecret);
 			String checkMailUrl = checkMail + "?info=" + secuetUrl;
 
-			text = text.replace("${url}", checkMailUrl);
+			text = text.replace(Constants.TEMPLATE_MAIL_URL, checkMailUrl);
 
 			// 记录code
 			this.recordCode(user.getId(), type, code);
 		}
 
 		// 替换时间
-		if(text.indexOf("${date}") != -1) {
-			text = text.replace("${date}", DateUtil.format("yyyy-MM-DD", new Date()));
+		if(text.indexOf(Constants.TEMPLATE_MAIL_DATE) != -1) {
+			text = text.replace(Constants.TEMPLATE_MAIL_DATE, DateUtil.format("yyyy-MM-DD", new Date()));
 		}
-		if(text.indexOf("${time}") != -1) {
-			text = text.replace("${time}", DateUtil.format("HH:ss:mm", new Date()));
+		if(text.indexOf(Constants.TEMPLATE_MAIL_TIME) != -1) {
+			text = text.replace(Constants.TEMPLATE_MAIL_TIME, DateUtil.format("HH:ss:mm", new Date()));
 		}
-		if(text.indexOf("${datetime}") != -1) {
-			text = text.replace("${datetime}", DateUtil.format("yyyy-MM-DD HH:ss:mm", new Date()));
+		if(text.indexOf(Constants.TEMPLATE_MAIL_DATETIME) != -1) {
+			text = text.replace(Constants.TEMPLATE_MAIL_DATETIME, DateUtil.format("yyyy-MM-DD HH:ss:mm", new Date()));
 		}
 
 		// 替换用户属性
-		if(text.indexOf("${mail}") != -1) {
-			text = text.replace("${mail}", user.getMail());
+		if(text.indexOf(Constants.TEMPLATE_MAIL_MAIL) != -1) {
+			text = text.replace(Constants.TEMPLATE_MAIL_MAIL, user.getMail());
 		}
-		if(text.indexOf("${phone}") != -1) {
-			text = text.replace("${phone}", user.getPhone());
+		if(text.indexOf(Constants.TEMPLATE_MAIL_PHONE) != -1) {
+			text = text.replace(Constants.TEMPLATE_MAIL_PHONE, user.getPhone());
 		}
-		if(text.indexOf("${nickname}") != -1 || text.indexOf("${username}") != -1 || text.indexOf("${name}") != -1) {
+		if(text.indexOf(Constants.TEMPLATE_MAIL_NICKNAME) != -1
+				|| text.indexOf(Constants.TEMPLATE_MAIL_USERNAME) != -1
+				|| text.indexOf(Constants.TEMPLATE_MAIL_NAME) != -1) {
 			UserVO userInfo = userInfoService.baseFind(user.getId());
-			if(text.indexOf("${nickname}") != -1) {
-				text = text.replace("${nickname}", userInfo.getNickname());
+			if(text.indexOf(Constants.TEMPLATE_MAIL_NICKNAME) != -1) {
+				text = text.replace(Constants.TEMPLATE_MAIL_NICKNAME, userInfo.getNickname());
 			}
-			if(text.indexOf("${username}") != -1) {
-				text = text.replace("${username}", userInfo.getUsername());
+			if(text.indexOf(Constants.TEMPLATE_MAIL_USERNAME) != -1) {
+				text = text.replace(Constants.TEMPLATE_MAIL_USERNAME, userInfo.getUsername());
 			}
-			if(text.indexOf("${name}") != -1) {
-				text = text.replace("${name}", userInfo.getName());
+			if(text.indexOf(Constants.TEMPLATE_MAIL_NAME) != -1) {
+				text = text.replace(Constants.TEMPLATE_MAIL_NAME, userInfo.getName());
 			}
 		}
 
@@ -482,7 +471,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 
 		String url = SecretUtil.aes128Decrypt(info, aesSecret);
 
-		if(url.indexOf("userId=") == -1 || url.indexOf("code=") == -1) {
+		if(url.indexOf(Constants.CHECK_MAIL_PARAMS_USER_ID) == -1 || url.indexOf(Constants.CHECK_MAIL_PARAMS_CODE) == -1) {
 			throw new ThrowPrompt("认证信息错误，请重新认证！", "072014");
 		}
 
@@ -493,7 +482,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 
 
 		String callback = defaultRedirect;
-		if(url.indexOf("callback=") != -1) {
+		if(url.indexOf(Constants.CHECK_MAIL_PARAMS_CALLBACK) != -1) {
 			callback = urls[3];
 		}
 
@@ -548,9 +537,11 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		UserVO user = null;
 		if(VerifyUtils.isNotEmpty(userId)) {
 			user = super.baseFind(userId);
-			if(null != token
-					&& ((!Constants.PROJECT_NAME.equals(token.getClientId()) && !userId.equals(token.getUserId()))
-						|| (Constants.PROJECT_NAME.equals(token.getClientId()) && !clientService.isMyClient(token.getUserId(), user.getClientId())))) {
+
+			boolean isPermission = null != token
+									&& ((!Constants.PROJECT_NAME.equals(token.getClientId()) && !userId.equals(token.getUserId()))
+									|| (Constants.PROJECT_NAME.equals(token.getClientId()) && !clientService.isMyClient(token.getUserId(), user.getClientId())));
+			if(isPermission) {
 				throw new ThrowPrompt("无权发送此用户短信！", "072007");
 			}
 
@@ -596,19 +587,19 @@ public class UserService extends BaseService<UserDao,UserVO> {
 
 		// 设置参数
 		if(null != user) {
-			if(phone.matches("([a-z]|[A-Z]|[0-9]){1,}")) {
+			if(phone.matches(Constants.REGEX_USERNAME)) {
 				params.put("phone", phone);
 			}
 		}
 		UserVO userInfo = userInfoService.baseFind(user.getId());
 		if(null != userInfo) {
-			if(user.getNickname().matches("([a-z]|[A-Z]|[0-9]){1,}")) {
+			if(user.getNickname().matches(Constants.REGEX_USERNAME)) {
 				params.put("nickname", userInfo.getNickname());
 			}
-			if(user.getUsername().matches("([a-z]|[A-Z]|[0-9]){1,}")) {
+			if(user.getUsername().matches(Constants.REGEX_USERNAME)) {
 				params.put("username", userInfo.getUsername());
 			}
-			if(user.getName().matches("([a-z]|[A-Z]|[0-9]){1,}")) {
+			if(user.getName().matches(Constants.REGEX_USERNAME)) {
 				params.put("name", userInfo.getName());
 			}
 		}
@@ -649,9 +640,13 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			text = "用户";
 		}
 
-		if(isCheckUserExist && VerifyUtils.isNotEmpty(userId) && userId.indexOf("_") == -1) {
+		// 用户id分隔符
+		// clientId_phone/mail
+		String userIdFlag = "_";
+
+		if(isCheckUserExist && VerifyUtils.isNotEmpty(userId) && userId.indexOf(userIdFlag) == -1) {
 			throw new ThrowPrompt("该" + text + "已存在！" , "072023");
-		} else if(!isCheckUserExist && (VerifyUtils.isEmpty(userId) || userId.indexOf("_") != -1)) {
+		} else if(!isCheckUserExist && (VerifyUtils.isEmpty(userId) || userId.indexOf(userIdFlag) != -1)) {
 			throw new ThrowPrompt("该" + text + "不存在！", "072024");
 		}
 	}
@@ -726,7 +721,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	 * @param tokenVO
 	 * @param id
      */
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void delete(TokenVO tokenVO, String id) {
 		UserRecycleVO userRecycleVO = this.setRecycle(tokenVO, id);
 
@@ -739,7 +734,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	 * @param tokenVO
 	 * @param ids
      */
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void deleteBatch(TokenVO tokenVO, List<String> ids) {
 		List<UserRecycleVO> recycles = new ArrayList<>();
 
@@ -815,7 +810,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	 * @param tokenVO
 	 * @param vo
      */
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void update(TokenVO tokenVO, UserVO vo) {
 		if(!Constants.PROJECT_NAME.equals(tokenVO.getClientId()) && !tokenVO.getUserId().equals(vo.getId())) {
 			throw new ThrowPrompt("用户信息错误！", "142003");
@@ -839,10 +834,12 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		this.checkUserInfo(oldUserVO.getClientId(), oldUserVO.getId(), vo.getUsername(), vo.getMail(), vo.getPhone());
 
 		// 实名认证通过 不能修改姓名 身份证号码
-		if(oldUserInfoVO.getCertification() == 3 && VerifyUtils.isNotEmpty(vo.getName()) && !vo.getName().equals(oldUserInfoVO.getName())) {
+		if(oldUserInfoVO.getCertification() == Constants.USER_CERTIFICATION_SUCCESS
+				&& VerifyUtils.isNotEmpty(vo.getName()) && !vo.getName().equals(oldUserInfoVO.getName())) {
 			throw new ThrowPrompt("已实名通过，不能修改姓名！", "142006");
 		}
-		if(oldUserInfoVO.getCertification() == 3 && VerifyUtils.isNotEmpty(vo.getIdcard()) && !vo.getIdcard().equals(oldUserInfoVO.getIdcard())) {
+		if(oldUserInfoVO.getCertification() == Constants.USER_CERTIFICATION_SUCCESS
+				&& VerifyUtils.isNotEmpty(vo.getIdcard()) && !vo.getIdcard().equals(oldUserInfoVO.getIdcard())) {
 			throw new ThrowPrompt("已实名通过，不能修改身份证号码！", "142007");
 		}
 
@@ -899,7 +896,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	 */
 	private UserVO setUpdateVlaue(UserVO dbVO, UserVO upVO) {
 		if(null == dbVO) {
-			return dbVO;
+			return null;
 		}
 
 		boolean isUpdate = false;
@@ -1012,25 +1009,7 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		//地址
 		if(null != upVO.getAddress()) {
 			// 拼接详细地址
-			String address = upVO.getAddress();
-			if(!VerifyUtils.isEmpty(upVO.getArea())) {
-				CodeBO codeBO = codeService.baseFind(upVO.getArea());
-				if(null != codeBO && !VerifyUtils.isEmpty(codeBO.getValue())) {
-					address = codeBO.getValue() + "_" + address;
-				}
-			}
-			if(!VerifyUtils.isEmpty(upVO.getCity())) {
-				CodeBO codeBO = codeService.baseFind(upVO.getCity());
-				if(null != codeBO && !VerifyUtils.isEmpty(codeBO.getValue())) {
-					address = codeBO.getValue() + "_" + address;
-				}
-			}
-			if(!VerifyUtils.isEmpty(upVO.getProvince())) {
-				CodeBO codeBO = codeService.baseFind(upVO.getProvince());
-				if(null != codeBO && !VerifyUtils.isEmpty(codeBO.getValue())) {
-					address = codeBO.getValue() + "_" + address;
-				}
-			}
+			String address = this.joinAddress(upVO);
 			dbVO.setAddress(address);
 			isUpdate = true;
 		}
@@ -1048,6 +1027,36 @@ public class UserService extends BaseService<UserDao,UserVO> {
 	}
 
 	/**
+	 * 拼接详细地址
+	 * @param userVO
+	 * @return
+	 */
+	private String joinAddress(UserVO userVO) {
+		String address = VerifyUtils.isNotEmpty(userVO.getAddress())?userVO.getAddress():"";
+
+		if(!VerifyUtils.isEmpty(userVO.getArea())) {
+			CodeBO codeBO = codeService.baseFind(userVO.getArea());
+			if(null != codeBO && !VerifyUtils.isEmpty(codeBO.getValue())) {
+				address = codeBO.getValue() + "_" + address;
+			}
+		}
+		if(!VerifyUtils.isEmpty(userVO.getCity())) {
+			CodeBO codeBO = codeService.baseFind(userVO.getCity());
+			if(null != codeBO && !VerifyUtils.isEmpty(codeBO.getValue())) {
+				address = codeBO.getValue() + "_" + address;
+			}
+		}
+		if(!VerifyUtils.isEmpty(userVO.getProvince())) {
+			CodeBO codeBO = codeService.baseFind(userVO.getProvince());
+			if(null != codeBO && !VerifyUtils.isEmpty(codeBO.getValue())) {
+				address = codeBO.getValue() + "_" + address;
+			}
+		}
+
+		return address;
+	}
+
+	/**
 	 * 校验修改的信息是否已存在
 	 * @param clientId
 	 * @param nowUserId 要修改的用户的id，插入不需要填写
@@ -1059,7 +1068,10 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		if(!VerifyUtils.isEmpty(userName)) {
 			List<UserVO> users = this.dao.check(clientId, userName, null);
 			for(UserVO user : users) {
-				if((VerifyUtils.isEmpty(nowUserId) && user.getUsername().equals(userName)) || (!VerifyUtils.isEmpty(nowUserId) && !user.getId().equals(nowUserId))) {
+				// 判断是否注册
+				boolean isRegister = (VerifyUtils.isEmpty(nowUserId) && user.getUsername().equals(userName))
+						|| (!VerifyUtils.isEmpty(nowUserId) && !user.getId().equals(nowUserId));
+				if(isRegister) {
 					throw new ThrowPrompt("该用户名已注册，请更换后再试！", "142010");
 				}
 			}
@@ -1068,7 +1080,11 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		if(!VerifyUtils.isEmpty(mail)) {
 			List<UserVO> users = this.dao.check(clientId, mail, null);
 			for(UserVO user : users) {
-				if((VerifyUtils.isEmpty(nowUserId) && user.getMail().equals(mail)) || (!VerifyUtils.isEmpty(nowUserId) && !user.getId().equals(nowUserId))) {
+				// 判断是否注册
+				boolean isRegister = (VerifyUtils.isEmpty(nowUserId) && user.getMail().equals(mail))
+						|| (!VerifyUtils.isEmpty(nowUserId) && !user.getId().equals(nowUserId));
+
+				if(isRegister) {
 					if(null ==  user.getMailVerify() || user.getMailVerify() == 0) {
 						throw new ThrowPrompt("该邮箱已注册，但未验证！", "142011");
 					} else {
@@ -1080,7 +1096,11 @@ public class UserService extends BaseService<UserDao,UserVO> {
 		if(!VerifyUtils.isEmpty(phone)) {
 			List<UserVO> users = this.dao.check(clientId, phone, null);
 			for(UserVO user : users) {
-				if((VerifyUtils.isEmpty(nowUserId) && user.getPhone().equals(phone)) || (!VerifyUtils.isEmpty(nowUserId) && !user.getId().equals(nowUserId))) {
+				// 判断是否注册
+				boolean isRegister = (VerifyUtils.isEmpty(nowUserId) && user.getPhone().equals(phone))
+						|| (!VerifyUtils.isEmpty(nowUserId) && !user.getId().equals(nowUserId));
+
+				if(isRegister) {
 					if(null == user.getPhoneVerify() || user.getPhoneVerify() == 0) {
 						throw new ThrowPrompt("该手机号码已注册，但未验证！", "142013");
 					} else {

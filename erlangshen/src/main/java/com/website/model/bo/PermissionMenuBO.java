@@ -1,10 +1,10 @@
 package com.website.model.bo;
 
+import com.fastjavaframework.base.BaseBean;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import com.fastjavaframework.base.BaseBean;
 
 /**
  * @author https://github.com/shuli495/erlangshen
@@ -20,19 +20,27 @@ public class PermissionMenuBO extends BaseBean {
 
 	private Integer parentId;
 
-	// 0菜单 1功能
+	/**
+	 * 0菜单 1功能
+	 */
 	@Max(value=1, message="{permission_menu.type.max}")
 	private Integer type;
 
-	// 菜单名称
+	/**
+	 * 菜单名称
+	 */
 	@Size(max=255, min=0, message="{permission_menu.name.size}")
 	private String name;
 
-	// 菜单url
+	/**
+	 * 菜单url
+	 */
 	@Size(max=255, min=0, message="{permission_menu.url.size}")
 	private String url;
 
-	// 标签
+	/**
+	 * 标签
+	 */
 	private String tag;
 
 
@@ -90,5 +98,12 @@ public class PermissionMenuBO extends BaseBean {
 
 	public void setTag(String tag) {
 		this.tag = tag;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " PermissionMenuBO{\"id\": \""+id+"\", \"clientId\": \""+clientId+"\", "
+				+ "\"parentId\": \""+parentId+"\", \"type\": \""+type+"\",  \"name\": \""+name+"\", "
+				+ "\"url\": \""+url+"\", \"tag\": \""+tag+"\"";
 	}
 }

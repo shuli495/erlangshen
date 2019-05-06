@@ -33,7 +33,7 @@ public class TokenController extends BaseElsController<TokenService> {
 	 * @param isCheckStatus 是否校验用户激活状态
      * @return
      */
-	@Authority(role = "adminToken")
+	@Authority(role = Constants.ADMIN_TOKEN)
 	@RequestMapping(method=RequestMethod.POST)
 	public Object token(@RequestHeader(value="Is-Check-Status",required=false) boolean isCheckStatus) {
 		String userName = request.getParameter("userName");
@@ -42,7 +42,7 @@ public class TokenController extends BaseElsController<TokenService> {
 		String platform = request.getParameter("platform");
 		String loginIp = request.getParameter("loginIp");
 
-		if("KEY".equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
+		if(Constants.IDENTITY_TYPE_KEY.equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
 			throw new ThrowException("AK/SK方式loginIp参数必传！", "071002");
 		}
 
@@ -65,7 +65,7 @@ public class TokenController extends BaseElsController<TokenService> {
 		// 检查token
 		TokenVO tokenVO = this.service.check(token, loginIp);
 
-		Map<String, Object> result = new HashMap<>();
+		Map<String, Object> result = new HashMap<>(2);
 		if(userService.isMyUser(super.identity().getUserId(), tokenVO.getUserId())) {
 			result.put("valid", true);
 			result.put("token", tokenVO);

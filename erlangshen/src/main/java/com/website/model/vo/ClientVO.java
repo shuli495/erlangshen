@@ -1,5 +1,6 @@
 package com.website.model.vo;
 
+import com.alibaba.fastjson.JSONArray;
 import com.website.model.bo.ClientBO;
 
 import java.util.List;
@@ -10,16 +11,24 @@ import java.util.List;
 public class ClientVO extends ClientBO {
 	private static final long serialVersionUID = 1L;
 
-	// 已设置邮箱数量
-	private int setMailNum;
+	/**
+	 * 已设置邮箱数量
+	 */
+	private Integer setMailNum;
 
-	// 已设置手机信息数量
-	private int setPhoneNum;
+	/**
+	 * 已设置手机信息数量
+	 */
+	private Integer setPhoneNum;
 
-	//用户列表
+	/**
+	 * 用户列表
+	 */
 	private List<UserVO> users;
 
-	//已删除用户列表
+	/**
+	 * 已删除用户列表
+	 */
 	private List<UserRecycleVO> delUsers;
 
 	public int getSetMailNum() {
@@ -52,5 +61,13 @@ public class ClientVO extends ClientBO {
 
 	public void setDelUsers(List<UserRecycleVO> delUsers) {
 		this.delUsers = delUsers;
+	}
+
+
+	@Override
+	public String toString() {
+		return super.toString() + " ClientVO{\"setMailNum\": \""+setMailNum+"\", \"setPhoneNum\": \""+setPhoneNum+"\", "
+				+ "\"users\": \""+ JSONArray.toJSONString(users) +"\", "
+				+ "\"delUsers\": \""+JSONArray.toJSONString(delUsers)+"\"}";
 	}
 }

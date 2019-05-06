@@ -1,10 +1,10 @@
 package com.website.model.bo;
 
+import com.fastjavaframework.base.BaseBean;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
-
-import com.fastjavaframework.base.BaseBean;
 
 /**
  * @author https://github.com/shuli495/erlangshen
@@ -16,18 +16,26 @@ public class TokenBO extends BaseBean {
 
 	@NotNull(message="{token.userId.null}")
 	@Size(max=64, min=0, message="{token.userId.size}")
-	private String userId;	
+	private String userId;
 
+	/**
+	 * 有效时间
+	 */
 	@NotNull(message="{token.activeTime.null}")
-	private Date activeTime;	//有效时间
+	private Date activeTime;
 
-	// 客户端ip
+	/**
+	 * 客户端ip
+	 */
 	@Size(max=128, min=0, message="{token.ip.size}")
 	private String ip;
 
 	private Date createdTime;
 
-	// 登录端 用于区分在不同平台是否可以重复登录
+	/**
+	 * 登录端
+	 * 用于区分在不同平台是否可以重复登录
+	 */
 	@Size(max=255, min=0, message="{token.client.size}")
 	private String platform;
 
@@ -77,5 +85,13 @@ public class TokenBO extends BaseBean {
 
 	public void setPlatform(String platform) {
 		this.platform = platform;
+	}
+
+
+	@Override
+	public String toString() {
+		return super.toString() + " TokenBO{\"id\": \""+id+"\", \"userId\": \""+userId+"\", "
+				+ "\"activeTime\": \""+activeTime+"\", \"ip\": \""+ip+"\", \"createdTime\": \""+createdTime+"\", "
+				+ "\"platform\": \""+platform+"\"}";
 	}
 }

@@ -3,6 +3,7 @@ package com.website.executor;
 import com.baidu.aip.ocr.AipOcr;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.util.VerifyUtils;
+import com.website.common.Constants;
 import com.website.model.vo.UserVO;
 import com.website.service.UserInfoService;
 import org.json.JSONObject;
@@ -22,8 +23,16 @@ import java.util.regex.Matcher;
 public class Certification extends AbstractQpsControl {
 
     private String userId;
-    private String name;    // 姓名 不传取user表中的name
-    private String idcard;  // 身份证号 不传取user表中的idcard
+
+    /**
+     * 姓名 不传取user表中的name
+     */
+    private String name;
+
+    /**
+     * 身份证号 不传取user表中的idcard
+     */
+    private String idcard;
 
     @Value("${path.idcard}")
     private String pathIdcard;
@@ -68,7 +77,7 @@ public class Certification extends AbstractQpsControl {
             }
 
             // 认证中、认证成功
-            if(user.getCertification() == 1 || user.getCertification() == 3) {
+            if(user.getCertification() == Constants.USER_CERTIFICATION_ING || user.getCertification() == Constants.USER_CERTIFICATION_SUCCESS) {
                 return;
             }
 
@@ -103,7 +112,7 @@ public class Certification extends AbstractQpsControl {
             }
 
             // 身份证文件大小限制4M
-            if(front.length() > 4194304 || back.length() > 4194304 ) {
+            if(front.length() > Constants.IDCARD_UP_MAX || back.length() > Constants.IDCARD_UP_MAX ) {
                 throw new Exception("身份证图片必须小于4M！");
             }
 
@@ -153,8 +162,8 @@ public class Certification extends AbstractQpsControl {
             }
 
             // 姓名、号码与图片相同，认证成功
-            if(user.getName().equals(forntRes.getJSONObject("姓名").getString("words"))
-                    && user.getIdcard().equals(forntRes.getJSONObject("公民身份号码").getString("words"))) {
+            if(user.getName().equals(forntRes.getJSONObject(Constants.BAIDUYUN_OCR_KEY_NAME).getString(Constants.BAIDUYUN_OCR_KEY_WORDS))
+                    && user.getIdcard().equals(forntRes.getJSONObject(Constants.BAIDUYUN_OCR_KEY_IDCARD).getString(Constants.BAIDUYUN_OCR_KEY_WORDS))) {
                 UserVO updateUser = new UserVO();
                 updateUser.setId(user.getId());
                 updateUser.setName(name);
@@ -193,7 +202,7 @@ public class Certification extends AbstractQpsControl {
 
         JSONObject res = client.idcard(imagePath, type, options);
 
-        if(res.has("edit_tool")) {
+        if(res.has(Constants.BAIDUYUN_OCR_KEY_EDIT_TOOL)) {
             throw new Exception("身份证被编辑软件编辑过，请上传原版身份证！");
         }
 
@@ -203,6 +212,7 @@ public class Certification extends AbstractQpsControl {
             case "blurred": throw new Exception("身份证模糊！");
             case "over_exposure": throw new Exception("身份证关键字段反光或过曝！");
             case "unknown": throw new Exception("实名认证失败，请重新上传身份证！");
+            default:
         }
 
         return res.getJSONObject("words_result");

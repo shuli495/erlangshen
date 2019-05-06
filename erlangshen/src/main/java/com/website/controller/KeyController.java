@@ -87,14 +87,16 @@ public class KeyController extends BaseElsController<KeyService> {
 			vo.setOrderSort(orderSort);
 		}
 
-		if(null != pageSize && null != pageNum && pageSize != 0 && pageNum != 0) {	//分页查询
+		if(null != pageSize && null != pageNum && pageSize != 0 && pageNum != 0) {
+			//分页查询
 			Page page = new Page();
 			page.setPageSize(pageSize);
 			page.setPageNum(pageNum);
 			vo.setPage(page);
 
 			return success(this.service.baseQueryPageByAnd(vo));
-		} else {	//列表查询
+		} else {
+			//列表查询
 			return success(this.service.baseQueryByAnd(vo));
 		}
 	}

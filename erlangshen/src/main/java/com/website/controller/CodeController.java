@@ -10,7 +10,6 @@ import com.website.common.BaseElsController;
 import com.website.common.Constants;
 import com.website.model.bo.CodeBO;
 import com.website.service.CodeService;
-import com.website.service.TokenService;
 import com.website.service.ValidateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,10 +32,10 @@ public class CodeController extends BaseElsController<CodeService> {
 	 * 获取验证码
 	 * @return
 	 */
-	@Authority(role = "adminToken")
+	@Authority(role = Constants.ADMIN_TOKEN)
 	@RequestMapping(value="/verify", method=RequestMethod.GET)
 	public Object code(@RequestParam(required = false) String loginIp, @RequestParam(required = true) String type) {
-		if("KEY".equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
+		if(Constants.IDENTITY_TYPE_KEY.equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
 			throw new ThrowException("AK/SK方式loginIp参数必传！", "071001");
 		}
 
@@ -44,7 +43,7 @@ public class CodeController extends BaseElsController<CodeService> {
 			loginIp = CommonUtil.getIp(super.request);
 		}
 
-		if(!"login".equals(type) && !"register".equals(type)) {
+		if(!Constants.CODE_TYPE_LOGIN.equals(type) && !Constants.CODE_TYPE_REGISTER.equals(type)) {
 			throw new ThrowException("类型只能是login或register！", "071003");
 		}
 

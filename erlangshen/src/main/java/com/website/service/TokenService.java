@@ -112,13 +112,14 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
         ClientSecurityVO clientSecurityVO = clientSecurityService.baseFind(token.getClientId());
 
         // 异地登录检查，上次登录地址与当前登录地址不同，发告警
-        if(null != clientSecurityVO && clientSecurityVO.getIsCheckPlace()
-                && clientSecurityVO.getIsCheckPlace()
-                && VerifyUtils.isNotEmpty(loginIp)
-                && userTokens.size() > 0
-                && !userTokens.get(0).getIp().equals(loginIp)
-                && (VerifyUtils.isNotEmpty(clientSecurityVO.getCheckPlaceMailTypeId())
-                || VerifyUtils.isNotEmpty(clientSecurityVO.getCheckPlacePhoneTypeId()))) {
+        boolean isPlaceOther = null != clientSecurityVO && clientSecurityVO.getIsCheckPlace()
+                                && clientSecurityVO.getIsCheckPlace()
+                                && VerifyUtils.isNotEmpty(loginIp)
+                                && userTokens.size() > 0
+                                && !userTokens.get(0).getIp().equals(loginIp)
+                                && (VerifyUtils.isNotEmpty(clientSecurityVO.getCheckPlaceMailTypeId())
+                                || VerifyUtils.isNotEmpty(clientSecurityVO.getCheckPlacePhoneTypeId()));
+        if(isPlaceOther) {
             new LoginPlaceReport(user.getId(), token.getClientId(), userTokens.get(0).getIp(), loginIp);
         }
 
@@ -141,9 +142,12 @@ public class TokenService extends BaseService<TokenDao,TokenVO> {
             TokenVO reToken = null;
 
 
-            String loginApi = clientSecurityVO.getLoginApi();   //登录通知接口
-            Integer isCheckPlatform = clientSecurityVO.getIsCheckPlatform();    // 是否对登陆平台检查
-            Integer checkPlatformType = clientSecurityVO.getCheckPlatformType();// 登录冲突操作
+            //登录通知接口
+            String loginApi = clientSecurityVO.getLoginApi();
+            // 是否对登陆平台检查
+            Integer isCheckPlatform = clientSecurityVO.getIsCheckPlatform();
+            // 登录冲突操作
+            Integer checkPlatformType = clientSecurityVO.getCheckPlatformType();
 
             for (TokenVO userToken : userTokens) {
                 // 同端同平台

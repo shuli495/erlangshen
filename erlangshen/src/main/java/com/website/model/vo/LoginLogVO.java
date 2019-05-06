@@ -71,4 +71,12 @@ public class LoginLogVO extends LoginLogBO {
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}
+
+
+	@Override
+	public String toString() {
+		return super.toString() + " LoginLogVO{\"username\": \""+username+"\", \"nickname\": \""+nickname+"\", "
+				+ "\"mail\": \""+mail+"\", \"phone\": \""+phone+"\", \"clientId\": \""+clientId+"\", " +
+				"\"clientName\": \""+clientName+"\", \"createdBy\": \""+createdBy+"\"}";
+	}
 }

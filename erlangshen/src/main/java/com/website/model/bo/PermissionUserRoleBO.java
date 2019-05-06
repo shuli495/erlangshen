@@ -1,10 +1,10 @@
 package com.website.model.bo;
 
+import com.fastjavaframework.base.BaseBean;
+
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.validation.constraints.Max;
-
-import com.fastjavaframework.base.BaseBean;
 
 /**
  * @author https://github.com/shuli495/erlangshen
@@ -45,6 +45,12 @@ public class PermissionUserRoleBO extends BaseBean {
 
 	public void setRoleId(Integer roleId) {
 		this.roleId = roleId;
+	}
+
+
+	@Override
+	public String toString() {
+		return super.toString() + " PermissionUserRoleBO{\"id\": \""+id+"\", \"userId\": \""+userId+"\", \"roleId\": \""+roleId+"\"}";
 	}
 
 }

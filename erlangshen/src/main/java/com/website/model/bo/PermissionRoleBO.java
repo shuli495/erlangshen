@@ -1,9 +1,9 @@
 package com.website.model.bo;
 
+import com.fastjavaframework.base.BaseBean;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import com.fastjavaframework.base.BaseBean;
 
 /**
  * @author https://github.com/shuli495/erlangshen
@@ -17,7 +17,9 @@ public class PermissionRoleBO extends BaseBean {
 	@Size(max=64, min=0, message="{permission_role.clientId.size}")
 	private String clientId;
 
-	// 角色
+	/**
+	 * 角色
+	 */
 	@NotNull(message="{permission_role.role.null}")
 	@Size(max=255, min=0, message="{permission_role.role.size}")
 	private String role;
@@ -47,4 +49,9 @@ public class PermissionRoleBO extends BaseBean {
 		this.role = role;
 	}
 
+
+	@Override
+	public String toString() {
+		return super.toString() + " PermissionRoleBO{\"id\": \""+id+"\", \"clientId\": \""+clientId+"\", \"role\": \""+role+"\"}";
+	}
 }

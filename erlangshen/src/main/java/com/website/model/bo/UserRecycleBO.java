@@ -1,10 +1,10 @@
 package com.website.model.bo;
 
-import javax.validation.constraints.Size;
-import javax.validation.constraints.NotNull;
-import java.util.Date;
-
 import com.fastjavaframework.base.BaseBean;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.Date;
 
 /**
  * @author https://github.com/shuli495/erlangshen
@@ -14,97 +14,148 @@ public class UserRecycleBO extends BaseBean {
 
 	private String id;
 
-	// 客户端
+	/**
+	 * 客户端
+	 */
 	@Size(max=64, min=0, message="{user_recycle.clientId.size}")
 	private String clientId;
 
-	// 来源
+	/**
+	 * 来源
+	 */
 	@Size(max=255, min=0, message="{user_recycle.source.size}")
 	private String source;
 
-	// 密码
+	/**
+	 * 密码
+	 */
 	@NotNull(message="{user_recycle.pwd.null}")
 	@Size(max=255, min=0, message="{user_recycle.pwd.size}")
 	private String pwd;
 
-	// 用户名
+	/**
+	 * 用户名
+	 */
 	@Size(max=32, min=0, message="{user_recycle.username.size}")
 	private String username;
 
-	// 昵称
+	/**
+	 * 昵称
+	 */
 	@Size(max=8, min=0, message="{user_recycle.nickname.size}")
 	private String nickname;
 
-	// 邮箱
+	/**
+	 * 邮箱
+	 */
 	@Size(max=32, min=0, message="{user_recycle.mail.size}")
 	private String mail;
 
-	// 手机号码
+	/**
+	 * 手机号码
+	 */
 	@Size(max=32, min=0, message="{user_recycle.phone.size}")
 	private String phone;
 
-	// 电话
+	/**
+	 * 电话
+	 */
 	@Size(max=32, min=0, message="{user_recycle.tel.size}")
 	private String tel;
 
-	// QQ
+	/**
+	 * QQ
+	 */
 	@Size(max=32, min=0, message="{user_recycle.qq.size}")
 	private String qq;
 
-	// 微信
+	/**
+	 * 微信
+	 */
 	@Size(max=32, min=0, message="{user_recycle.weixin.size}")
 	private String weixin;
 
-	// 微信二维码
+	/**
+	 * 微信二维码
+	 */
 	@Size(max=255, min=0, message="{user_recycle.wexinImg.size}")
 	private String wexinImg;
 
-	// 新浪微博
+	/**
+	 * 新浪微博
+	 */
 	@Size(max=32, min=0, message="{user_recycle.weibo.size}")
 	private String weibo;
 
-	// 头像
+	/**
+	 * 头像
+	 */
 	@Size(max=255, min=0, message="{user_recycle.head.size}")
 	private String head;
 
-	// 姓名
+	/**
+	 * 姓名
+	 */
 	@Size(max=32, min=0, message="{user_recycle.name.size}")
 	private String name;
 
-	// 性别 0女 1男
+	/**
+	 * 性别 0女 1男
+	 */
 	private Boolean sex;
 
-	// 身份证号
+	/**
+	 * 身份证号
+	 */
 	@Size(max=18, min=0, message="{user_recycle.idcard.size}")
 	private String idcard;
 
-	// 实名认证 0未实名 1认证中 2认证失败 3认证成功
+	/**
+	 * 实名认证
+	 * 0未实名 1认证中 2认证失败 3认证成功
+	 */
 	private Integer certification;
 
-	// 省
+	/**
+	 * 省
+	 */
 	@Size(max=64, min=0, message="{user_recycle.province.size}")
 	private String province;
 
-	// 市
+	/**
+	 * 市
+	 */
 	@Size(max=64, min=0, message="{user_recycle.city.size}")
 	private String city;
 
-	// 区
+	/**
+	 * 区
+	 */
 	@Size(max=64, min=0, message="{user_recycle.area.size}")
 	private String area;
 
-	// 地址
+	/**
+	 * 地址
+	 */
 	@Size(max=255, min=0, message="{user_recycle.address.size}")
 	private String address;
 
-	// 创建时间
+	/**
+	 * 创建时间
+	 */
 	private Date createdTime;
 
-	// 操作时间
+	/**
+	 * 操作时间
+	 */
 	@NotNull(message="{user_recycle.operatorTime.null}")
 	private Date operatorTime;
 
-	private Integer status;	//状态 0正常 1邮箱手机未验证 2邮箱未验证 3手机未验证
+	/**
+	 * 状态
+	 * 0正常 1邮箱手机未验证 2邮箱未验证 3手机未验证
+	 */
+	private Integer status;
 
 
 	public String getId() {
@@ -307,4 +358,12 @@ public class UserRecycleBO extends BaseBean {
 		this.status = status;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + " UserInfoBO{\"source\": \""+source+"\", \"nickname\": \""+nickname+"\", \"tel\": \""+tel+"\", "
+				+ "\"qq\": \""+qq+"\", \"weixin\": \""+weixin+"\", \"weibo\": \""+weibo+"\", \"name\": \""+name+"\", "
+				+ "\"sex\": \""+sex+"\", \"idcard\": \""+idcard+"\", \"certification\": \""+certification+"\", "
+				+ "\"province\": \""+province+"\", \"city\": \""+city+"\", \"area\": \""+area+"\", \"address\": \""+address+"\", "
+				+ "\"createdTime\": \""+createdTime+"\", \"operatorTime\": \""+operatorTime+"\", \"status\": \""+status+"\"}";
+	}
 }

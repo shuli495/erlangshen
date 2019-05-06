@@ -87,4 +87,12 @@ public class CodeBO extends BaseBean {
 		this.enable = enable;
 	}
 
+
+	@Override
+	public String toString() {
+		return super.toString() + " CodeBO{\"id\": \""+id+"\", \"parentId\": \""+parentId+"\", "
+				+ "\"groupId\": \""+groupId+"\", \"code\": \""+code+"\", "
+				+ "\"value\": \""+value+"\", \"sqeuence\": \""+sqeuence+"\", "
+				+ "\"enable\": \""+enable+"\"}";
+	}
 }

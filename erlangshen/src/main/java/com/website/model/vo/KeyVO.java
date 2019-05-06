@@ -26,4 +26,9 @@ public class KeyVO extends KeyBO {
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " KeyVO{\"clientName\": \""+clientName+"\", \"createdBy\": \""+createdBy+"\"}";
+	}
 }

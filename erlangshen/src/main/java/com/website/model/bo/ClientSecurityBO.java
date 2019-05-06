@@ -1,10 +1,10 @@
 package com.website.model.bo;
 
+import com.fastjavaframework.base.BaseBean;
+
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.validation.constraints.Max;
-
-import com.fastjavaframework.base.BaseBean;
 
 /**
  * @author https://github.com/shuli495/erlangshen
@@ -16,30 +16,49 @@ public class ClientSecurityBO extends BaseBean {
 	@Size(max=64, min=0, message="{client_security.clientId.size}")
 	private String clientId;
 
-	// 是否异地登陆检查 0不检查 1检查
+	/**
+	 * 是否异地登陆检查 0不检查 1检查
+	 */
 	private Boolean isCheckPlace;
 
-	// 通知优先级 0都通知 1手机优先 2邮件优先
+	/**
+	 * 通知优先级 0都通知 1手机优先 2邮件优先
+	 */
 	@Max(value=99999999, message="{client_security.checkPlacePriority.max}")
 	private Integer checkPlacePriority;
 
-	// 异地登陆邮件通知类型
+	/**
+	 * 异地登陆邮件通知类型
+	 */
 	@Size(max=10, min=0, message="{client_security.checkPlacePhoneTypeId.size}")
 	private Integer checkPlacePhoneTypeId;
 
-	// 异地登陆手机通知类型
+	/**
+	 * 异地登陆手机通知类型
+	 */
 	@Size(max=10, min=0, message="{client_security.checkPlaceMailTypeId.size}")
 	private Integer checkPlaceMailTypeId;
 
-	// 是否对登陆平台检查 0多平台多账号可同时登陆 1可以多平台登录，同一平台只能1个账号在线 2所有平台只能1个账号在线
+	/**
+	 *  是否对登陆平台检查
+	 *  0多平台多账号可同时登陆
+	 *  1可以多平台登录，同一平台只能1个账号在线
+	 *  2所有平台只能1个账号在线
+	 */
 	@Max(value=99999999, message="{client_security.isCheckPlatform.max}")
 	private Integer isCheckPlatform;
 
-	// 登录冲突操作 0登出之前登陆的账号 1新登陆请求失败
+	/**
+	 * 登录冲突操作
+	 * 0登出之前登陆的账号
+	 * 1新登陆请求失败
+	 */
 	@Max(value=99999999, message="{client_security.checkPlatformType.max}")
 	private Integer checkPlatformType;
 
-	// 登录通知接口
+	/**
+	 * 登录通知接口
+	 */
 	@Size(max=255, min=0, message="{client_security.loginApi.size}")
 	private String loginApi;
 
@@ -108,4 +127,11 @@ public class ClientSecurityBO extends BaseBean {
 		this.loginApi = loginApi;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + " ClientSecurityBO{\"clientId\": \""+clientId+"\", \"isCheckPlace\": \""+isCheckPlace+"\", "
+				+ "\"checkPlacePriority\": \""+checkPlacePriority+"\", \"checkPlacePhoneTypeId\": \""+checkPlacePhoneTypeId+"\", "
+				+ "\"checkPlaceMailTypeId\": \""+checkPlaceMailTypeId+"\", \"isCheckPlatform\": \""+isCheckPlatform+"\", "
+				+ "\"checkPlatformType\": \""+checkPlatformType+"\", \"loginApi\": \""+loginApi+"\"}";
+	}
 }

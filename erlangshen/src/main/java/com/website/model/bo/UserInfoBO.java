@@ -1,9 +1,9 @@
 package com.website.model.bo;
 
-import javax.validation.constraints.Size;
 import javax.validation.constraints.Max;
-import java.util.Date;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.Date;
 
 /**
  * @author https://github.com/shuli495/erlangshen
@@ -11,66 +11,100 @@ import javax.validation.constraints.NotNull;
 public class UserInfoBO extends UserBO {
 	private static final long serialVersionUID = 1L;
 
-	// 来源
+	/**
+	 * 来源
+	 */
 	@Size(max=255, min=0, message="{user_info.source.size}")
 	private String source;
 
-	// 昵称
+	/**
+	 * 昵称
+	 */
 	@Size(max=8, min=0, message="{user_info.nickname.size}")
 	private String nickname;
 
-	// 电话
+	/**
+	 * 电话
+	 */
 	@Size(max=32, min=0, message="{user_info.tel.size}")
 	private String tel;
 
-	// QQ
+	/**
+	 * QQ
+	 */
 	@Size(max=32, min=0, message="{user_info.qq.size}")
 	private String qq;
 
-	// 微信
+	/**
+	 * 微信
+	 */
 	@Size(max=32, min=0, message="{user_info.weixin.size}")
 	private String weixin;
 
-	// 新浪微博
+	/**
+	 * 新浪微博
+	 */
 	@Size(max=32, min=0, message="{user_info.weibo.size}")
 	private String weibo;
 
-	// 姓名
+	/**
+	 * 姓名
+	 */
 	@Size(max=32, min=0, message="{user_info.name.size}")
 	private String name;
 
-	// 性别 0女 1男
+	/**
+	 * 性别
+	 * 0女 1男
+	 */
 	private Boolean sex;
 
-	// 身份证号
+	/**
+	 * 身份证号
+	 */
 	@Size(max=18, min=0, message="{user_info.idcard.size}")
 	private String idcard;
 
-	// 实名认证 0未实名 1认证中 2认证失败 3认证成功
+	/**
+	 * 实名认证
+	 * 0未实名 1认证中 2认证失败 3认证成功
+	 */
 	@Max(value=99999999, message="{user_info.certification.max}")
 	private Integer certification;
 
-	// 实名认证失败原因
+	/**
+	 * 实名认证失败原因
+	 */
 	@Size(max=255, min=0, message="{user_info.certificationFailMsg.size}")
 	private String certificationFailMsg;
 
-	// 省
+	/**
+	 * 省
+	 */
 	@Size(max=64, min=0, message="{user_info.province.size}")
 	private String province;
 
-	// 市
+	/**
+	 * 市
+	 */
 	@Size(max=64, min=0, message="{user_info.city.size}")
 	private String city;
 
-	// 区
+	/**
+	 * 区
+	 */
 	@Size(max=64, min=0, message="{user_info.area.size}")
 	private String area;
 
-	// 地址
+	/**
+	 * 地址
+	 */
 	@Size(max=255, min=0, message="{user_info.address.size}")
 	private String address;
 
-	// 创建时间
+	/**
+	 * 创建时间
+	 */
 	@NotNull(message="{user_info.createdTime.null}")
 	private Date createdTime;
 
@@ -203,4 +237,13 @@ public class UserInfoBO extends UserBO {
 		this.createdTime = createdTime;
 	}
 
+
+	@Override
+	public String toString() {
+		return super.toString() + " UserInfoBO{\"source\": \""+source+"\", \"nickname\": \""+nickname+"\", \"tel\": \""+tel+"\", "
+				+ "\"qq\": \""+qq+"\", \"weixin\": \""+weixin+"\", \"weibo\": \""+weibo+"\", \"name\": \""+name+"\", "
+				+ "\"sex\": \""+sex+"\", \"idcard\": \""+idcard+"\", \"certification\": \""+certification+"\", "
+				+ "\"certificationFailMsg\": \""+certificationFailMsg+"\", \"province\": \""+province+"\", \"city\": \""+city+"\", "
+				+ "\"area\": \""+area+"\", \"address\": \""+address+"\", \"createdTime\": \""+createdTime+"\"}";
+	}
 }

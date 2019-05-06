@@ -1,33 +1,27 @@
 package com.website.controller;
 
 import com.fastjavaframework.annotation.Authority;
+import com.fastjavaframework.exception.ThrowException;
+import com.fastjavaframework.exception.ThrowPrompt;
+import com.fastjavaframework.page.Page;
 import com.fastjavaframework.util.CommonUtil;
+import com.fastjavaframework.util.UUID;
+import com.fastjavaframework.util.VerifyUtils;
+import com.website.common.BaseElsController;
 import com.website.common.Constants;
+import com.website.model.vo.UserVO;
+import com.website.service.ClientService;
+import com.website.service.UserService;
+import com.website.service.ValidateService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
-
-import com.fastjavaframework.exception.ThrowException;
-import com.fastjavaframework.util.VerifyUtils;
-import com.website.common.BaseElsController;
-import com.website.model.vo.UserVO;
-import com.website.service.ClientService;
-import com.website.service.ValidateService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import com.fastjavaframework.util.UUID;
-import com.fastjavaframework.page.Page;
-import com.fastjavaframework.exception.ThrowPrompt;
-import com.website.service.UserService;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 用户
@@ -49,11 +43,11 @@ public class UserController extends BaseElsController<UserService> {
 	/**
 	 * 创建
 	 */
-	@Authority(role = "adminToken")
+	@Authority(role = Constants.ADMIN_TOKEN)
 	@RequestMapping(method=RequestMethod.POST)
 	public Object create(@RequestBody UserVO vo) {
 		String loginIp = vo.getLoginIp();
-		if("KEY".equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
+		if(Constants.IDENTITY_TYPE_KEY.equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
 			throw new ThrowException("AK/SK方式loginIp参数必传！", "071002");
 		}
 
@@ -104,7 +98,7 @@ public class UserController extends BaseElsController<UserService> {
 	 * @param callback	如果是url注册链接，此参数发送邮件后跳转到此参数的url
 	 * @param isCheckUserExist	检查用户是否存在 null不检查 true存在抛异常 false不存在抛异常
 	 */
-	@Authority(role = "adminToken")
+	@Authority(role = Constants.ADMIN_TOKEN)
 	@RequestMapping(value=Constants.URL_USER_SENDMAIL, method=RequestMethod.GET)
 	public Object sendMail(@RequestParam String type,
 						   @RequestParam(required = false) String mail,
@@ -121,7 +115,7 @@ public class UserController extends BaseElsController<UserService> {
 			throw new ThrowPrompt("mail喝userId二选一!", "081017");
 		}
 
-		if("KEY".equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
+		if(Constants.IDENTITY_TYPE_KEY.equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
 			throw new ThrowException("AK/SK方式loginIp参数必传！", "081018");
 		}
 
@@ -140,7 +134,7 @@ public class UserController extends BaseElsController<UserService> {
 	 * @param isCheckUserExist	检查用户是否存在 null不检查 true存在抛异常 false不存在抛异常
      * @return
      */
-	@Authority(role = "adminToken")
+	@Authority(role = Constants.ADMIN_TOKEN)
 	@RequestMapping(value=Constants.URL_USER_SENDPHONE, method=RequestMethod.GET)
 	public Object sendPhone(@RequestParam String type,
 						   @RequestParam(required = false) String userId,
@@ -149,7 +143,7 @@ public class UserController extends BaseElsController<UserService> {
 							@RequestParam(required = false) String verifyCode,
 							@RequestParam(required = false) Boolean isCheckUserExist) {
 
-		if("KEY".equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
+		if(Constants.IDENTITY_TYPE_KEY.equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
 			throw new ThrowException("AK/SK方式loginIp参数必传！", "081018");
 		}
 
@@ -167,7 +161,7 @@ public class UserController extends BaseElsController<UserService> {
 	 * @param mail	与phone、userId三选一
 	 * @param phone 与mail、userId三选一
      */
-	@Authority(role = "adminToken")
+	@Authority(role = Constants.ADMIN_TOKEN)
 	@RequestMapping(value=Constants.URL_USER_CHECKCODE, method=RequestMethod.GET)
 	public Object checkCode(@RequestParam(required = false) String code,@RequestParam(required = false) String type,
 							@RequestParam(required = false) String userId,
@@ -196,7 +190,7 @@ public class UserController extends BaseElsController<UserService> {
 	 * @param info
 	 * @return
 	 */
-	@Authority(role = "adminToken")
+	@Authority(role = Constants.ADMIN_TOKEN)
 	@RequestMapping(value=Constants.URL_USER_CHECKMAIL, method=RequestMethod.GET)
 	public String checkMail(@RequestParam String info) {
 		return "redirect:" + this.service.checkMail(info);
@@ -323,12 +317,13 @@ public class UserController extends BaseElsController<UserService> {
 	 * @param file
      */
 	private void uploadIdcard(String type, String id, MultipartFile file) {
-		if(file.getContentType().indexOf("jpg") == -1
-			&& file.getContentType().indexOf("jpeg") == -1
-			&& file.getContentType().indexOf("png") == -1
-			&& file.getContentType().indexOf("bmp") == -1) {
-			throw new ThrowPrompt("上传文件类型只能是jpg/png/bmp格式", "081009");
+		String[] imageTypes = new String[]{"jpg", "jpeg", "png", "bmp"};
+		for(String imageType : imageTypes) {
+			if(file.getContentType().indexOf(imageType) == -1) {
+				throw new ThrowPrompt("上传文件类型只能是jpg/png/bmp格式", "081009");
+			}
 		}
+
 		try {
 			String pathRoot = request.getSession().getServletContext().getRealPath("");
 			String filePath = new StringBuilder(pathRoot)
@@ -357,7 +352,7 @@ public class UserController extends BaseElsController<UserService> {
 		if(VerifyUtils.isEmpty(vo.getCertification())) {
 			throw new ThrowPrompt("认证状态不能为空！", "081012");
 		}
-		if(vo.getCertification() != 2) {
+		if(vo.getCertification() != Constants.USER_CERTIFICATION_FAIL) {
 			vo.setCertificationFailMsg(null);
 		}
 
@@ -374,7 +369,7 @@ public class UserController extends BaseElsController<UserService> {
 	/**
 	 * 修改密码
 	 */
-	@Authority(role = "adminToken")
+	@Authority(role = Constants.ADMIN_TOKEN)
 	@RequestMapping(value="/rePwd", method=RequestMethod.POST)
 	public Object rePwd(@RequestBody UserVO vo) {
 		if(VerifyUtils.isEmpty(vo.getId())) {
@@ -413,7 +408,7 @@ public class UserController extends BaseElsController<UserService> {
 	/**
 	 * 列表查询 and条件
 	 */
-	@Authority(role = "adminToken")
+	@Authority(role = Constants.ADMIN_TOKEN)
 	@RequestMapping(method=RequestMethod.GET)
 	public Object query(@RequestParam(required = false) Integer pageSize, @RequestParam(required = false) Integer pageNum,
 						@RequestParam(required = false) String sort, @RequestParam(required = false) String order,
@@ -513,14 +508,16 @@ public class UserController extends BaseElsController<UserService> {
 
 		vo.setOrderBy("CREATED_TIME");
 
-		if(pageSize != null && pageNum != null && pageSize != 0 && pageNum != 0) {	//分页查询
+		if(pageSize != null && pageNum != null && pageSize != 0 && pageNum != 0) {
+			//分页查询
 			Page page = new Page();
 			page.setPageSize(pageSize);
 			page.setPageNum(pageNum);
 			vo.setPage(page);
 
 			return success(this.service.queryByClientPage(vo));
-		} else {	//列表查询
+		} else {
+			//列表查询
 			return success(this.service.queryByClient(vo));
 		}
 	}

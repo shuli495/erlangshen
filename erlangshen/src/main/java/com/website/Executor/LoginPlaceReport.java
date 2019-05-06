@@ -3,12 +3,14 @@ package com.website.executor;
 import com.alibaba.fastjson.JSONObject;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.util.VerifyUtils;
+import com.website.common.Constants;
 import com.website.model.vo.ClientMailVO;
 import com.website.model.vo.ClientPhoneVO;
 import com.website.model.vo.ClientSecurityVO;
 import com.website.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -94,8 +96,10 @@ public class LoginPlaceReport extends AbstractQpsControl {
             super.getQpsSwitch().set(false);
 
             // 与上次登录地址不同
-            if(!oldIp.getJSONObject("content").getJSONObject("address_detail").getString("city")
-                    .equals(newIp.getJSONObject("content").getJSONObject("address_detail").getString("city"))) {
+            if(!oldIp.getJSONObject(Constants.BAIDUMAP_IP_KEY_CONTENT)
+                    .getJSONObject(Constants.BAIDUMAP_IP_KEY_ADDRESS_DETAIL).getString(Constants.BAIDUMAP_IP_KEY_CITY)
+                    .equals(newIp.getJSONObject(Constants.BAIDUMAP_IP_KEY_CONTENT)
+                            .getJSONObject(Constants.BAIDUMAP_IP_KEY_ADDRESS_DETAIL).getString(Constants.BAIDUMAP_IP_KEY_CITY))) {
                 // 全部通知
                 if(clientSecurityVO.getCheckPlacePriority() == 0) {
                     // 短信通知
@@ -161,7 +165,7 @@ public class LoginPlaceReport extends AbstractQpsControl {
             URL realUrl = new URL(url);
 
             HttpURLConnection conn = (HttpURLConnection) realUrl.openConnection();
-            conn.setRequestMethod("GET");
+            conn.setRequestMethod(HttpMethod.GET.toString());
 
             BufferedReader in = new BufferedReader(new InputStreamReader(
                     conn.getInputStream(),"utf-8"));
@@ -172,7 +176,7 @@ public class LoginPlaceReport extends AbstractQpsControl {
             }
 
             JSONObject ipObj = JSONObject.parseObject(result);
-            if(ipObj.getInteger("status") == 0) {
+            if(ipObj.getInteger(Constants.BAIDUMAP_IP_KEY_STATUS) == 0) {
                 return ipObj;
             } else {
                 throw new ThrowException(result);

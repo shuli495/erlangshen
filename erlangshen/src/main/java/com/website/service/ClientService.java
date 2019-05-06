@@ -114,7 +114,7 @@ public class ClientService extends BaseService<ClientDao,ClientVO> {
      * @param tokenVO
      * @param ids
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(TokenVO tokenVO, List<String> ids) {
         List<ClientVO> delClients = new ArrayList<>();
 
@@ -151,7 +151,8 @@ public class ClientService extends BaseService<ClientDao,ClientVO> {
      * @return 删除的用户数
      */
     private int deleteUser(TokenVO tokenVO, String clientId) {
-        List<String> userIds = new ArrayList<>();   //删除用户id
+        //删除用户id
+        List<String> userIds = new ArrayList<>();
 
         // 当前client下的用户
         UserVO userVO = new UserVO();

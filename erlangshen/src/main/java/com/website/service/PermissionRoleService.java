@@ -51,7 +51,7 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
 	 * @param token
 	 * @param id
      */
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void delete(TokenVO token, Integer id) {
 		PermissionRoleVO vo = super.baseFind(id);
 		if(!clientService.isMyClient(token.getUserId() , vo.getClientId())) {
@@ -130,7 +130,7 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
 	 * @param ids
 	 * @param users
      */
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void userInsert(TokenVO token, List<Integer> ids, List<String> users) {
 		List<PermissionUserRoleVO> insertUsers = new LinkedList<>();
 
@@ -169,7 +169,7 @@ public class PermissionRoleService extends BaseService<PermissionRoleDao,Permiss
 	 * @param ids
 	 * @param users
      */
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void userDelete(TokenVO token, List<Integer> ids, List<String> users) {
 		List<PermissionUserRoleVO> deleteUsers = new LinkedList<>();
 

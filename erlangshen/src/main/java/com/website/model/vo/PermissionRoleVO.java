@@ -1,5 +1,6 @@
 package com.website.model.vo;
 
+import com.alibaba.fastjson.JSONArray;
 import com.website.model.bo.PermissionRoleBO;
 
 import java.util.List;
@@ -10,7 +11,9 @@ import java.util.List;
 public class PermissionRoleVO extends PermissionRoleBO {
 	private static final long serialVersionUID = 1L;
 
-	// 批量关联角色用
+	/**
+	 * 批量关联角色用
+	 */
 	List<Integer> roles;
 
 	List<String> users;
@@ -49,5 +52,13 @@ public class PermissionRoleVO extends PermissionRoleBO {
 
 	public void setMenuInfo(List<PermissionRoleMenuVO> menuInfo) {
 		this.menuInfo = menuInfo;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " PermissionRoleVO{\"roles\": \""+ JSONArray.toJSONString(roles) +"\", "
+				+ "\"users\": \""+JSONArray.toJSONString(users)+"\", "
+				+ "\"menus\": \""+JSONArray.toJSONString(menus)+"\", "
+				+ "\"menuInfo\": \""+JSONArray.toJSONString(menuInfo)+"\"}";
 	}
 }

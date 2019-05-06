@@ -10,7 +10,11 @@ public class TokenVO extends TokenBO {
 
 	private String clientId;
 	private String from;
-	private String authenticationMethod;	//认证方式AK/SK、TOKEN
+
+	/**
+	 * 认证方式AK/SK、TOKEN
+	 */
+	private String authenticationMethod;
 
 	public String getClientId() {
 		return clientId;
@@ -34,5 +38,12 @@ public class TokenVO extends TokenBO {
 
 	public void setAuthenticationMethod(String authenticationMethod) {
 		this.authenticationMethod = authenticationMethod;
+	}
+
+
+	@Override
+	public String toString() {
+		return super.toString() + " TokenVO{\"clientId\": \""+clientId+"\", \"from\": \""+from+"\", "
+				+ "\"authenticationMethod\": \""+authenticationMethod+"\"}";
 	}
 }

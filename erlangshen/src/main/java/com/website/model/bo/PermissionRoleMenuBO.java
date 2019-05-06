@@ -1,9 +1,9 @@
 package com.website.model.bo;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Max;
-
 import com.fastjavaframework.base.BaseBean;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author https://github.com/shuli495/erlangshen
@@ -44,5 +44,11 @@ public class PermissionRoleMenuBO extends BaseBean {
 
 	public void setMenuId(Integer menuId) {
 		this.menuId = menuId;
+	}
+
+
+	@Override
+	public String toString() {
+		return super.toString() + " PermissionRoleMenuBO{\"id\": \""+id+"\", \"roleId\": \""+roleId+"\", \"menuId\": \""+menuId+"\"}";
 	}
 }
