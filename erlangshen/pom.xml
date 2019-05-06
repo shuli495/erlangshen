@@ -59,6 +59,7 @@
 
 		<jjwt.version>0.6.0</jjwt.version>
 		<jbcrypt.version>0.4</jbcrypt.version>
+		<guava.version>20.0</guava.version>
 	</properties>
 
 	<dependencies>
@@ -102,8 +103,13 @@
 			<artifactId>jbcrypt</artifactId>
 			<version>${jbcrypt.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<plugins>

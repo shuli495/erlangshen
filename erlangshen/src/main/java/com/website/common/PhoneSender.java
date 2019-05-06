@@ -40,11 +40,11 @@ public class PhoneSender {
             request.setTemplateParam(params);
 
             SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
-            if(null == sendSmsResponse.getCode() || !"OK".equals(sendSmsResponse.getCode())) {
+            if(null == sendSmsResponse.getCode() || !Constants.ALIYUN_SMS_KEY_OK.equals(sendSmsResponse.getCode())) {
                 throw new ThrowException(sendSmsResponse.getCode()+"("+sendSmsResponse.getMessage()+")", "911001");
             }
         } catch (Exception e) {
-            if(e.getMessage().indexOf("isv.BUSINESS_LIMIT_CONTROL") != -1) {
+            if(e.getMessage().indexOf(Constants.ALIYUN_SMS_KEY_ERR_LIMIT) != -1) {
                 String level = "";
                 String maxNum = "";
                 try {

@@ -1,6 +1,7 @@
 package com.website.common;
 
 import com.fastjavaframework.exception.ThrowException;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sun.mail.util.MailSSLSocketFactory;
 
 import javax.mail.Address;
@@ -10,8 +11,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  * 邮件发送
@@ -21,8 +21,12 @@ public class MailSender {
     private static ExecutorService executorService;
 
     public MailSender() {
-        if(null == this.executorService) {
-            this.executorService = Executors.newCachedThreadPool();
+        if(null == MailSender.executorService) {
+            ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("mail-pool-%d").build();
+
+            MailSender.executorService = new ThreadPoolExecutor(5, 200,
+                    0L, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<Runnable>(1024), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
         }
     }
 
@@ -41,7 +45,7 @@ public class MailSender {
     public void send(String from, String nikeName, String smtp, String subject, String content, String mail, String userName, String pwd) {
         try {
             Sender sender = new Sender(from, nikeName, smtp, subject, content, mail, userName, pwd);
-            this.executorService.execute(sender);
+            MailSender.executorService.execute(sender);
         } catch (Exception e) {
             throw new ThrowException("邮件发送队列失败：" + e.getMessage(), "901001");
         }
