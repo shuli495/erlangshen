@@ -1,15 +1,138 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com</groupId>
-    <artifactId>erlangshenParent</artifactId>
-    <packaging>pom</packaging>
-    <version>1.0.0</version>
-     <modules>
-         <module>erlangshen-java-sdk</module>
-     </modules>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com</groupId>
+	<artifactId>erlangshen</artifactId>
 
+	<packaging>jar</packaging>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>用户权限管理系统</description>
+
+	<scm>
+		<url>https://github.com/shuli495/fastWebsite</url>
+		<connection>scm:git:https://git@github.com/shuli495/fastWebsite.git</connection>
+	</scm>
+
+	<licenses>
+		<license>
+			<name>The MIT License</name>
+			<url>https://mit-license.org/</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>wangshuli</name>
+			<email>xiaoyao495@163.com</email>
+			<organization>free man</organization>
+			<organizationUrl>https://github.com/shuli495</organizationUrl>
+		</developer>
+	</developers>
+
+	<parent>
+		<!-- 从本地关联fastjava代码，本地需要添加fastjava代码，与下个依赖二选一 -->
+		<!--<groupId>com.fastjavaframework</groupId>-->
+		<!--<artifactId>fastjava-parent</artifactId>-->
+		<!--<version>2.0.0</version>-->
+		<!--<relativePath>../fastjavaParent/pom.xml</relativePath>-->
+		<groupId>com.github.shuli495</groupId>
+		<artifactId>fastjava-parent</artifactId>
+		<version>2.0.0</version>
+	</parent>
+
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
+	<properties>
+		<javamail.version>1.6.0-rc1</javamail.version>
+		<json.version>20180130</json.version>
+
+		<aliyun.core.version>3.7.1</aliyun.core.version>
+		<aliyun.dysmsapi.version>1.1.0</aliyun.dysmsapi.version>
+
+		<baiduyun.version>4.2.0</baiduyun.version>
+
+		<jjwt.version>0.6.0</jjwt.version>
+		<jbcrypt.version>0.4</jbcrypt.version>
+		<guava.version>20.0</guava.version>
+		<commons-codec.version>1.9</commons-codec.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>javax.mail-api</artifactId>
+			<version>${javamail.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>${javamail.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${json.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-core</artifactId>
+			<version>${aliyun.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+			<version>${aliyun.dysmsapi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.baidu.aip</groupId>
+			<artifactId>java-sdk</artifactId>
+			<version>${baiduyun.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>${jjwt.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mindrot</groupId>
+			<artifactId>jbcrypt</artifactId>
+			<version>${jbcrypt.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>${commons-codec.version}</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<!-- 制作镜像 mvn clean package dockerfile:build -->
+				<!-- 启动镜像 docker run -d -p 8090:8090 IMAGE_ID -->
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+				<version>1.4.3</version>
+				<configuration>
+					<repository>${project.groupId}/${project.artifactId}</repository>
+					<tag>${project.version}</tag>
+					<buildArgs>
+						<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+					</buildArgs>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
