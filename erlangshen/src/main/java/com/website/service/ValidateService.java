@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import com.fastjavaframework.base.BaseService;
 import com.website.dao.ValidateDao;
 import com.website.model.vo.ValidateVO;
-import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -56,8 +56,7 @@ public class ValidateService extends BaseService<ValidateDao,ValidateVO> {
             ImageIO.write((BufferedImage)map.get("image"), "jpg", baos);
             byte[] bytes = baos.toByteArray();
 
-            BASE64Encoder encoder = new sun.misc.BASE64Encoder();
-            return encoder.encodeBuffer(bytes).trim();
+            return Base64.encodeBase64String(bytes);
         } catch (Exception e) {
             throw new ThrowException("验证码转base64错误：" + e.getMessage(), "122009");
         }
