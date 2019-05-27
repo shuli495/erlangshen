@@ -5,7 +5,6 @@ import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.fastjavaframework.FastjavaSpringBootConfig;
 import com.fastjavaframework.listener.SystemSettingListener;
-import com.website.common.Constants;
 import com.website.filter.IdentityFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -51,14 +50,7 @@ public class Application {
 
         registration.setFilter(new IdentityFilter());
 
-        registration.addUrlPatterns(Constants.URL_CLIENT);
-        registration.addUrlPatterns(Constants.URL_CODE);
-        registration.addUrlPatterns(Constants.URL_KEY);
-        registration.addUrlPatterns(Constants.URL_LOGIN_LOG);
-        registration.addUrlPatterns(Constants.URL_PERMISSION_MENU);
-        registration.addUrlPatterns(Constants.URL_PERMISSION_ROLE);
-        registration.addUrlPatterns(Constants.URL_TOKEN);
-        registration.addUrlPatterns(Constants.URL_USER);
+        registration.addUrlPatterns("/*");
 
         registration.setName("identityFilter");
         registration.setOrder(2);

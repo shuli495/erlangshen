@@ -54,12 +54,9 @@ public class IdentityFilter implements Filter {
             if(VerifyUtils.isNotEmpty(signature)) {
                 // ak/sk认证
                 this.checkKey(cxt, signature ,response, request, filterChain);
-            } else if(VerifyUtils.isNotEmpty(token)) {
+            } else {
                 //token认证
                 this.checkToken(cxt, token, response, request, filterChain);
-            } else {
-                this.returnError(response);
-                return;
             }
         } catch (Exception e) {
             this.returnError(response);

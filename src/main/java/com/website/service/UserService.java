@@ -590,17 +590,17 @@ public class UserService extends BaseService<UserDao,UserVO> {
 			if(phone.matches(Constants.REGEX_USERNAME)) {
 				params.put("phone", phone);
 			}
-		}
-		UserVO userInfo = userInfoService.baseFind(user.getId());
-		if(null != userInfo) {
-			if(user.getNickname().matches(Constants.REGEX_USERNAME)) {
-				params.put("nickname", userInfo.getNickname());
-			}
-			if(user.getUsername().matches(Constants.REGEX_USERNAME)) {
-				params.put("username", userInfo.getUsername());
-			}
-			if(user.getName().matches(Constants.REGEX_USERNAME)) {
-				params.put("name", userInfo.getName());
+			UserVO userInfo = userInfoService.baseFind(user.getId());
+			if(null != userInfo) {
+				if(user.getNickname().matches(Constants.REGEX_USERNAME)) {
+					params.put("nickname", userInfo.getNickname());
+				}
+				if(user.getUsername().matches(Constants.REGEX_USERNAME)) {
+					params.put("username", userInfo.getUsername());
+				}
+				if(user.getName().matches(Constants.REGEX_USERNAME)) {
+					params.put("name", userInfo.getName());
+				}
 			}
 		}
 
