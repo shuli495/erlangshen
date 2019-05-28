@@ -14,6 +14,11 @@ erlangshen-java-sdk java版sdk。
 6. 用户安全设置。异地登录提醒，不同客户端登录限制等。（即将竣工）
 
 
+**docker：**
+```
+docker pull registry.cn-beijing.aliyuncs.com/shuli495/erlangshen:master
+```
+
 ## erlangshen_web
 使用Flux框架，webpack+npm打包。
 
