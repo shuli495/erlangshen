@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.website.dao.ValidateDaoMapper">
-	<resultMap type="com.website.model.bo.ValidateBO" id="validateBO">
+	<resultMap type="com.erlangshen.model.bo.ValidateBO" id="validateBO">
 		<result column="USER_ID" property="userId" />
 		<result column="TYPE" property="type" />
 		<result column="CODE" property="code" />
 		<result column="CREATED_TIME" property="createdTime" />
 	</resultMap>
-	<resultMap type="com.website.model.vo.ValidateVO" id="validateVO" extends="validateBO">
+	<resultMap type="com.erlangshen.model.vo.ValidateVO" id="validateVO" extends="validateBO">
 	</resultMap>
 
-	<insert id="insert" parameterType="com.website.model.vo.ValidateVO" useGeneratedKeys="true">
+	<insert id="insert" parameterType="com.erlangshen.model.vo.ValidateVO" useGeneratedKeys="true">
 		INSERT validate
 		(USER_ID,TYPE,CODE,CREATED_TIME)
 		VALUES
@@ -26,7 +26,7 @@
 		</foreach>
 	</insert>
 
-	<update id="update" parameterType="com.website.model.vo.ValidateVO">
+	<update id="update" parameterType="com.erlangshen.model.vo.ValidateVO">
 		UPDATE validate
 		<trim prefix="SET" suffixOverrides=",">
 			<if test="code != null">
@@ -54,7 +54,7 @@
 		</foreach>
 	</update>
 
-	<delete id="delete" parameterType="com.website.model.vo.ValidateVO">
+	<delete id="delete" parameterType="com.erlangshen.model.vo.ValidateVO">
 		DELETE FROM validate
 		WHERE USER_ID=#{userId}
 		<if test="type != null">
@@ -65,7 +65,7 @@
 		</if>
 	</delete>
 
-	<select id="queryByOr" parameterType="com.website.model.vo.ValidateVO" resultMap="validateVO">
+	<select id="queryByOr" parameterType="com.erlangshen.model.vo.ValidateVO" resultMap="validateVO">
 		SELECT
 		USER_ID,`TYPE`,CODE,CREATED_TIME
 		FROM validate
@@ -82,7 +82,7 @@
 		</where>
 	</select>
 
-	<select id="queryByAnd" parameterType="com.website.model.vo.ValidateVO" resultMap="validateVO">
+	<select id="queryByAnd" parameterType="com.erlangshen.model.vo.ValidateVO" resultMap="validateVO">
 		SELECT
 		USER_ID,`TYPE`,CODE,CREATED_TIME
 		FROM validate

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.website.dao.UserInfoDaoMapper">
-	<resultMap type="com.website.model.bo.UserInfoBO" id="userInfoBO">
+	<resultMap type="com.erlangshen.model.bo.UserInfoBO" id="userInfoBO">
 		<id column="ID" property="id" />
 		<result column="SOURCE" property="source" />
 		<result column="NICKNAME" property="nickname" />
@@ -20,10 +20,10 @@
 		<result column="ADDRESS" property="address" />
 		<result column="CREATED_TIME" property="createdTime" />
 	</resultMap>
-	<resultMap type="com.website.model.vo.UserVO" id="userVO" extends="userInfoBO">
+	<resultMap type="com.erlangshen.model.vo.UserVO" id="userVO" extends="userInfoBO">
 	</resultMap>
 
-	<insert id="insert" parameterType="com.website.model.vo.UserVO" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.erlangshen.model.vo.UserVO" useGeneratedKeys="true" keyProperty="id">
 		INSERT user_info
 		(ID,SOURCE,NICKNAME,TEL,QQ,WEIXIN,WEIBO,`NAME`,SEX,IDCARD,CERTIFICATION,CERTIFICATION_FAIL_MSG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME)
 		VALUES
@@ -39,7 +39,7 @@
 		</foreach>
 	</insert>
 
-	<update id="update" parameterType="com.website.model.vo.UserVO">
+	<update id="update" parameterType="com.erlangshen.model.vo.UserVO">
 		UPDATE user_info
 		<trim prefix="SET" suffixOverrides=",">
 			<if test="source != null">
@@ -169,7 +169,7 @@
 		WHERE id=#{id}
 	</select>
 
-	<select id="queryByOr" parameterType="com.website.model.vo.UserVO" resultMap="userVO">
+	<select id="queryByOr" parameterType="com.erlangshen.model.vo.UserVO" resultMap="userVO">
 		SELECT
 		ID,SOURCE,NICKNAME,TEL,QQ,WEIXIN,WEIBO,`NAME`,SEX,IDCARD,CERTIFICATION,CERTIFICATION_FAIL_MSG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME
 		FROM user_info
@@ -225,7 +225,7 @@
 		</where>
 	</select>
 
-	<select id="queryByAnd" parameterType="com.website.model.vo.UserVO" resultMap="userVO">
+	<select id="queryByAnd" parameterType="com.erlangshen.model.vo.UserVO" resultMap="userVO">
 		SELECT
 		ID,SOURCE,NICKNAME,TEL,QQ,WEIXIN,WEIBO,`NAME`,SEX,IDCARD,CERTIFICATION,CERTIFICATION_FAIL_MSG,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME
 		FROM user_info

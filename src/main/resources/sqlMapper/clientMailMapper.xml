@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.website.dao.ClientMailDaoMapper">
-	<resultMap type="com.website.model.bo.ClientMailBO" id="clientMailBO">
+	<resultMap type="com.erlangshen.model.bo.ClientMailBO" id="clientMailBO">
 		<id column="ID" property="id" />
 		<result column="CLIENT_ID" property="clientId" />
 		<result column="MAIL" property="mail" />
@@ -12,10 +12,10 @@
 		<result column="SUBJECT" property="subject" />
 		<result column="TEXT" property="text" />
 	</resultMap>
-	<resultMap type="com.website.model.vo.ClientMailVO" id="clientMailVO" extends="clientMailBO">
+	<resultMap type="com.erlangshen.model.vo.ClientMailVO" id="clientMailVO" extends="clientMailBO">
 	</resultMap>
 
-	<insert id="insert" parameterType="com.website.model.vo.ClientMailVO" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.erlangshen.model.vo.ClientMailVO" useGeneratedKeys="true" keyProperty="id">
 		INSERT client_mail
 		(CLIENT_ID,MAIL,USERNAME,PWD,SMTP,TYPE,SUBJECT,TEXT)
 		VALUES
@@ -30,7 +30,7 @@
 		DELETE FROM client_mail WHERE CLIENT_ID=#{clientId}
 	</delete>
 
-	<select id="find" parameterType="com.website.model.vo.ClientMailVO" resultMap="clientMailVO">
+	<select id="find" parameterType="com.erlangshen.model.vo.ClientMailVO" resultMap="clientMailVO">
 		SELECT
 		ID,CLIENT_ID,MAIL,USERNAME,PWD,SMTP,TYPE,SUBJECT,TEXT
 		FROM client_mail
@@ -44,7 +44,7 @@
 		WHERE ID=#{id}
 	</select>
 
-	<select id="queryByAnd" parameterType="com.website.model.vo.ClientMailVO" resultMap="clientMailVO">
+	<select id="queryByAnd" parameterType="com.erlangshen.model.vo.ClientMailVO" resultMap="clientMailVO">
 		SELECT
 		ID,CLIENT_ID,MAIL,USERNAME,SMTP,TYPE,SUBJECT,TEXT
 		FROM client_mail

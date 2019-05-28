@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.website.dao.CodeDaoMapper">
-	<resultMap type="com.website.model.bo.CodeBO" id="CodeBO">
+	<resultMap type="com.erlangshen.model.bo.CodeBO" id="CodeBO">
 		<result column="ID" property="id" />
 		<result column="PARENT_ID" property="parentId" />
 		<result column="GROUP_ID" property="groupId" />
@@ -11,7 +11,7 @@
 		<result column="ENABLE" property="enable" />
 	</resultMap>
 
-	<insert id="insert" parameterType="com.website.model.bo.CodeBO" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.erlangshen.model.bo.CodeBO" useGeneratedKeys="true" keyProperty="id">
 		INSERT `code`
 		(ID,PARENT_ID,GROUP_ID,CODE,VALUE,SQEUENCE,ENABLE)
 		VALUES
@@ -27,7 +27,7 @@
 		</foreach>
 	</insert>
 
-	<update id="update" parameterType="com.website.model.bo.CodeBO">
+	<update id="update" parameterType="com.erlangshen.model.bo.CodeBO">
 		UPDATE `code`
 		<trim prefix="SET" suffixOverrides=",">
 			<if test="id != null">
@@ -103,7 +103,7 @@
 		WHERE id=#{id}
 	</select>
 
-	<select id="queryByOr" parameterType="com.website.model.bo.CodeBO" resultType="CodeBO">
+	<select id="queryByOr" parameterType="com.erlangshen.model.bo.CodeBO" resultType="CodeBO">
 		SELECT
 		ID,PARENT_ID as parentId,GROUP_ID as groupId,CODE,VALUE,SQEUENCE,ENABLE
 		FROM `code`
@@ -132,7 +132,7 @@
 		</where>
 	</select>
 
-	<select id="queryByAnd" parameterType="com.website.model.bo.CodeBO" resultType="CodeBO">
+	<select id="queryByAnd" parameterType="com.erlangshen.model.bo.CodeBO" resultType="CodeBO">
 		SELECT
 		ID,PARENT_ID as parentId,GROUP_ID as groupId,CODE,VALUE,SQEUENCE,ENABLE
 		FROM `code`

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.website.dao.UserDaoMapper">
-	<resultMap id="userBO" type="com.website.model.bo.UserBO">
+	<resultMap id="userBO" type="com.erlangshen.model.bo.UserBO">
 		<id column="ID" property="id"/>
 		<result column="CLIENT_ID" property="clientId"/>
 		<result column="PWD" property="pwd"/>
@@ -12,7 +12,7 @@
 		<result column="PHONE_VERIFY" property="phoneVerify"/>
 		<result column="STATUS" property="status"/>
 	</resultMap>
-	<resultMap id="userInfoBO" type="com.website.model.bo.UserInfoBO" extends="userBO">
+	<resultMap id="userInfoBO" type="com.erlangshen.model.bo.UserInfoBO" extends="userBO">
 		<id column="ID" property="id" />
 		<result column="SOURCE" property="source" />
 		<result column="NICKNAME" property="nickname" />
@@ -31,11 +31,11 @@
 		<result column="ADDRESS" property="address" />
 		<result column="CREATED_TIME" property="createdTime" />
 	</resultMap>
-	<resultMap id="userVO" type="com.website.model.vo.UserVO" extends="userInfoBO">
+	<resultMap id="userVO" type="com.erlangshen.model.vo.UserVO" extends="userInfoBO">
 		<result column="CLIENT_NAME" property="clientName"/>
 	</resultMap>
 
-	<select id="check" parameterType="com.website.model.bo.UserBO" resultMap="userVO">
+	<select id="check" parameterType="com.erlangshen.model.bo.UserBO" resultMap="userVO">
 		SELECT
 		t0.ID,t0.CLIENT_ID,t0.PWD,t0.USERNAME,t0.MAIL,t0.MAIL_VERIFY,t0.PHONE,t0.PHONE_VERIFY,t0.STATUS
 		FROM `user` t0,client t1
@@ -47,7 +47,7 @@
 		  </if>
 	</select>
 
-	<insert id="insert" keyProperty="id" parameterType="com.website.model.bo.UserBO" useGeneratedKeys="true">
+	<insert id="insert" keyProperty="id" parameterType="com.erlangshen.model.bo.UserBO" useGeneratedKeys="true">
 		INSERT user
 		(ID,CLIENT_ID,PWD,USERNAME,MAIL,MAIL_VERIFY,PHONE,PHONE_VERIFY,STATUS)
 		VALUES
@@ -63,7 +63,7 @@
 		</foreach>
 	</insert>
 
-	<update id="update" parameterType="com.website.model.bo.UserBO">
+	<update id="update" parameterType="com.erlangshen.model.bo.UserBO">
 		UPDATE user
 		<trim prefix="SET" suffixOverrides=",">
 			<if test="clientId != null">
@@ -145,7 +145,7 @@
 		WHERE id=#{id}
 	</select>
 
-	<select id="queryByAnd" parameterType="com.website.model.bo.UserBO" resultMap="userVO">
+	<select id="queryByAnd" parameterType="com.erlangshen.model.bo.UserBO" resultMap="userVO">
 		SELECT
 		ID,CLIENT_ID,PWD,USERNAME,MAIL,MAIL_VERIFY,PHONE,PHONE_VERIFY,STATUS
 		FROM user
@@ -174,7 +174,7 @@
 		</where>
 	</select>
 
-	<select id="queryByClient" parameterType="com.website.model.vo.UserVO" resultMap="userVO">
+	<select id="queryByClient" parameterType="com.erlangshen.model.vo.UserVO" resultMap="userVO">
 		SELECT
 		t0.ID,t0.CLIENT_ID,t0.USERNAME,t0.MAIL,t0.MAIL_VERIFY,t0.PHONE,t0.PHONE_VERIFY,t0.STATUS,
 		t1.SOURCE,t1.NICKNAME,t1.TEL,t1.QQ,t1.WEIXIN,t1.WEIBO,t1.`NAME`,t1.SEX,t1.IDCARD,t1.CERTIFICATION,t1.CERTIFICATION_FAIL_MSG,t1.PROVINCE,t1.CITY,t1.AREA,t1.ADDRESS,t1.CREATED_TIME,

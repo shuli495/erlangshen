@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.website.dao.ClientPhoneDaoMapper">
-	<resultMap type="com.website.model.bo.ClientPhoneBO" id="clientPhoneBO">
+	<resultMap type="com.erlangshen.model.bo.ClientPhoneBO" id="clientPhoneBO">
 		<id column="ID" property="id" />
 		<result column="CLIENT_ID" property="clientId" />
 		<result column="PLATFORM" property="platform" />
@@ -12,10 +12,10 @@
 		<result column="TYPE" property="type" />
 		<result column="TEXT" property="text" />
 	</resultMap>
-	<resultMap type="com.website.model.vo.ClientPhoneVO" id="clientPhoneVO" extends="clientPhoneBO">
+	<resultMap type="com.erlangshen.model.vo.ClientPhoneVO" id="clientPhoneVO" extends="clientPhoneBO">
 	</resultMap>
 
-	<insert id="insert" parameterType="com.website.model.vo.ClientPhoneVO" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.erlangshen.model.vo.ClientPhoneVO" useGeneratedKeys="true" keyProperty="id">
 		INSERT client_phone
 		(CLIENT_ID,PLATFORM,AK,SK,SIGN,TMPLATE,TYPE,TEXT)
 		VALUES
@@ -30,7 +30,7 @@
 		DELETE FROM client_phone WHERE CLIENT_ID=#{clientId}
 	</delete>
 
-	<select id="find" parameterType="com.website.model.vo.ClientPhoneVO" resultMap="clientPhoneVO">
+	<select id="find" parameterType="com.erlangshen.model.vo.ClientPhoneVO" resultMap="clientPhoneVO">
 		SELECT
 		ID,CLIENT_ID,PLATFORM,AK,SK,SIGN,TMPLATE,TYPE,TEXT
 		FROM client_phone
@@ -44,7 +44,7 @@
 		WHERE id=#{id}
 	</select>
 
-	<select id="queryByAnd" parameterType="com.website.model.vo.ClientPhoneVO" resultMap="clientPhoneVO">
+	<select id="queryByAnd" parameterType="com.erlangshen.model.vo.ClientPhoneVO" resultMap="clientPhoneVO">
 		SELECT
 		ID,CLIENT_ID,PLATFORM,AK,SIGN,TMPLATE,TYPE,TEXT
 		FROM client_phone

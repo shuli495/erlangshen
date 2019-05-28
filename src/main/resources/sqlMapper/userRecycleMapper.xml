@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.website.dao.UserRecycleDaoMapper">
-	<resultMap type="com.website.model.bo.UserRecycleBO" id="userRecycleBO">
+	<resultMap type="com.erlangshen.model.bo.UserRecycleBO" id="userRecycleBO">
 		<id column="ID" property="id" />
 		<result column="CLIENT_ID" property="clientId" />
 		<result column="SOURCE" property="source" />
@@ -28,10 +28,10 @@
 		<result column="OPERATOR_TIME" property="operatorTime" />
 		<result column="STATUS" property="status" />
 	</resultMap>
-	<resultMap type="com.website.model.vo.UserRecycleVO" id="userRecycleVO" extends="userRecycleBO">
+	<resultMap type="com.erlangshen.model.vo.UserRecycleVO" id="userRecycleVO" extends="userRecycleBO">
 	</resultMap>
 
-	<insert id="insert" parameterType="com.website.model.vo.UserRecycleVO" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.erlangshen.model.vo.UserRecycleVO" useGeneratedKeys="true" keyProperty="id">
 		INSERT user_recycle
 		(ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,CERTIFICATION,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,OPERATOR_TIME,STATUS)
 		VALUES
@@ -47,7 +47,7 @@
 		</foreach>
 	</insert>
 
-	<update id="update" parameterType="com.website.model.vo.UserRecycleVO">
+	<update id="update" parameterType="com.erlangshen.model.vo.UserRecycleVO">
 		UPDATE user_recycle
 		<trim prefix="SET" suffixOverrides=",">
 			<if test="clientId != null">
@@ -225,7 +225,7 @@
 		WHERE id=#{id}
 	</select>
 
-	<select id="queryByOr" parameterType="com.website.model.vo.UserRecycleVO" resultMap="userRecycleVO">
+	<select id="queryByOr" parameterType="com.erlangshen.model.vo.UserRecycleVO" resultMap="userRecycleVO">
 		SELECT
 		ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,CERTIFICATION,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,OPERATOR_TIME,STATUS
 		FROM user_recycle
@@ -305,7 +305,7 @@
 		</where>
 	</select>
 
-	<select id="queryByAnd" parameterType="com.website.model.vo.UserRecycleVO" resultMap="userRecycleVO">
+	<select id="queryByAnd" parameterType="com.erlangshen.model.vo.UserRecycleVO" resultMap="userRecycleVO">
 		SELECT
 		ID,CLIENT_ID,SOURCE,PWD,USERNAME,NICKNAME,MAIL,PHONE,TEL,QQ,WEIXIN,WEXIN_IMG,WEIBO,HEAD,NAME,SEX,IDCARD,CERTIFICATION,PROVINCE,CITY,AREA,ADDRESS,CREATED_TIME,OPERATOR_TIME,STATUS
 		FROM user_recycle

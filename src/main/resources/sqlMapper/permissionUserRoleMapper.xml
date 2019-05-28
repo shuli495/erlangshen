@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.website.dao.PermissionUserRoleDaoMapper">
-	<resultMap type="com.website.model.bo.PermissionUserRoleBO" id="permissionUserRoleBO">
+	<resultMap type="com.erlangshen.model.bo.PermissionUserRoleBO" id="permissionUserRoleBO">
 		<id column="ID" property="id" />
 		<result column="USER_ID" property="userId" />
 		<result column="ROLE_ID" property="roleId" />
 	</resultMap>
-	<resultMap type="com.website.model.vo.PermissionUserRoleVO" id="permissionUserRoleVO" extends="permissionUserRoleBO">
+	<resultMap type="com.erlangshen.model.vo.PermissionUserRoleVO" id="permissionUserRoleVO" extends="permissionUserRoleBO">
 	</resultMap>
 
-	<insert id="insert" parameterType="com.website.model.vo.PermissionUserRoleVO" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.erlangshen.model.vo.PermissionUserRoleVO" useGeneratedKeys="true" keyProperty="id">
 		INSERT permission_user_role
 		(USER_ID,ROLE_ID)
 		VALUES
@@ -25,7 +25,7 @@
 		</foreach>
 	</insert>
 
-	<update id="update" parameterType="com.website.model.vo.PermissionUserRoleVO">
+	<update id="update" parameterType="com.erlangshen.model.vo.PermissionUserRoleVO">
 		UPDATE permission_user_role
 		<trim prefix="SET" suffixOverrides=",">
 			<if test="userId != null">
@@ -71,7 +71,7 @@
 		WHERE id=#{id}
 	</select>
 
-	<select id="queryByOr" parameterType="com.website.model.vo.PermissionUserRoleVO" resultMap="permissionUserRoleVO">
+	<select id="queryByOr" parameterType="com.erlangshen.model.vo.PermissionUserRoleVO" resultMap="permissionUserRoleVO">
 		SELECT
 		ID,USER_ID,ROLE_ID
 		FROM permission_user_role
@@ -85,7 +85,7 @@
 		</where>
 	</select>
 
-	<select id="queryByAnd" parameterType="com.website.model.vo.PermissionUserRoleVO" resultMap="permissionUserRoleVO">
+	<select id="queryByAnd" parameterType="com.erlangshen.model.vo.PermissionUserRoleVO" resultMap="permissionUserRoleVO">
 		SELECT
 		ID,USER_ID,ROLE_ID
 		FROM permission_user_role

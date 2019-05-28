@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.website.dao.PermissionRoleMenuDaoMapper">
-	<resultMap type="com.website.model.bo.PermissionRoleMenuBO" id="permissionRoleFunctionBO">
+	<resultMap type="com.erlangshen.model.bo.PermissionRoleMenuBO" id="permissionRoleFunctionBO">
 		<id column="ID" property="id" />
 		<result column="ROLE_ID" property="roleId" />
 		<result column="MENU_ID" property="menuId" />
 	</resultMap>
-	<resultMap type="com.website.model.vo.PermissionRoleMenuVO" id="permissionRoleFunctionVO" extends="permissionRoleFunctionBO">
+	<resultMap type="com.erlangshen.model.vo.PermissionRoleMenuVO" id="permissionRoleFunctionVO" extends="permissionRoleFunctionBO">
 	</resultMap>
 
-	<insert id="insert" parameterType="com.website.model.vo.PermissionRoleMenuVO" useGeneratedKeys="true" keyProperty="id">
+	<insert id="insert" parameterType="com.erlangshen.model.vo.PermissionRoleMenuVO" useGeneratedKeys="true" keyProperty="id">
 		INSERT permission_role_menu
 		(ROLE_ID,MENU_ID)
 		VALUES
@@ -25,7 +25,7 @@
 		</foreach>
 	</insert>
 
-	<update id="update" parameterType="com.website.model.vo.PermissionRoleMenuVO">
+	<update id="update" parameterType="com.erlangshen.model.vo.PermissionRoleMenuVO">
 		UPDATE permission_role_menu
 		<trim prefix="SET" suffixOverrides=",">
 			<if test="roleId != null">
@@ -71,7 +71,7 @@
 		WHERE id=#{id}
 	</select>
 
-	<select id="queryByOr" parameterType="com.website.model.vo.PermissionRoleMenuVO" resultMap="permissionRoleFunctionVO">
+	<select id="queryByOr" parameterType="com.erlangshen.model.vo.PermissionRoleMenuVO" resultMap="permissionRoleFunctionVO">
 		SELECT
 		ID,ROLE_ID,MENU_ID
 		FROM permission_role_menu
@@ -85,7 +85,7 @@
 		</where>
 	</select>
 
-	<select id="queryByAnd" parameterType="com.website.model.vo.PermissionRoleMenuVO" resultMap="permissionRoleFunctionVO">
+	<select id="queryByAnd" parameterType="com.erlangshen.model.vo.PermissionRoleMenuVO" resultMap="permissionRoleFunctionVO">
 		SELECT
 		ID,ROLE_ID,MENU_ID
 		FROM permission_role_menu
