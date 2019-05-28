@@ -142,7 +142,7 @@
 		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
-				<!-- 制作镜像 mvn clean package dockerfile:build -->
+				<!-- 制作镜像 mvn dockerfile:build -->
 				<!-- 启动镜像 docker run -d -p 8090:8090 IMAGE_ID -->
 				<groupId>com.spotify</groupId>
 				<artifactId>dockerfile-maven-plugin</artifactId>
