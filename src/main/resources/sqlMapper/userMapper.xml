@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.website.dao.UserDaoMapper">
+<mapper namespace="com.erlangshen.dao.UserDaoMapper">
 	<resultMap id="userBO" type="com.erlangshen.model.bo.UserBO">
 		<id column="ID" property="id"/>
 		<result column="CLIENT_ID" property="clientId"/>

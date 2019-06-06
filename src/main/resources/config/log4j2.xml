@@ -53,7 +53,7 @@
 		<!-- 过滤掉一些无用的DEBUG信息 -->
 		<logger name="org.springframework" level="INFO" />
 		<logger name="org.mybatis" level="INFO" />
-		<logger name="com.website.dao" level="INFO" />
+		<logger name="com.erlangshen.dao" level="INFO" />
 
 		<!-- sql日志 -->
 		<logger name="druid.sql.Statement" level="DEBUG" additivity="false">

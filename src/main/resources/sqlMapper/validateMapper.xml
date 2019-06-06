@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.website.dao.ValidateDaoMapper">
+<mapper namespace="com.erlangshen.dao.ValidateDaoMapper">
 	<resultMap type="com.erlangshen.model.bo.ValidateBO" id="validateBO">
 		<result column="USER_ID" property="userId" />
 		<result column="TYPE" property="type" />
