@@ -17,10 +17,7 @@ import org.apache.commons.codec.binary.Base64;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 邮件、短信等验证码验证
@@ -42,21 +39,21 @@ public class ValidateService extends BaseService<ValidateDao, ValidateVO> {
      * 获取防机器人验证码
      * @param type lgoin register
      * @param tokenClientId
-     * @param loginIp
+     * @param flag
      * @return base64图片
      */
-    public String verifyCode(String type, String tokenClientId, String loginIp) {
+    public String robotCode(String type, String tokenClientId, String flag) {
         Map<String, Object> map = CodeUtil.codeImg();
 
         // code入库
-        this.insert(tokenClientId + "_" + loginIp, type, map.get("code").toString());
+        this.insert(tokenClientId + "_" + flag, type, map.get("code").toString());
 
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write((BufferedImage)map.get("image"), "jpg", baos);
             byte[] bytes = baos.toByteArray();
 
-            return Base64.encodeBase64String(bytes);
+            return "data:image/jpg;base64," + Base64.encodeBase64String(bytes);
         } catch (Exception e) {
             throw new ThrowException("验证码转base64错误：" + e.getMessage(), "122009");
         }
@@ -68,23 +65,29 @@ public class ValidateService extends BaseService<ValidateDao, ValidateVO> {
      * @param type
      * @param verifyCode
      */
-    public void checkVerifyCode(String validateId, String type, String verifyCode) {
+    public void checkRobotCode(String validateId, String type, String verifyCode) {
         ValidateVO validateVO = new ValidateVO();
         validateVO.setUserId(validateId);
         validateVO.setType(type);
         List<ValidateVO> validates = this.baseQueryByAnd(validateVO);
 
         for(ValidateVO validate : validates) {
+            Map<String, String> codeImage = new HashMap<>(1);
+            String validateType = validate.getType();
+            String[] flags = validate.getUserId().split("_");
             try {
-                this.checkOvertime(type, validate.getCreatedTime());
+                this.checkOvertime(validate.getCreatedTime());
             } catch (Exception e) {
-                throw new ThrowPrompt("验证码超时！", "152007");
+                codeImage.put("codeImage", this.robotCode(validateType, flags[0], flags[1]));
+                throw new ThrowPrompt("验证码超时！", "152007", codeImage);
             }
             if(VerifyUtils.isEmpty(verifyCode)) {
-                throw new ThrowPrompt("请输入验证码！", "152008");
+                codeImage.put("codeImage", this.robotCode(validateType, flags[0], flags[1]));
+                throw new ThrowPrompt("请输入验证码！", "152008", codeImage);
             }
             if(!validate.getCode().equalsIgnoreCase(verifyCode)) {
-                throw new ThrowPrompt("验证码错误！", "152009");
+                codeImage.put("codeImage", this.robotCode(validateType, flags[0], flags[1]));
+                throw new ThrowPrompt("验证码错误！", "152009", codeImage);
             }
         }
     }
@@ -156,16 +159,19 @@ public class ValidateService extends BaseService<ValidateDao, ValidateVO> {
      * @return ValidateVO
      */
     public ValidateVO checkByMailOrPhone(String clientId, String mail, String phone, String code, String type) {
+        String objId = clientId + "_";
+
         UserVO queryUserVO = new UserVO();
         queryUserVO.setClientId(clientId);
         if(VerifyUtils.isNotEmpty(phone)) {
             queryUserVO.setPhone(phone);
+            objId += phone;
         } else {
             queryUserVO.setMail(mail);
+            objId += mail;
         }
-        List<UserVO> users = userService.baseQueryByAnd(queryUserVO);
 
-        String objId = clientId + "_" + mail;
+        List<UserVO> users = userService.baseQueryByAnd(queryUserVO);
         if(users.size() > 0) {
             objId = users.get(0).getId();
         }
@@ -204,7 +210,7 @@ public class ValidateService extends BaseService<ValidateDao, ValidateVO> {
         } else {
             // 认证信息是否过期
             for(ValidateVO validate : validates) {
-                this.checkOvertime(type, validate.getCreatedTime());
+                this.checkOvertime(validate.getCreatedTime());
             }
             return validates;
         }
@@ -212,10 +218,9 @@ public class ValidateService extends BaseService<ValidateDao, ValidateVO> {
 
     /**
      * 校验验证码是否在有效期内
-     * @param type  验证类型
      * @param validateCreateTime 验证码创建时间
      */
-    public void checkOvertime(String type, Date validateCreateTime) {
+    public void checkOvertime(Date validateCreateTime) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(validateCreateTime);
 

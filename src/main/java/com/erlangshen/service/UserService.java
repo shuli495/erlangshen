@@ -83,19 +83,14 @@ public class UserService extends BaseService<UserDao, UserVO> {
 	 * 根据用户名、邮箱或手机校验用户是否存在
 	 * @param clientId
 	 * @param userName 用户名或邮箱或手机
-	 * @param pwd
 	 * @return
 	 */
-	public List<UserVO> checkExist(String clientId, String userName, String pwd) {
+	public List<UserVO> checkExist(String clientId, String userName) {
 		if(VerifyUtils.isEmpty(userName)) {
 			throw new ThrowPrompt("请填写用户名、邮箱或手机！", "081015");
 		}
 
-		if(VerifyUtils.isNotEmpty(pwd)) {
-			pwd = SecretUtil.md5(pwd);
-		}
-
-		return this.dao.check(clientId, userName, pwd);
+		return this.dao.check(clientId, userName);
 	}
 
 	/**
@@ -161,8 +156,8 @@ public class UserService extends BaseService<UserDao, UserVO> {
 		}
 
 		// 校验验机器人证码
-		String validateId = tokenVO.getClientId() + "_" + vo.getLoginIp();
-		validateService.checkVerifyCode(validateId, "register", vo.getVerifyCode());
+		String validateId = tokenVO.getClientId() + "_" + (VerifyUtils.isNotEmpty(userName)?userName:VerifyUtils.isNotEmpty(mail)?mail:phone);
+		validateService.checkRobotCode(validateId, "robot_register", vo.getRobotCode());
 
 		// 校验修改的信息是否已存在
 		this.checkUserInfo(clientId, "", vo.getUsername(), vo.getMail(), vo.getPhone());
@@ -175,8 +170,11 @@ public class UserService extends BaseService<UserDao, UserVO> {
 
 		// 验证验证码
 		ValidateVO validateVO = null;
+		if(VerifyUtils.isNotEmpty(phone) && VerifyUtils.isEmpty(vo.getCode())) {
+			throw new ThrowPrompt("验证码必填", "142010");
+		}
 		if(VerifyUtils.isNotEmpty(vo.getCode())) {
-			validateVO = validateService.checkByMailOrPhone(clientId, mail, phone, vo.getCode(), null);
+			validateVO = validateService.checkByMailOrPhone(clientId, mail, phone, vo.getCode(), "register");
 
 			if(VerifyUtils.isNotEmpty(phone)) {
 				vo.setPhoneVerify(1);
@@ -210,7 +208,7 @@ public class UserService extends BaseService<UserDao, UserVO> {
 		}
 
 		// 删除防机器人验证码
-		if(VerifyUtils.isNotEmpty(vo.getVerifyCode())) {
+		if(VerifyUtils.isNotEmpty(vo.getRobotCode())) {
 			try {
 				validateService.delete(validateId, "register", null);
 			} catch (Exception e){
@@ -219,7 +217,7 @@ public class UserService extends BaseService<UserDao, UserVO> {
 		}
 
 		try {
-			if(vo.getAutoLogin()) {
+			if(null != vo.getAutoLogin() && vo.getAutoLogin()) {
 				TokenVO token = tokenService.newToken(vo, vo.getLoginIp(), vo.getPlatform());
 				vo.setToken(token);
 			}
@@ -237,7 +235,7 @@ public class UserService extends BaseService<UserDao, UserVO> {
 	 * @param callback	url注册链接中，回调地址
 	 * @param isCheckUserExist	检查用户是否存在 null不检查 true存在抛异常 false不存在抛异常
 	 */
-	public Object sendMail(TokenVO token, String type, String userId, String mail, String callback, String loginIp,
+	public Object sendMail(TokenVO token, String type, String userId, String mail, String callback,
 						   String verifyCode, Boolean isCheckUserExist) {
 		if(null == token && VerifyUtils.isEmpty(userId)) {
 			throw new ThrowException("token或userId必传一个！", "072004");
@@ -247,8 +245,9 @@ public class UserService extends BaseService<UserDao, UserVO> {
 		ClientBO clientBO = null;
 
 		// 校验验机器人证码
-		String validateId = token.getClientId() + "_" + loginIp;
-		validateService.checkVerifyCode(validateId, "sendMail", verifyCode);
+		String flag = VerifyUtils.isNotEmpty(userId)?userId:mail;
+		String validateId = token.getClientId() + "_" + flag;
+		validateService.checkRobotCode(validateId, "sendMail", verifyCode);
 
 		// 校验用户权限
 		if(VerifyUtils.isNotEmpty(userId)) {
@@ -258,7 +257,7 @@ public class UserService extends BaseService<UserDao, UserVO> {
 				Map<String, String> result = new HashMap<>(3);
 				result.put("data", "用户信息错误！");
 				result.put("code", "072006");
-				result.put("image", validateService.verifyCode("sendMail", token.getClientId(), loginIp));
+				result.put("image", validateService.robotCode("sendMail", token.getClientId(), flag));
 				return result;
 			}
 			if(user.getMailVerify() == Constants.USER_MAIL_VERIFY_SUCCESS && type.startsWith(Constants.SEND_MAIL_TYPE_MAIL)) {
@@ -517,14 +516,15 @@ public class UserService extends BaseService<UserDao, UserVO> {
 	 * @param phone
 	 * @param isCheckUserExist	检查用户是否存在 null不检查 true存在抛异常 false不存在抛异常
      */
-	public Object sendPhone(TokenVO token, String type, String userId, String phone, String loginIp, String verifyCode, Boolean isCheckUserExist) {
+	public Object sendPhone(TokenVO token, String type, String userId, String phone, String verifyCode, Boolean isCheckUserExist) {
 		if(null == token && VerifyUtils.isEmpty(userId)) {
 			throw new ThrowException("token或userId必传一个！", "072004");
 		}
 
 		// 校验验机器人证码
-		String validateId = token.getClientId() + "_" + loginIp;
-		validateService.checkVerifyCode(validateId, "sendPhone", verifyCode);
+		String flag = VerifyUtils.isNotEmpty(userId)?userId:phone;
+		String validateId = token.getClientId() + "_" + flag;
+		validateService.checkRobotCode(validateId, "sendPhone", verifyCode);
 
 		ClientPhoneVO clientPhoneVO = null;
 
@@ -560,7 +560,7 @@ public class UserService extends BaseService<UserDao, UserVO> {
 		}
 
 		if(null == clientPhoneVO) {
-			throw new ThrowPrompt("该应用未配置短信平台！", "072022");
+			throw new ThrowException("该应用未配置短信平台！", "072022");
 		}
 
 		if(VerifyUtils.isEmpty(phone)) {
@@ -578,7 +578,7 @@ public class UserService extends BaseService<UserDao, UserVO> {
 			Map<String, String> result = new HashMap<>(3);
 			result.put("data", e.getMessage());
 			result.put("code", e.getCode());
-			result.put("image", validateService.verifyCode("sendPhone", token.getClientId(), loginIp));
+			result.put("image", validateService.robotCode("sendPhone", token.getClientId(), flag));
 			return result;
 		}
 
@@ -668,19 +668,44 @@ public class UserService extends BaseService<UserDao, UserVO> {
 	}
 
 	/**
-	 * 重置密码
+	 * 重置密码、找回密码
 	 * @param tokenVO	生成的token
 	 * @param userId	修改密码的用户
+	 * @param userName	用户名
+	 * @param mail		邮箱
+	 * @param phone		手机
 	 * @param code		验证码
 	 * @param oldPwd	旧密码
      * @param pwd		修改后的密码
+	 *
+	 * userId、userName、mail、phone 四选一
 	 *
 	 * code 与 oldPwd 必填一个；
 	 * code根据邮件验证码修改密码，不需要原密码；
 	 * oldPwd根据原密码修改密码，不需邮件验证，只能修改当前登录用户密码。
      */
-	public void rePwd(TokenVO tokenVO, String userId, String code, String oldPwd, String pwd) {
-		UserVO oldUserVO = super.baseFind(userId);
+	public void rePwd(TokenVO tokenVO, String userId, String userName, String mail, String phone,
+					  String code, String oldPwd, String pwd) {
+		UserVO oldUserVO = null;
+		if(VerifyUtils.isNotEmpty(userId)) {
+			oldUserVO = super.baseFind(userId);
+		} else {
+			userId = tokenVO.getClientId() + "_";
+
+			UserVO queryUser = new UserVO();
+			queryUser.setClientId(tokenVO.getClientId());
+			if(VerifyUtils.isNotEmpty(userName)) {
+				queryUser.setUsername(userName);
+				userId += userName;
+			} else if(VerifyUtils.isNotEmpty(mail)) {
+				queryUser.setMail(mail);
+				userId += mail;
+			} else if(VerifyUtils.isNotEmpty(phone)) {
+				queryUser.setPhone(phone);
+				userId += phone;
+			}
+			oldUserVO = super.baseFindByAnd(queryUser);
+		}
 
 		if(null == oldUserVO) {
 			throw new ThrowPrompt("用户信息错误！", "072026");
@@ -688,20 +713,23 @@ public class UserService extends BaseService<UserDao, UserVO> {
 
 		// 根据code修改密码
 		if(!VerifyUtils.isEmpty(code)) {
-			validateService.checkByUserId(userId, null, code);
-		} else {	// 根据原密码修改密码
-			if(!tokenVO.getUserId().equals(userId)) {
-				throw new ThrowPrompt("无权修改改用户的密码！", "072015");
+			validateService.checkByUserId(userId, "retrieve", code);
+		} else {
+			// 根据原密码修改密码
+			try {
+				this.isMyUser(tokenVO.getUserId(), userId);
+			} catch (Exception e) {
+				throw new ThrowPrompt("无权修改该用户的密码！", "072015");
 			}
 
-			if(!oldUserVO.getPwd().equals(SecretUtil.md5(oldPwd))) {
+			if(!BCrypt.checkpw(oldPwd, oldUserVO.getPwd())) {
 				throw new ThrowPrompt("原密码错误！", "072016");
 			}
 		}
 
 		UserVO userVO = new UserVO();
-		userVO.setId(userId);
-		userVO.setPwd(SecretUtil.md5(pwd));
+		userVO.setId(oldUserVO.getId());
+		userVO.setPwd(BCrypt.hashpw(pwd, BCrypt.gensalt()));
 		super.baseUpdate(userVO);
 
 		if(!VerifyUtils.isEmpty(code)) {
@@ -710,7 +738,7 @@ public class UserService extends BaseService<UserDao, UserVO> {
 				ValidateVO validateVO = new ValidateVO();
 				validateVO.setUserId(userId);
 				validateVO.setCode(code);
-				validateService.delete(userId, null, code);
+				validateService.delete(userId, "retrieve", code);
 			} catch (Exception e) {
 			}
 		}
@@ -1066,7 +1094,7 @@ public class UserService extends BaseService<UserDao, UserVO> {
      */
 	public void checkUserInfo(String clientId, String nowUserId, String userName, String mail, String phone) {
 		if(!VerifyUtils.isEmpty(userName)) {
-			List<UserVO> users = this.dao.check(clientId, userName, null);
+			List<UserVO> users = this.dao.check(clientId, userName);
 			for(UserVO user : users) {
 				// 判断是否注册
 				boolean isRegister = (VerifyUtils.isEmpty(nowUserId) && user.getUsername().equals(userName))
@@ -1078,7 +1106,7 @@ public class UserService extends BaseService<UserDao, UserVO> {
 		}
 
 		if(!VerifyUtils.isEmpty(mail)) {
-			List<UserVO> users = this.dao.check(clientId, mail, null);
+			List<UserVO> users = this.dao.check(clientId, mail);
 			for(UserVO user : users) {
 				// 判断是否注册
 				boolean isRegister = (VerifyUtils.isEmpty(nowUserId) && user.getMail().equals(mail))
@@ -1094,7 +1122,7 @@ public class UserService extends BaseService<UserDao, UserVO> {
 			}
 		}
 		if(!VerifyUtils.isEmpty(phone)) {
-			List<UserVO> users = this.dao.check(clientId, phone, null);
+			List<UserVO> users = this.dao.check(clientId, phone);
 			for(UserVO user : users) {
 				// 判断是否注册
 				boolean isRegister = (VerifyUtils.isEmpty(nowUserId) && user.getPhone().equals(phone))

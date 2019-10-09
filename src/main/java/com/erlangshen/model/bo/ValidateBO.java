@@ -13,14 +13,14 @@ public class ValidateBO extends BaseBean {
 	private static final long serialVersionUID = 1L;
 
 	@NotNull(message="{validate.userId.null}")
-	@Size(max=64, min=0, message="{validate.userId.size}")
+	@Size(max=65, min=0, message="{validate.userId.size}")
 	private String userId;
 
 	/**
 	 * 类型 email phone
 	 */
 	@NotNull(message="{validate.type.null}")
-	@Size(max=10, min=0, message="{validate.type.size}")
+	@Size(max=16, min=0, message="{validate.type.size}")
 	private String type;
 
 	@Size(max=255, min=0, message="{validate.code.size}")

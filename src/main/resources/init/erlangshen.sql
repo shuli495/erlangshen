@@ -3921,8 +3921,8 @@ CREATE TABLE `user_recycle`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `validate`;
 CREATE TABLE `validate`  (
-  `user_id` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `type` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '类型 mail phone',
+  `user_id` varchar(65) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `type` varchar(16) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '类型 mail phone',
   `code` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `created_time` datetime(0) NOT NULL,
   PRIMARY KEY (`user_id`, `type`) USING BTREE,

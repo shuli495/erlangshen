@@ -26,7 +26,7 @@ public class UserVO extends UserInfoBO {
     /**
      * 防机器人校验验证码
      */
-    private String verifyCode;
+    private String robotCode;
 
     /**
      * 新密码
@@ -53,12 +53,17 @@ public class UserVO extends UserInfoBO {
      */
     private String platform;
 
-    public String getVerifyCode() {
-        return verifyCode;
+    /**
+     * 取消生成机器人验证码
+     */
+    private boolean calanceRobotCode;
+
+    public String getRobotCode() {
+        return robotCode;
     }
 
-    public void setVerifyCode(String verifyCode) {
-        this.verifyCode = verifyCode;
+    public void setRobotCode(String robotCode) {
+        this.robotCode = robotCode;
     }
 
     public String getCreatedBy() {
@@ -125,11 +130,19 @@ public class UserVO extends UserInfoBO {
         this.platform = platform;
     }
 
+    public boolean getCalanceRobotCode() {
+        return calanceRobotCode;
+    }
+
+    public void setCalanceRobotCode(boolean calanceRobotCode) {
+        this.calanceRobotCode = calanceRobotCode;
+    }
 
     @Override
     public String toString() {
         return super.toString() + " UserVO{\"createdBy\": \""+createdBy+"\", \"clientName\": \""+clientName+"\", "
                 + "\"code\": \""+code+"\", \"oldPwd\": \""+oldPwd+"\", \"token\": \""+token+"\", "
-                + "\"autoLogin\": \""+autoLogin+"\", \"loginIp\": \""+loginIp+"\", \"platform\": \""+platform+"\"}";
+                + "\"autoLogin\": \""+autoLogin+"\", \"loginIp\": \""+loginIp+"\", \"platform\": \""+platform+"\","
+                + "\"calanceRobotCode\": \"" + calanceRobotCode + "}";
     }
 }

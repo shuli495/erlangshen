@@ -1,6 +1,9 @@
 package com.erlangshen.service;
 
+import com.erlangshen.common.Constants;
 import com.erlangshen.common.HttpHelper;
+import com.erlangshen.dao.TokenDao;
+import com.erlangshen.executor.LoginPlaceReport;
 import com.erlangshen.model.vo.ClientSecurityVO;
 import com.erlangshen.model.vo.TokenVO;
 import com.erlangshen.model.vo.UserVO;
@@ -9,8 +12,6 @@ import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.page.OrderSort;
 import com.fastjavaframework.response.ReturnJson;
 import com.fastjavaframework.util.VerifyUtils;
-import com.erlangshen.dao.TokenDao;
-import com.erlangshen.executor.LoginPlaceReport;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -23,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
@@ -61,25 +61,25 @@ public class TokenService extends BaseService<TokenDao, TokenVO> {
      * @param userName
      * @param pwd
      * @param platform 登录端，区分不同平台的登录，用于校验不同平台是否可以同事登录；入安卓登录、网页能同时登录，其他手机不能登录。空值全局校验
-     * @param verifyCode
+     * @param robotCode
      * @return
      */
-    public Object inster(HttpServletResponse response, TokenVO token, boolean isCheckStatus,
-                          String loginIp, String userName, String pwd, String platform, String verifyCode) {
+    public Object inster(TokenVO token, boolean isCheckStatus, String loginIp, String userName, String pwd,
+                         String platform, String robotCode) {
         // 校验防机器人验证码
         String validateId = token.getClientId() + "_" + loginIp;
-        validateService.checkVerifyCode(validateId, "login", verifyCode);
+        validateService.checkRobotCode(validateId, Constants.CODE_TYPE_ROBOT, robotCode);
 
         // 根据用户名查询用户
         List<UserVO> users = new ArrayList<>();
         try {
-            users = userService.checkExist(token.getClientId(), userName, null);
+            users = userService.checkExist(token.getClientId(), userName);
         } catch (Exception e) {
-            return this.returnCode(response, token.getClientId(), loginIp, "用户名或密码错误！", "122012");
+            return this.returnCode(token.getClientId(), userName, "用户名或密码错误！", "122012");
         }
 
         if(users.size() == 0) {
-            return this.returnCode(response, token.getClientId(), loginIp, "用户名或密码错误！", "122013");
+            return this.returnCode(token.getClientId(), userName, "用户名或密码错误！", "122013");
         }
 
         // 验证状态
@@ -98,7 +98,7 @@ public class TokenService extends BaseService<TokenDao, TokenVO> {
 
         // 校验密码
         if(!BCrypt.checkpw(pwd, user.getPwd())) {
-            return this.returnCode(response, token.getClientId(), loginIp, "用户名或密码错误！", "122014");
+            return this.returnCode(token.getClientId(), userName, "用户名或密码错误！", "122014");
         }
 
         // 查询已存在token
@@ -130,7 +130,7 @@ public class TokenService extends BaseService<TokenDao, TokenVO> {
         // 没有token，新生成
         if (null == userTokens || userTokens.size() == 0) {
             // 删除登录验证码
-            validateService.delete(validateId, "login", null);
+            validateService.delete(validateId, Constants.CODE_TYPE_ROBOT, null);
             // 返回token
             return (new ReturnJson()).success(this.newToken(user, loginIp, platform));
         } else {
@@ -200,7 +200,7 @@ public class TokenService extends BaseService<TokenDao, TokenVO> {
             }
 
             // 删除登录防机器人验证码
-            validateService.delete(validateId, "login", null);
+            validateService.delete(validateId, Constants.CODE_TYPE_ROBOT, null);
 
             // 返回token
             user.setToken(reToken);
@@ -210,20 +210,16 @@ public class TokenService extends BaseService<TokenDao, TokenVO> {
 
     /**
      * 返回code
-     * @param response
      * @param tokenClientId
      * @param loginIp
      * @param data
      * @param code
      * @return
      */
-    private Object returnCode(HttpServletResponse response, String tokenClientId, String loginIp, String data, String code) {
-        response.setStatus(400);
-        Map<String, String> result = new HashMap<>(3);
-        result.put("data", data);
-        result.put("code", code);
-        result.put("image", validateService.verifyCode("login", tokenClientId, loginIp));
-        return result;
+    private Object returnCode(String tokenClientId, String loginIp, String data, String code) {
+        Map<String, String> codeImageMap = new HashMap<>(1);
+        codeImageMap.put("codeImage", validateService.robotCode(Constants.CODE_TYPE_ROBOT, tokenClientId, loginIp));
+        throw new ThrowPrompt(data, code, codeImageMap);
     }
 
     /**
@@ -301,14 +297,9 @@ public class TokenService extends BaseService<TokenDao, TokenVO> {
             throw new ThrowPrompt("token无效！", "122005");
         }
 
-        Claims claims = Jwts.parser()
-                .setSigningKey(aesSecret)
-                .parseClaimsJws(token)
-                .getBody();
-
         TokenVO tokenVO = super.baseFind(token);
 
-        if(null == tokenVO || null == claims) {
+        if(null == tokenVO) {
             throw new ThrowPrompt("token无效！", "122006");
         }
 
@@ -320,6 +311,14 @@ public class TokenService extends BaseService<TokenDao, TokenVO> {
         cal.setTime(new Date());
         if(tokenVO.getActiveTime().before(cal.getTime())) {
             throw new ThrowPrompt("token失效，请重新获取！", "122008");
+        }
+
+        Claims claims = Jwts.parser()
+                .setSigningKey(aesSecret)
+                .parseClaimsJws(token)
+                .getBody();
+        if(null == claims) {
+            throw new ThrowPrompt("token无效！", "122009");
         }
 
         tokenVO.setClientId((String)claims.get("cilentId"));

@@ -10,7 +10,6 @@ import com.fastjavaframework.annotation.Authority;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
 import com.fastjavaframework.page.Page;
-import com.fastjavaframework.util.CommonUtil;
 import com.fastjavaframework.util.UUID;
 import com.fastjavaframework.util.VerifyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 /**
@@ -45,18 +47,9 @@ public class UserController extends BaseElsController<UserService> {
 	 */
 	@Authority(role = Constants.ADMIN_TOKEN)
 	@RequestMapping(method=RequestMethod.POST)
-	public Object create(@RequestBody UserVO vo) {
-		String loginIp = vo.getLoginIp();
-		if(Constants.IDENTITY_TYPE_KEY.equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
-			throw new ThrowException("AK/SK方式loginIp参数必传！", "071002");
-		}
-
-		if(VerifyUtils.isEmpty(loginIp)) {
-			loginIp = CommonUtil.getIp(super.request);
-		}
-
-		vo.setLoginIp(loginIp);
-		vo.setId(UUID.uuid());
+	public Object create(@RequestBody UserVO vo) throws Exception {
+		String uuid = UUID.uuid();
+		vo.setId(uuid);
 		vo.setCreatedTime(new Date());
 
 		if(VerifyUtils.isEmpty(vo.getClientId())) {
@@ -65,27 +58,42 @@ public class UserController extends BaseElsController<UserService> {
 
 		try {
 			this.service.insert(super.identity(), vo);
-		} catch (ThrowException e) {
-			response.setStatus(500);
+		} catch (Exception e) {
+			Map<String, Object> errResult = new HashMap<>(3);
 
-			Map<String, String> result = new HashMap<>(3);
-			result.put("data", e.getMessage());
-			result.put("code", e.getCode());
-			result.put("image", validateService.verifyCode("register", super.identity().getClientId(), loginIp));
-			return result;
-		} catch (ThrowPrompt e) {
-			response.setStatus(400);
+			String code = "500";
+			String message = e.getMessage();
+			String status = ThrowException.RETRUN_EXCEPTION_NAME;
+			if (e instanceof ThrowPrompt) {
+				status = ThrowPrompt.RETRUN_PROMPT_NAME;
+				code = ((ThrowPrompt) e).getCode();
+				message = ((ThrowPrompt) e).getDetailMessage();
+			} else if(e instanceof ThrowException) {
+				code = ((ThrowException) e).getCode();
+				message = ((ThrowException) e).getDetailMessage();
+			}
 
-			Map<String, String> result = new HashMap<>(3);
-			result.put("data", e.getMessage());
-			result.put("code", e.getCode());
-			result.put("image", validateService.verifyCode("register", super.identity().getClientId(), loginIp));
-			return result;
+			errResult.put("message", message);
+			errResult.put("code", code);
+			errResult.put("status", status);
+			errResult.put("data", "");
+
+			if(!vo.getCalanceRobotCode()) {
+				Map<String, String> codeImageMap = new HashMap<>(1);
+				String flag = VerifyUtils.isNotEmpty(vo.getUsername())?vo.getUsername():VerifyUtils.isNotEmpty(vo.getMail())?vo.getMail():vo.getPhone();
+				codeImageMap.put("codeImage", validateService.robotCode("robot_register", super.identity().getClientId(), flag));
+				errResult.put("data", codeImageMap);
+			}
+
+			return errResult;
 		}
 
 		Map<String, String> map = new HashMap<>(2);
 		map.put("id", vo.getId());
-		map.put("token", vo.getToken().getId());
+
+		if(null != vo.getToken() && VerifyUtils.isNotEmpty(vo.getToken().getId())) {
+			map.put("token", vo.getToken().getId());
+		}
 
 		return success(map);
 	}
@@ -104,7 +112,6 @@ public class UserController extends BaseElsController<UserService> {
 						   @RequestParam(required = false) String mail,
 						   @RequestParam(required = false) String userId,
 						    @RequestParam(required = false) String callback,
-						   @RequestParam(required = false) String loginIp,
 						   @RequestParam(required = false) String verifyCode,
 						   @RequestParam(required = false) Boolean isCheckUserExist) {
 		if(VerifyUtils.isEmpty(type)) {
@@ -115,15 +122,7 @@ public class UserController extends BaseElsController<UserService> {
 			throw new ThrowPrompt("mail喝userId二选一!", "081017");
 		}
 
-		if(Constants.IDENTITY_TYPE_KEY.equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
-			throw new ThrowException("AK/SK方式loginIp参数必传！", "081018");
-		}
-
-		if(VerifyUtils.isEmpty(loginIp)) {
-			loginIp = CommonUtil.getIp(super.request);
-		}
-
-		return this.service.sendMail(super.identity(), type, userId, mail, callback, loginIp, verifyCode, isCheckUserExist);
+		return this.service.sendMail(super.identity(), type, userId, mail, callback, verifyCode, isCheckUserExist);
 	}
 
 	/**
@@ -139,19 +138,10 @@ public class UserController extends BaseElsController<UserService> {
 	public Object sendPhone(@RequestParam String type,
 						   @RequestParam(required = false) String userId,
 							@RequestParam(required = false) String phone,
-							@RequestParam(required = false) String loginIp,
 							@RequestParam(required = false) String verifyCode,
 							@RequestParam(required = false) Boolean isCheckUserExist) {
 
-		if(Constants.IDENTITY_TYPE_KEY.equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
-			throw new ThrowException("AK/SK方式loginIp参数必传！", "081018");
-		}
-
-		if(VerifyUtils.isEmpty(loginIp)) {
-			loginIp = CommonUtil.getIp(super.request);
-		}
-
-		return this.service.sendPhone(super.identity(), type, userId, phone, loginIp, verifyCode, isCheckUserExist);
+		return this.service.sendPhone(super.identity(), type, userId, phone, verifyCode, isCheckUserExist);
 	}
 
 	/**
@@ -203,7 +193,7 @@ public class UserController extends BaseElsController<UserService> {
 	 */
 	@RequestMapping(value="/checkUser/{name}", method=RequestMethod.GET)
 	public Object checkUser(@PathVariable String name) {
-		List<UserVO> users = this.service.checkExist(super.identity().getClientId(), name, null);
+		List<UserVO> users = this.service.checkExist(super.identity().getClientId(), name);
 
 		if(users.size() == 0) {
 			return success(true);
@@ -367,23 +357,24 @@ public class UserController extends BaseElsController<UserService> {
 	}
 
 	/**
-	 * 修改密码
+	 * 重置密码、找回密码
 	 */
 	@Authority(role = Constants.ADMIN_TOKEN)
 	@RequestMapping(value="/rePwd", method=RequestMethod.POST)
 	public Object rePwd(@RequestBody UserVO vo) {
-		if(VerifyUtils.isEmpty(vo.getId())) {
-			throw new ThrowPrompt("id必传!", "081013");
+		if(VerifyUtils.isEmpty(vo.getId()) && VerifyUtils.isEmpty(vo.getUsername())
+				&& VerifyUtils.isEmpty(vo.getMail()) && VerifyUtils.isEmpty(vo.getPhone())) {
+			throw new ThrowPrompt("请输入账号", "081013");
 		}
 		if(VerifyUtils.isEmpty(vo.getPwd())) {
-			throw new ThrowPrompt("pwd必传!", "081014");
+			throw new ThrowPrompt("请输入新密码", "081014");
 		}
 		if(VerifyUtils.isEmpty(vo.getCode()) && VerifyUtils.isEmpty(vo.getOldPwd())) {
-			throw new ThrowPrompt("code或oldPwd必传一个!", "081015");
+			throw new ThrowPrompt("验证码或原密码必传一个!", "081015");
 		}
 
-		vo.setId(vo.getId());
-		this.service.rePwd(super.identity(), vo.getId(), vo.getCode(), vo.getOldPwd(), vo.getPwd());
+		this.service.rePwd(super.identity(), vo.getId(), vo.getUsername(), vo.getMail(), vo.getPhone(),
+				vo.getCode(), vo.getOldPwd(), vo.getPwd());
 		return success();
 	}
 

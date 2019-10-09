@@ -138,7 +138,7 @@ public class LoginPlaceReport extends AbstractQpsControl {
         if(VerifyUtils.isNotEmpty(clientPhoneId)) {
             ClientPhoneVO clientPhoneVO = clientPhoneService.baseFind(clientPhoneId);
             if(null != clientPhoneVO) {
-                userService.sendPhone(null, clientPhoneVO.getType(), userId, null, "", null, null);
+                userService.sendPhone(null, clientPhoneVO.getType(), userId, null, null, null);
             }
         }
     }
@@ -151,7 +151,7 @@ public class LoginPlaceReport extends AbstractQpsControl {
         if(VerifyUtils.isNotEmpty(clientMailId)) {
             ClientMailVO clientMailVO = clientMailService.baseFind(clientMailId);
             if(null != clientMailVO) {
-                userService.sendMail(null, clientMailVO.getType(), userId, null, null, "", null, null);
+                userService.sendMail(null, clientMailVO.getType(), userId, null, null, null, null);
             }
         }
     }

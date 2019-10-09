@@ -36,8 +36,8 @@ mybatis:
 fastjava:
   options-auhority: true
   exception:
-    message: ""
-
+    response-ok: true
+    prompt-stack: true
 
 aes:
   secret: ${SECRET:123QWE}  #数据加密秘钥

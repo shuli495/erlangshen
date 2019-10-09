@@ -2,6 +2,7 @@ package com.erlangshen.controller;
 
 import com.erlangshen.common.BaseElsController;
 import com.erlangshen.common.Constants;
+import com.erlangshen.model.vo.LoginVO;
 import com.erlangshen.model.vo.TokenVO;
 import com.erlangshen.service.TokenService;
 import com.erlangshen.service.UserService;
@@ -29,18 +30,12 @@ public class TokenController extends BaseElsController<TokenService> {
 
 	/**
 	 * 获取token
-	 * @param isCheckStatus 是否校验用户激活状态
      * @return
      */
 	@Authority(role = Constants.ADMIN_TOKEN)
 	@RequestMapping(method=RequestMethod.POST)
-	public Object token(@RequestHeader(value="Is-Check-Status",required=false) boolean isCheckStatus) {
-		String userName = request.getParameter("userName");
-		String pwd = request.getParameter("pwd");
-		String verifyCode = request.getParameter("verifyCode");
-		String platform = request.getParameter("platform");
-		String loginIp = request.getParameter("loginIp");
-
+	public Object token(@RequestBody LoginVO loginVO) {
+		String loginIp = loginVO.getLoginIp();
 		if(Constants.IDENTITY_TYPE_KEY.equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
 			throw new ThrowException("AK/SK方式loginIp参数必传！", "071002");
 		}
@@ -49,20 +44,20 @@ public class TokenController extends BaseElsController<TokenService> {
 			loginIp = CommonUtil.getIp(super.request);
 		}
 
-		return this.service.inster(response, super.identity(), isCheckStatus, loginIp, userName, pwd, platform, verifyCode);
+		return this.service.inster(super.identity(), loginVO.isCheckStatus(), loginIp, loginVO.getUserName(),
+				loginVO.getPwd(), loginVO.getPlatform(), loginVO.getRobotCode());
 	}
 
 	/**
 	 * 查询token是否有效
-	 * @param token
 	 * @return
 	 */
-	@RequestMapping(value = "/{token}", method=RequestMethod.POST)
-	public Object check(@PathVariable String token) {
-		String loginIp = request.getParameter("loginIp");
+	@RequestMapping(method=RequestMethod.PUT)
+	public Object check(@RequestBody LoginVO loginVO) {
+		String loginIp = loginVO.getLoginIp();
 
 		// 检查token
-		TokenVO tokenVO = this.service.check(token, loginIp);
+		TokenVO tokenVO = this.service.check(loginVO.getToken(), loginIp);
 
 		Map<String, Object> result = new HashMap<>(2);
 		if(userService.isMyUser(super.identity().getUserId(), tokenVO.getUserId())) {

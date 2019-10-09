@@ -8,7 +8,6 @@ import com.erlangshen.service.ValidateService;
 import com.fastjavaframework.annotation.Authority;
 import com.fastjavaframework.exception.ThrowException;
 import com.fastjavaframework.exception.ThrowPrompt;
-import com.fastjavaframework.util.CommonUtil;
 import com.fastjavaframework.util.UUID;
 import com.fastjavaframework.util.VerifyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,20 +33,17 @@ public class CodeController extends BaseElsController<CodeService> {
 	 */
 	@Authority(role = Constants.ADMIN_TOKEN)
 	@RequestMapping(value="/verify", method=RequestMethod.GET)
-	public Object code(@RequestParam(required = false) String loginIp, @RequestParam(required = true) String type) {
-		if(Constants.IDENTITY_TYPE_KEY.equals(super.identity().getAuthenticationMethod()) && VerifyUtils.isEmpty(loginIp)) {
-			throw new ThrowException("AK/SK方式loginIp参数必传！", "071001");
+	public Object code(String flag, String type) {
+		if(VerifyUtils.isEmpty(flag)) {
+			throw new ThrowException("flag参数必传！", "071001");
 		}
 
-		if(VerifyUtils.isEmpty(loginIp)) {
-			loginIp = CommonUtil.getIp(super.request);
+		if(!Constants.CODE_TYPE_ROBOT.equals(type) && !Constants.CODE_TYPE_REGISTER.equals(type)
+				&& !Constants.CODE_TYPE_RETRIEVE.equals(type)) {
+			throw new ThrowException("类型不正确", "071003");
 		}
 
-		if(!Constants.CODE_TYPE_LOGIN.equals(type) && !Constants.CODE_TYPE_REGISTER.equals(type)) {
-			throw new ThrowException("类型只能是login或register！", "071003");
-		}
-
-		return success(validateService.verifyCode(type, super.identity().getClientId(), loginIp));
+		return success(validateService.robotCode(type, super.identity().getClientId(), flag));
 	}
 
 	/**

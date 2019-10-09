@@ -42,9 +42,6 @@
 		WHERE t0.CLIENT_ID=t1.ID AND t1.DELETED=0
 		  AND t1.ID=#{clientId}
 		  AND (t0.USERNAME=#{username} OR t0.MAIL=#{username} OR t0.PHONE=#{username})
-		  <if test="pwd != null">
-		  	  AND t0.PWD=#{pwd}
-		  </if>
 	</select>
 
 	<insert id="insert" keyProperty="id" parameterType="com.erlangshen.model.bo.UserBO" useGeneratedKeys="true">

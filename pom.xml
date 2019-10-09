@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com</groupId>
 	<artifactId>erlangshen</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 
 	<packaging>jar</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
@@ -33,13 +33,12 @@
 
 	<parent>
 		<!-- 从本地关联fastjava代码，本地需要添加fastjava代码，与下个依赖二选一 -->
-<!--        <groupId>com.fastjavaframework</groupId>-->
-<!--        <artifactId>fastjava-parent</artifactId>-->
-<!--        <version>2.0.1</version>-->
-<!--        <relativePath>../fastjava-parent/pom.xml</relativePath>-->
-		<groupId>com.github.shuli495</groupId>
+		<groupId>com.fastjavaframework</groupId>
 		<artifactId>fastjava-parent</artifactId>
-		<version>2.0.1</version>
+		<version>2.0.6</version>
+<!--		<groupId>com.github.shuli495</groupId>-->
+<!--		<artifactId>fastjava-parent</artifactId>-->
+<!--		<version>2.0.6</version>-->
 	</parent>
 
 	<repositories>

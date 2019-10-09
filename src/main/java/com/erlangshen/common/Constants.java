@@ -91,10 +91,13 @@ public class Constants {
 
 	/**
 	 * 发送验证码类型
-	 * login登录验证码 register注册验证码
+	 * robot防刷验证码
+	 * register注册时短信或邮件验证码
+	 * retrieve找回密码时短信或邮件验证码
 	 */
-	public static final String CODE_TYPE_LOGIN = "login";
+	public static final String CODE_TYPE_ROBOT = "robot";
 	public static final String CODE_TYPE_REGISTER = "register";
+	public static final String CODE_TYPE_RETRIEVE = "retrieve";
 
 	/**
 	 * 发送邮件类型

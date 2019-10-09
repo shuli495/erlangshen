@@ -6,13 +6,13 @@ import com.erlangshen.common.HttpHelper;
 import com.erlangshen.model.vo.ClientVO;
 import com.erlangshen.model.vo.KeyVO;
 import com.erlangshen.model.vo.TokenVO;
+import com.erlangshen.service.ClientService;
+import com.erlangshen.service.KeyService;
+import com.erlangshen.service.TokenService;
 import com.fastjavaframework.listener.SystemSetting;
 import com.fastjavaframework.util.CommonUtil;
 import com.fastjavaframework.util.SecretUtil;
 import com.fastjavaframework.util.VerifyUtils;
-import com.erlangshen.service.ClientService;
-import com.erlangshen.service.KeyService;
-import com.erlangshen.service.TokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.context.WebApplicationContext;
@@ -74,7 +74,7 @@ public class IdentityFilter implements Filter {
      * @throws IOException
      */
     private String sign(HttpServletRequest request, String body, String sk) throws IOException {
-        String url = request.getMethod() + ":" + request.getPathInfo();
+        String url = request.getMethod() + ":" + request.getServletPath();
         if(HttpMethod.GET.toString().equalsIgnoreCase(request.getMethod())) {
             body = request.getQueryString();
         }
@@ -194,7 +194,7 @@ public class IdentityFilter implements Filter {
      * @param response
      */
     private void returnError(HttpServletResponse response) {
-        CommonUtil.setResponseReturnValue(response, 401, "{\"data\":\"身份认证错误！\"}");
+        CommonUtil.setResponseReturnValue(response, 401, "身份认证错误！");
     }
 
     @Override
